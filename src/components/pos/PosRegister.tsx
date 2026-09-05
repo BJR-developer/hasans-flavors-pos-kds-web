@@ -165,11 +165,11 @@ export function PosRegister() {
   };
 
   return (
-    <div className="flex-1 flex flex-col lg:flex-row min-h-[calc(100vh-56px)] lg:h-[calc(100vh-56px)] overflow-y-auto lg:overflow-hidden bg-[#FAFAFA] relative">
+    <div className="flex-1 flex flex-col md:flex-row min-h-[calc(100vh-3.5rem)] bg-[#FAFAFA] relative">
       {/* Menu Catalog Pane */}
-      <div className="flex-1 flex flex-col overflow-hidden min-w-0">
+      <div className="flex-1 min-w-0 flex flex-col">
         {/* Minimal Category & Search Bar */}
-        <div className="px-4 sm:px-5 py-2.5 bg-white border-b border-[#E5E5E5] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shrink-0 sticky top-0 lg:static z-10">
+        <div className="px-4 sm:px-5 py-2.5 bg-white border-b border-[#E5E5E5] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shrink-0 sticky top-14 z-10">
           {/* Categories with IMAGES for Fast Visual Selection */}
           <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
             {/* All Dishes Category Chip */}
@@ -263,7 +263,7 @@ export function PosRegister() {
         </div>
 
         {/* Fast Dish Grid (Responsive 2 to 5 columns) */}
-        <div className="flex-1 overflow-y-auto p-3 sm:p-4 lg:p-5">
+        <div className="p-3 sm:p-4 lg:p-5">
           {filteredDishes.length === 0 ? (
             <div className="h-64 flex flex-col items-center justify-center text-center text-[#737373]">
               <AlertCircle className="w-6 h-6 stroke-1 text-[#A3A3A3] mb-1.5" />
@@ -351,8 +351,11 @@ export function PosRegister() {
         </div>
       </div>
 
-      {/* Fast Order Ticket Pane (Sticky Right) */}
-      <div id="pos-order-ticket" className="shrink-0">
+      {/* Fast Order Ticket Pane (100% Sticky Right from md: up) */}
+      <aside
+        id="pos-order-ticket"
+        className="w-full md:w-[360px] lg:w-[390px] xl:w-[420px] shrink-0 bg-white border-t md:border-t-0 md:border-l border-[#E5E5E5] md:sticky md:top-14 md:h-[calc(100dvh-3.5rem)] md:self-start z-20 flex flex-col"
+      >
         <PosCartPane
           items={cartItems}
           onUpdateQty={handleUpdateQty}
@@ -360,11 +363,11 @@ export function PosRegister() {
           onClearCart={() => setCartItems([])}
           onOrderCompleted={(order) => setReceiptOrder(order)}
         />
-      </div>
+      </aside>
 
       {/* Mobile Sticky Bottom Summary Bar */}
       {cartItems.length > 0 && (
-        <div className="lg:hidden fixed bottom-0 left-0 right-0 p-3 bg-white/95 backdrop-blur-xs border-t border-[#E5E5E5] shadow-lg flex items-center justify-between z-30 px-4">
+        <div className="md:hidden fixed bottom-0 left-0 right-0 p-3 bg-white/95 backdrop-blur-xs border-t border-[#E5E5E5] shadow-lg flex items-center justify-between z-30 px-4">
           <div>
             <div className="flex items-center gap-1.5">
               <span className="text-xs font-bold text-[#1F1F1F]">

@@ -90,9 +90,9 @@ export function PosCartPane({
   };
 
   return (
-    <div className="w-full lg:w-[380px] xl:w-[420px] shrink-0 bg-white border-l border-[#E5E5E5] flex flex-col h-full lg:sticky lg:top-14 lg:h-[calc(100vh-56px)] z-20">
-      {/* 1. Sticky Header inside Ticket */}
-      <div className="p-4 border-b border-[#E5E5E5] bg-white sticky top-0 z-10 space-y-3 shrink-0">
+    <div className="w-full h-full flex flex-col bg-white overflow-hidden">
+      {/* 1. Ticket Header & Channel Switcher */}
+      <div className="p-4 border-b border-[#E5E5E5] bg-white space-y-3 shrink-0">
         <div className="flex items-center justify-between">
           <span className="text-xs font-bold text-[#1F1F1F] tracking-tight">
             Order Ticket{' '}
