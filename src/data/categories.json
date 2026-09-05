@@ -1,0 +1,65 @@
+[
+  {
+    "id": "all",
+    "name": "All Dishes",
+    "icon": "restaurant-outline",
+    "count": 67,
+    "imageUrl": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=400&q=80"
+  },
+  {
+    "id": "biryani",
+    "name": "Biryani & Rice",
+    "match": "biryani|rice",
+    "icon": "bowl-outline",
+    "count": 19,
+    "imageUrl": "https://halalfood.com.ph/wp-content/uploads/2026/08/WhatsApp-Image-2026-08-01-at-10.09.05-PM.jpeg"
+  },
+  {
+    "id": "curries",
+    "name": "Curries & Karahi",
+    "match": "curry|karahi|haleem|nihari",
+    "icon": "flame-outline",
+    "count": 9,
+    "imageUrl": "https://images.unsplash.com/photo-1589302168068-964664d93dc0?auto=format&fit=crop&w=400&q=80"
+  },
+  {
+    "id": "bbq",
+    "name": "BBQ & Kababs",
+    "match": "kabab|bbq|tikka",
+    "icon": "bonfire-outline",
+    "count": 5,
+    "imageUrl": "https://halalfood.com.ph/wp-content/uploads/2026/08/WhatsApp-Image-2026-07-31-at-9.39.37-PM.jpeg"
+  },
+  {
+    "id": "rolls",
+    "name": "Rolls & Fast Food",
+    "match": "roll|burger|wrap|bite",
+    "icon": "fast-food-outline",
+    "count": 12,
+    "imageUrl": "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?auto=format&fit=crop&w=400&q=80"
+  },
+  {
+    "id": "drinks",
+    "name": "Soft Drinks & Beverages",
+    "match": "drink|beverage|cola|coke|sprite|royal|water|lassi|chai|tea|soda|lemonade",
+    "icon": "water-outline",
+    "count": 10,
+    "imageUrl": "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&w=400&q=80"
+  },
+  {
+    "id": "breads",
+    "name": "Fresh Breads & Roti",
+    "match": "roti|naan|paratha|chapati",
+    "icon": "pizza-outline",
+    "count": 3,
+    "imageUrl": "https://halalfood.com.ph/wp-content/uploads/2026/08/adadad.jpeg"
+  },
+  {
+    "id": "combos",
+    "name": "Party Bilao & Combos",
+    "match": "bilao|combo|platter",
+    "icon": "people-outline",
+    "count": 3,
+    "imageUrl": "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=400&q=80"
+  }
+]
