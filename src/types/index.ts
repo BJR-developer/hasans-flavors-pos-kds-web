@@ -93,7 +93,16 @@ export interface TableSession {
   joinedAt?: string;
 }
 
-export type UserRole = 'pos' | 'kds' | 'owner';
+export type UserRole = 'staff' | 'kds' | 'owner';
+
+export interface UserProfile {
+  id: string;
+  name: string;
+  email: string;
+  role: UserRole;
+  roleLabel: string;
+  avatarUrl?: string;
+}
 
 export interface DailyStats {
   todayRevenue: number;

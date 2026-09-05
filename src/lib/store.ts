@@ -179,7 +179,66 @@ export function setStoredDishes(dishes: Dish[]): void {
 }
 
 /**
- * Toggle dish stock (86 item)
+ * Add a new product / dish to the menu
+ */
+export function addDish(dishData: Omit<Dish, 'id' | 'slug' | 'formattedPrice' | 'rating' | 'reviewCount'>): Dish {
+  const dishes = getStoredDishes();
+  const id = `dish_${Date.now()}`;
+  const slug = dishData.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+  
+  const newDish: Dish = {
+    ...dishData,
+    id,
+    slug,
+    formattedPrice: `₱${dishData.price.toLocaleString()}`,
+    rating: '4.8',
+    reviewCount: 1,
+  };
+
+  const updated = [newDish, ...dishes];
+  setStoredDishes(updated);
+  return newDish;
+}
+
+/**
+ * Update an existing product
+ */
+export function updateDish(dishId: string, partial: Partial<Dish>): Dish | null {
+  const dishes = getStoredDishes();
+  let updatedDish: Dish | null = null;
+
+  const updated = dishes.map((d) => {
+    if (d.id === dishId) {
+      const price = partial.price !== undefined ? partial.price : d.price;
+      updatedDish = {
+        ...d,
+        ...partial,
+        price,
+        formattedPrice: `₱${price.toLocaleString()}`,
+      };
+      return updatedDish;
+    }
+    return d;
+  });
+
+  if (updatedDish) {
+    setStoredDishes(updated);
+  }
+  return updatedDish;
+}
+
+/**
+ * Delete a product
+ */
+export function deleteDish(dishId: string): boolean {
+  const dishes = getStoredDishes();
+  const filtered = dishes.filter((d) => d.id !== dishId);
+  setStoredDishes(filtered);
+  return true;
+}
+
+/**
+ * Toggle dish stock (In Stock vs Out of Stock)
  */
 export function toggleDishStock(dishId: string): Dish[] {
   const dishes = getStoredDishes();

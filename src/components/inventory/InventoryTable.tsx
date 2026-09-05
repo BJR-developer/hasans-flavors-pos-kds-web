@@ -15,11 +15,17 @@ import {
 import {
   Search,
   X,
+  Plus,
+  Edit2,
   ChevronLeft,
   ChevronRight,
+  Info,
+  CheckCircle2,
+  XCircle,
 } from 'lucide-react';
 import { Dish } from '@/types';
 import { useDishes, useCategories, useToggleDishStock } from '@/hooks/useRestaurantData';
+import { ProductFormModal } from './ProductFormModal';
 
 export function InventoryTable() {
   const { data: dishes = [] } = useDishes();
@@ -31,6 +37,10 @@ export function InventoryTable() {
   const [selectedCat, setSelectedCat] = useState<string>('all');
   const [stockFilter, setStockFilter] = useState<'all' | 'instock' | 'outofstock'>('all');
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 12 });
+
+  // Product Create / Edit Modal state
+  const [isFormModalOpen, setIsFormModalOpen] = useState(false);
+  const [dishToEdit, setDishToEdit] = useState<Dish | null>(null);
 
   const filteredData = useMemo(() => {
     return dishes.filter((dish) => {
@@ -55,7 +65,7 @@ export function InventoryTable() {
     () => [
       {
         accessorKey: 'name',
-        header: 'Dish',
+        header: 'Dish / Product',
         cell: ({ row }) => {
           const d = row.original;
           return (
@@ -69,9 +79,14 @@ export function InventoryTable() {
                   sizes="36px"
                 />
               </div>
-              <span className="font-semibold text-xs text-[#1F1F1F] truncate max-w-xs">
-                {d.name}
-              </span>
+              <div className="min-w-0">
+                <span className="font-semibold text-xs text-[#1F1F1F] truncate block max-w-xs">
+                  {d.name}
+                </span>
+                <span className="text-[10px] text-[#737373] line-clamp-1 max-w-xs">
+                  {d.description}
+                </span>
+              </div>
             </div>
           );
         },
@@ -96,31 +111,55 @@ export function InventoryTable() {
       },
       {
         accessorKey: 'inStock',
-        header: 'Status',
+        header: 'Stock Status',
         cell: ({ row }) => {
           const inStock = row.original.inStock;
           return (
             <span
-              className={`text-[11px] font-semibold px-2 py-0.5 rounded ${
+              className={`inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded ${
                 inStock
                   ? 'text-[#2E7D32] bg-[#E8F5E9]'
                   : 'text-[#BA1A20] bg-[#FFF2F0]'
               }`}
             >
-              {inStock ? 'Available' : '86 Out of Stock'}
+              {inStock ? (
+                <>
+                  <CheckCircle2 className="w-3 h-3" />
+                  <span>Available</span>
+                </>
+              ) : (
+                <>
+                  <XCircle className="w-3 h-3" />
+                  <span>Out of Stock</span>
+                </>
+              )}
             </span>
           );
         },
       },
       {
         id: 'actions',
-        header: () => <span className="text-right block">Toggle</span>,
+        header: () => <span className="text-right block">Manage</span>,
         cell: ({ row }) => {
           const dish = row.original;
           const isAvailable = dish.inStock;
 
           return (
-            <div className="text-right">
+            <div className="flex items-center justify-end gap-2">
+              {/* Edit Product */}
+              <button
+                type="button"
+                onClick={() => {
+                  setDishToEdit(dish);
+                  setIsFormModalOpen(true);
+                }}
+                className="p-1 rounded text-[#737373] hover:text-[#1F1F1F] hover:bg-[#F5F5F5] transition-colors"
+                title="Edit Product"
+              >
+                <Edit2 className="w-3.5 h-3.5" />
+              </button>
+
+              {/* Toggle Availability Button */}
               <button
                 type="button"
                 onClick={() => toggleStockMutation.mutate(dish.id)}
@@ -130,7 +169,7 @@ export function InventoryTable() {
                     : 'bg-[#1F1F1F] text-white hover:bg-[#383838]'
                 }`}
               >
-                {isAvailable ? '86 Dish' : 'Make Available'}
+                {isAvailable ? 'Mark Out of Stock' : 'Set Available'}
               </button>
             </div>
           );
@@ -164,13 +203,42 @@ export function InventoryTable() {
 
   return (
     <div className="flex-1 flex flex-col p-4 lg:p-6 max-w-[1720px] mx-auto w-full space-y-4">
-      {/* Top Filter Bar */}
+      {/* Header with Title & Add Product Button */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div>
+          <div className="flex items-center gap-2">
+            <h1 className="text-lg font-bold text-[#1F1F1F]">
+              Menu Products &amp; Stock Availability
+            </h1>
+          </div>
+          <p className="text-xs text-[#737373] mt-0.5 flex items-center gap-1">
+            <Info className="w-3.5 h-3.5 text-[#A3A3A3]" />
+            <span>
+              Manage dishes and stock. &ldquo;86&rdquo; is restaurant slang meaning temporarily out of stock / sold out.
+            </span>
+          </p>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => {
+            setDishToEdit(null);
+            setIsFormModalOpen(true);
+          }}
+          className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-[#BA1A20] hover:bg-[#8B0000] text-white text-xs font-bold transition-colors shadow-xs"
+        >
+          <Plus className="w-4 h-4" />
+          <span>Add New Product</span>
+        </button>
+      </div>
+
+      {/* Filter Bar */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
         <div className="flex items-center gap-1 overflow-x-auto no-scrollbar py-0.5">
           {[
             { id: 'all', label: `All Items (${dishes.length})` },
             { id: 'instock', label: `Available (${dishes.filter((d) => d.inStock).length})` },
-            { id: 'outofstock', label: `86 Out of Stock (${dishes.filter((d) => !d.inStock).length})` },
+            { id: 'outofstock', label: `Out of Stock (${dishes.filter((d) => !d.inStock).length})` },
           ].map((tab) => {
             const isSelected = stockFilter === tab.id;
             return (
@@ -250,15 +318,23 @@ export function InventoryTable() {
             </thead>
 
             <tbody className="divide-y divide-[#F5F5F5]">
-              {table.getRowModel().rows.map((row) => (
-                <tr key={row.id} className="hover:bg-[#FAFAFA] transition-colors">
-                  {row.getVisibleCells().map((cell) => (
-                    <td key={cell.id} className="px-4 py-2.5">
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </td>
-                  ))}
+              {table.getRowModel().rows.length === 0 ? (
+                <tr>
+                  <td colSpan={columns.length} className="px-4 py-8 text-center text-xs text-[#A3A3A3]">
+                    No matching dishes
+                  </td>
                 </tr>
-              ))}
+              ) : (
+                table.getRowModel().rows.map((row) => (
+                  <tr key={row.id} className="hover:bg-[#FAFAFA] transition-colors">
+                    {row.getVisibleCells().map((cell) => (
+                      <td key={cell.id} className="px-4 py-2.5">
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </td>
+                    ))}
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
@@ -290,6 +366,17 @@ export function InventoryTable() {
           </div>
         </div>
       </div>
+
+      {/* Add / Edit Product Modal */}
+      <ProductFormModal
+        isOpen={isFormModalOpen}
+        onClose={() => {
+          setIsFormModalOpen(false);
+          setDishToEdit(null);
+        }}
+        dishToEdit={dishToEdit}
+        categories={categories}
+      />
     </div>
   );
 }

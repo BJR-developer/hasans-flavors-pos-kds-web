@@ -12,6 +12,9 @@ import {
   toggleDishStock as apiToggleDishStock,
   toggleItemInKitchen as apiToggleItemInKitchen,
   updateDishPrice as apiUpdateDishPrice,
+  addDish as apiAddDish,
+  updateDish as apiUpdateDish,
+  deleteDish as apiDeleteDish,
   resetStoreData as apiResetStoreData,
 } from '@/lib/store';
 import categoriesData from '@/data/categories.json';
@@ -175,6 +178,48 @@ export function useUpdateDishPrice() {
   return useMutation({
     mutationFn: async ({ dishId, price }: { dishId: string; price: number }) => {
       return apiUpdateDishPrice(dishId, price);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.dishes });
+    },
+  });
+}
+
+// Add New Dish
+export function useAddDish() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (dishData: Omit<Dish, 'id' | 'slug' | 'formattedPrice' | 'rating' | 'reviewCount'>) => {
+      return apiAddDish(dishData);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.dishes });
+    },
+  });
+}
+
+// Update Existing Dish
+export function useUpdateDish() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ dishId, data }: { dishId: string; data: Partial<Dish> }) => {
+      return apiUpdateDish(dishId, data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.dishes });
+    },
+  });
+}
+
+// Delete Dish
+export function useDeleteDish() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (dishId: string) => {
+      return apiDeleteDish(dishId);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.dishes });
