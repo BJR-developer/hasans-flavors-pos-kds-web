@@ -121,11 +121,11 @@ export function PosRegister() {
   };
 
   return (
-    <div className="flex-1 flex flex-col lg:flex-row h-[calc(100vh-56px)] overflow-hidden bg-[#FAFAFA]">
+    <div className="flex-1 flex flex-col lg:flex-row min-h-[calc(100vh-56px)] lg:h-[calc(100vh-56px)] overflow-y-auto lg:overflow-hidden bg-[#FAFAFA] relative">
       {/* Menu Catalog Pane */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col overflow-hidden min-w-0">
         {/* Minimal Category & Search Bar */}
-        <div className="px-5 py-3 bg-white border-b border-[#E5E5E5] flex items-center justify-between gap-4 shrink-0">
+        <div className="px-5 py-3 bg-white border-b border-[#E5E5E5] flex items-center justify-between gap-4 shrink-0 sticky top-0 lg:static z-10">
           {/* Category Tabs */}
           <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
             <button
@@ -265,14 +265,45 @@ export function PosRegister() {
         </div>
       </div>
 
-      {/* Fast Order Ticket Pane */}
-      <PosCartPane
-        items={cartItems}
-        onUpdateQty={handleUpdateQty}
-        onRemoveItem={handleRemoveItem}
-        onClearCart={() => setCartItems([])}
-        onOrderCompleted={(order) => setReceiptOrder(order)}
-      />
+      {/* Fast Order Ticket Pane (Sticky Right) */}
+      <div id="pos-order-ticket" className="shrink-0">
+        <PosCartPane
+          items={cartItems}
+          onUpdateQty={handleUpdateQty}
+          onRemoveItem={handleRemoveItem}
+          onClearCart={() => setCartItems([])}
+          onOrderCompleted={(order) => setReceiptOrder(order)}
+        />
+      </div>
+
+      {/* Mobile Sticky Bottom Summary Bar (Hidden on desktop lg:) */}
+      {cartItems.length > 0 && (
+        <div className="lg:hidden fixed bottom-0 left-0 right-0 p-3 bg-white/95 backdrop-blur-xs border-t border-[#E5E5E5] shadow-lg flex items-center justify-between z-30 px-4">
+          <div>
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs font-bold text-[#1F1F1F]">
+                {cartItems.reduce((s, i) => s + i.quantity, 0)} items
+              </span>
+              <span className="text-[#D4D4D4]">•</span>
+              <span className="text-sm font-black text-[#BA1A20]">
+                ₱{cartItems.reduce((s, i) => s + i.totalPrice, 0).toLocaleString()}
+              </span>
+            </div>
+            <span className="text-[10px] text-[#737373]">+5% VAT included</span>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => {
+              const el = document.getElementById('pos-order-ticket');
+              el?.scrollIntoView({ behavior: 'smooth' });
+            }}
+            className="px-4 py-2 rounded-lg bg-[#BA1A20] hover:bg-[#8B0000] text-white text-xs font-bold shadow-xs transition-colors"
+          >
+            Review Ticket &amp; Pay
+          </button>
+        </div>
+      )}
 
       {/* Modals */}
       <DishCustomizerModal

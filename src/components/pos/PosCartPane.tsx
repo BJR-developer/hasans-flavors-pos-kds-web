@@ -59,7 +59,12 @@ export function PosCartPane({
       const orderPayload: Omit<Order, 'id' | 'orderNumber' | 'createdAt'> = {
         type: orderType,
         tableNumber: orderType === 'dine_in' ? selectedTable : undefined,
-        customerName: orderType === 'dine_in' ? selectedTable : orderType === 'takeout' ? 'Takeout Guest' : 'Delivery Order',
+        customerName:
+          orderType === 'dine_in'
+            ? selectedTable
+            : orderType === 'takeout'
+            ? 'Takeout Guest'
+            : 'Delivery Order',
         items,
         subtotal,
         tax,
@@ -85,12 +90,15 @@ export function PosCartPane({
   };
 
   return (
-    <div className="flex flex-col h-full bg-white border-l border-[#E5E5E5] w-full max-w-[380px] shrink-0">
-      {/* 1. Minimal Header & Service Mode */}
-      <div className="p-4 border-b border-[#E5E5E5] bg-white space-y-3">
+    <div className="w-full lg:w-[380px] xl:w-[420px] shrink-0 bg-white border-l border-[#E5E5E5] flex flex-col h-full lg:sticky lg:top-14 lg:h-[calc(100vh-56px)] z-20">
+      {/* 1. Sticky Header inside Ticket */}
+      <div className="p-4 border-b border-[#E5E5E5] bg-white sticky top-0 z-10 space-y-3 shrink-0">
         <div className="flex items-center justify-between">
           <span className="text-xs font-bold text-[#1F1F1F] tracking-tight">
-            Order Ticket {items.length > 0 ? `(${items.reduce((s, i) => s + i.quantity, 0)} items)` : ''}
+            Order Ticket{' '}
+            {items.length > 0
+              ? `(${items.reduce((s, i) => s + i.quantity, 0)} items)`
+              : ''}
           </span>
           {items.length > 0 && (
             <button
@@ -170,10 +178,10 @@ export function PosCartPane({
         )}
       </div>
 
-      {/* 2. Fast Items List */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-2.5">
+      {/* 2. Fast Items List (Scrolls independently between sticky header and sticky footer) */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-2.5 min-h-0">
         {items.length === 0 ? (
-          <div className="h-full flex flex-col items-center justify-center text-center p-6 text-[#A3A3A3]">
+          <div className="h-full min-h-[180px] flex flex-col items-center justify-center text-center p-6 text-[#A3A3A3]">
             <Utensils className="w-7 h-7 stroke-1 text-[#D4D4D4] mb-2" />
             <p className="text-xs font-semibold text-[#525252]">No items selected</p>
             <p className="text-[11px] text-[#A3A3A3] mt-0.5">Tap any dish on the left to add.</p>
@@ -240,8 +248,8 @@ export function PosCartPane({
         )}
       </div>
 
-      {/* 3. Streamlined Bottom Checkout */}
-      <div className="p-4 border-t border-[#E5E5E5] bg-white space-y-3 shrink-0">
+      {/* 3. Sticky Bottom Checkout Bar */}
+      <div className="p-4 border-t border-[#E5E5E5] bg-white space-y-3 shrink-0 sticky bottom-0 z-10 shadow-xs">
         {/* Total Display */}
         <div className="space-y-1 text-xs">
           <div className="flex justify-between text-[#737373]">
