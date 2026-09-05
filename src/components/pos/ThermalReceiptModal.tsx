@@ -3,6 +3,7 @@
 import React from 'react';
 import { Printer, X } from 'lucide-react';
 import { Order } from '@/types';
+import { printThermalReceipt } from '@/lib/printReceipt';
 
 interface ThermalReceiptModalProps {
   order: Order | null;
@@ -13,7 +14,7 @@ export function ThermalReceiptModal({ order, onClose }: ThermalReceiptModalProps
   if (!order) return null;
 
   const handlePrint = () => {
-    window.print();
+    printThermalReceipt(order);
   };
 
   const formattedDate = new Date(order.createdAt).toLocaleDateString('en-US', {
@@ -38,7 +39,7 @@ export function ThermalReceiptModal({ order, onClose }: ThermalReceiptModalProps
           <div className="flex items-center gap-2">
             <button
               onClick={handlePrint}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#BA1A20] hover:bg-[#8B0000] text-white text-xs font-bold transition-all shadow-xs"
+              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-[#BA1A20] hover:bg-[#8B0000] text-white text-xs font-bold transition-all shadow-xs"
             >
               <Printer className="w-3.5 h-3.5" />
               <span>Print</span>
@@ -52,9 +53,9 @@ export function ThermalReceiptModal({ order, onClose }: ThermalReceiptModalProps
           </div>
         </div>
 
-        {/* Scrollable Receipt Body */}
+        {/* Scrollable Receipt Preview Container */}
         <div className="p-6 overflow-y-auto max-h-[75vh] flex justify-center bg-[#FAF9F8]">
-          {/* Printable 80mm Slip Container */}
+          {/* 80mm Slip Layout */}
           <div
             id="printable-thermal-receipt"
             className="w-full max-w-[320px] bg-white p-5 rounded-lg border border-[#E9E8E7] shadow-sm font-mono text-xs text-[#1A1C1C] leading-relaxed"
@@ -196,7 +197,7 @@ export function ThermalReceiptModal({ order, onClose }: ThermalReceiptModalProps
                   {order.paymentStatus}
                 </span>
               </div>
-              {order.cashTendered !== undefined && (
+              {order.cashTendered !== undefined && order.cashTendered > 0 && (
                 <>
                   <div className="flex justify-between">
                     <span>Cash Tendered:</span>
