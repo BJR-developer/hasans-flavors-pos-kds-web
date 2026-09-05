@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { X, Keyboard, Zap, Sparkles, CheckCircle2 } from 'lucide-react';
+import { X, Keyboard, Zap } from 'lucide-react';
 
 interface KeyboardShortcutsModalProps {
   isOpen: boolean;

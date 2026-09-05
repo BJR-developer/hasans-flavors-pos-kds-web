@@ -1,10 +1,10 @@
 'use client';
 
 import React, { useState } from 'react';
-import Image from 'next/image';
 import { X, Plus, Minus, Flame, Sparkles } from 'lucide-react';
 import { Dish, CartItem, PortionOption, AddonOption } from '@/types';
 import { PORTION_OPTIONS, ADDON_OPTIONS, SPICE_LEVELS } from '@/data/options';
+import { SafeImage } from '@/components/common/SafeImage';
 
 interface DishCustomizerModalProps {
   dish: Dish | null;
@@ -86,7 +86,7 @@ function DishCustomizerModalContent({
       <div className="relative bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden border border-[#E9E8E7] my-6 animate-in fade-in zoom-in-95 duration-200">
         {/* Top Header with Image & Title */}
         <div className="relative h-44 bg-[#F4F3F2] overflow-hidden">
-          <Image
+          <SafeImage
             src={dish.imageUrl}
             alt={dish.name}
             fill

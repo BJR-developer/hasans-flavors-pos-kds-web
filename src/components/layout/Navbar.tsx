@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   UtensilsCrossed,
@@ -9,19 +10,16 @@ import {
   TableProperties,
   Boxes,
   BarChart3,
-  RotateCcw,
   LogOut,
   LogIn,
-  User,
 } from 'lucide-react';
-import { useOrders, useResetStoreData } from '@/hooks/useRestaurantData';
+import { useOrders } from '@/hooks/useRestaurantData';
 import { useAuth } from '@/lib/auth';
 
 export function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
   const { data: orders = [] } = useOrders();
-  const resetStore = useResetStoreData();
   const { user, logout } = useAuth();
 
   const isSignInPage = pathname === '/signin';
@@ -77,13 +75,23 @@ export function Navbar() {
       <div className="max-w-[1720px] mx-auto px-3 sm:px-4 lg:px-6 h-14 flex items-center justify-between gap-2 sm:gap-4">
         {/* Brand */}
         <div className="flex items-center gap-2.5 shrink-0">
-          <Link href="/pos" className="flex items-center gap-2 group">
-            <span className="w-8 h-8 rounded-lg bg-[#BA1A20] text-white flex items-center justify-center font-black text-sm tracking-wider shadow-xs">
-              HF
-            </span>
+          <Link href="/pos" className="flex items-center gap-2.5 group">
+            <div className="relative w-9 h-9 rounded-lg overflow-hidden bg-[#FFF2F0] border border-[#FFDAD6] flex items-center justify-center shrink-0 shadow-2xs">
+              <Image
+                src="/logo.png"
+                alt="Hasan's Flavors Logo"
+                fill
+                sizes="36px"
+                priority
+                className="object-cover"
+              />
+            </div>
             <div className="hidden xs:block">
-              <span className="font-bold text-[#1F1F1F] text-xs sm:text-sm tracking-tight group-hover:text-[#BA1A20] transition-colors">
+              <span className="font-extrabold text-[#1F1F1F] text-xs sm:text-sm tracking-tight group-hover:text-[#BA1A20] transition-colors block">
                 Hasan&apos;s Flavors
+              </span>
+              <span className="text-[10px] text-[#737373] font-medium block leading-none">
+                POS &amp; Kitchen Operations
               </span>
             </div>
           </Link>

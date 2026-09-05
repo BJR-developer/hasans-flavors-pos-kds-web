@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import Image from 'next/image';
 import {
   useReactTable,
   getCoreRowModel,
@@ -26,6 +25,7 @@ import {
 import { Dish } from '@/types';
 import { useDishes, useCategories, useToggleDishStock } from '@/hooks/useRestaurantData';
 import { ProductFormModal } from './ProductFormModal';
+import { SafeImage } from '@/components/common/SafeImage';
 
 export function InventoryTable() {
   const { data: dishes = [] } = useDishes();
@@ -71,7 +71,7 @@ export function InventoryTable() {
           return (
             <div className="flex items-center gap-2.5">
               <div className="relative w-9 h-9 rounded-lg overflow-hidden bg-[#F5F5F5] shrink-0 border border-[#E5E5E5]">
-                <Image
+                <SafeImage
                   src={d.imageUrl}
                   alt={d.name}
                   fill

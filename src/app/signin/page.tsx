@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Utensils, ChefHat, BarChart3, ArrowRight, Lock, Mail } from 'lucide-react';
 import { useAuth, DEMO_ACCOUNTS } from '@/lib/auth';
@@ -49,8 +50,15 @@ export default function SignInPage() {
       <div className="w-full max-w-md bg-white rounded-2xl border border-[#E5E5E5] p-6 sm:p-8 shadow-sm space-y-6">
         {/* Brand Header */}
         <div className="text-center space-y-2">
-          <div className="w-12 h-12 rounded-xl bg-[#BA1A20] text-white mx-auto flex items-center justify-center font-black text-lg tracking-wider shadow-xs">
-            HF
+          <div className="relative w-14 h-14 rounded-2xl overflow-hidden bg-[#FFF2F0] border border-[#FFDAD6] mx-auto shadow-xs flex items-center justify-center">
+            <Image
+              src="/logo.png"
+              alt="Hasan's Flavors Logo"
+              fill
+              sizes="56px"
+              priority
+              className="object-cover"
+            />
           </div>
           <h1 className="text-xl font-black text-[#1F1F1F] tracking-tight">
             Hasan&apos;s Flavors Operations

@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useMemo, useEffect, useRef } from 'react';
-import Image from 'next/image';
 import { Search, X, SlidersHorizontal, AlertCircle, Keyboard } from 'lucide-react';
 import { Dish, CartItem, Order } from '@/types';
 import { useDishes, useCategories } from '@/hooks/useRestaurantData';
@@ -9,6 +8,7 @@ import { PosCartPane } from './PosCartPane';
 import { DishCustomizerModal } from './DishCustomizerModal';
 import { ThermalReceiptModal } from './ThermalReceiptModal';
 import { KeyboardShortcutsModal } from './KeyboardShortcutsModal';
+import { SafeImage } from '@/components/common/SafeImage';
 import { PORTION_OPTIONS } from '@/data/options';
 
 export function PosRegister() {
@@ -205,7 +205,7 @@ export function PosRegister() {
                 >
                   {cat.imageUrl ? (
                     <div className="relative w-5 h-5 rounded-md overflow-hidden bg-gray-200 shrink-0 border border-black/10">
-                      <Image
+                      <SafeImage
                         src={cat.imageUrl}
                         alt={cat.name}
                         fill
@@ -291,7 +291,7 @@ export function PosRegister() {
                   >
                     {/* Item Thumbnail */}
                     <div className="relative h-24 sm:h-28 w-full rounded-lg overflow-hidden bg-[#F5F5F5] mb-2">
-                      <Image
+                      <SafeImage
                         src={dish.imageUrl}
                         alt={dish.name}
                         fill

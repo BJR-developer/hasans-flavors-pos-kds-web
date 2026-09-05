@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { UserProfile, UserRole } from '@/types';
 
-const AUTH_STORAGE_KEY = 'hasan_auth_user_v1';
+const AUTH_STORAGE_KEY = 'hasan_pos_auth_user_v1';
 
 export const DEMO_ACCOUNTS: Record<UserRole, UserProfile> = {
   staff: {
@@ -57,20 +57,17 @@ export function setStoredAuthUser(user: UserProfile | null): void {
 }
 
 export function useAuth() {
-  const [user, setUser] = useState<UserProfile | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser] = useState<UserProfile | null>(() => {
+    const saved = getStoredAuthUser();
+    return saved || DEMO_ACCOUNTS.staff;
+  });
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const saved = getStoredAuthUser();
-    // Default to staff if none set for convenient first view, or null if explicit
-    if (saved) {
-      setUser(saved);
-    } else {
-      // Default to staff on first visit
-      setUser(DEMO_ACCOUNTS.staff);
+    if (!saved) {
       setStoredAuthUser(DEMO_ACCOUNTS.staff);
     }
-    setIsLoading(false);
   }, []);
 
   const login = (email: string): { success: boolean; role: UserRole } => {

@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import Image from 'next/image';
-import { X, Plus, Sparkles, Upload, Check } from 'lucide-react';
+import React, { useState } from 'react';
+import { X, Sparkles } from 'lucide-react';
 import { Dish, Category } from '@/types';
 import { useAddDish, useUpdateDish } from '@/hooks/useRestaurantData';
+import { SafeImage } from '@/components/common/SafeImage';
 
 interface ProductFormModalProps {
   isOpen: boolean;
@@ -28,44 +28,45 @@ export function ProductFormModal({
   dishToEdit,
   categories,
 }: ProductFormModalProps) {
+  if (!isOpen) return null;
+
+  return (
+    <ProductFormContent
+      key={dishToEdit?.id || 'new-product'}
+      onClose={onClose}
+      dishToEdit={dishToEdit}
+      categories={categories}
+    />
+  );
+}
+
+function ProductFormContent({
+  onClose,
+  dishToEdit,
+  categories,
+}: {
+  onClose: () => void;
+  dishToEdit?: Dish | null;
+  categories: Category[];
+}) {
   const addDishMutation = useAddDish();
   const updateDishMutation = useUpdateDish();
 
-  const [name, setName] = useState('');
-  const [category, setCategory] = useState('Combo Meals -Rice & Biryani');
-  const [price, setPrice] = useState('150');
-  const [imageUrl, setImageUrl] = useState(PRESET_IMAGES[0].url);
-  const [description, setDescription] = useState('');
-  const [spiceLevel, setSpiceLevel] = useState(2);
-  const [preparationTime, setPreparationTime] = useState('15-20 mins');
-  const [inStock, setInStock] = useState(true);
-  const [isChefSpecial, setIsChefSpecial] = useState(false);
-
-  useEffect(() => {
-    if (dishToEdit) {
-      setName(dishToEdit.name);
-      setCategory(dishToEdit.category);
-      setPrice(dishToEdit.price.toString());
-      setImageUrl(dishToEdit.imageUrl);
-      setDescription(dishToEdit.description);
-      setSpiceLevel(dishToEdit.spiceLevel || 2);
-      setPreparationTime(dishToEdit.preparationTime || '15-20 mins');
-      setInStock(dishToEdit.inStock);
-      setIsChefSpecial(dishToEdit.isChefSpecial || false);
-    } else {
-      setName('');
-      setCategory(categories[1]?.name || 'Combo Meals -Rice & Biryani');
-      setPrice('150');
-      setImageUrl(PRESET_IMAGES[0].url);
-      setDescription('');
-      setSpiceLevel(2);
-      setPreparationTime('15-20 mins');
-      setInStock(true);
-      setIsChefSpecial(false);
-    }
-  }, [dishToEdit, categories, isOpen]);
-
-  if (!isOpen) return null;
+  const [name, setName] = useState(() => dishToEdit?.name || '');
+  const [category, setCategory] = useState(
+    () => dishToEdit?.category || categories[1]?.name || 'Combo Meals -Rice & Biryani'
+  );
+  const [price, setPrice] = useState(() => (dishToEdit ? dishToEdit.price.toString() : '150'));
+  const [imageUrl, setImageUrl] = useState(() => dishToEdit?.imageUrl || PRESET_IMAGES[0].url);
+  const [description, setDescription] = useState(() => dishToEdit?.description || '');
+  const [spiceLevel, setSpiceLevel] = useState(() => dishToEdit?.spiceLevel || 2);
+  const [preparationTime, setPreparationTime] = useState(
+    () => dishToEdit?.preparationTime || '15-20 mins'
+  );
+  const [inStock, setInStock] = useState(() => (dishToEdit ? dishToEdit.inStock : true));
+  const [isChefSpecial, setIsChefSpecial] = useState(
+    () => (dishToEdit ? dishToEdit.isChefSpecial || false : false)
+  );
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -231,7 +232,7 @@ export function ProductFormModal({
           {/* Image Preview */}
           {imageUrl && (
             <div className="relative w-full h-28 rounded-xl overflow-hidden bg-gray-100 border border-[#E5E5E5]">
-              <Image
+              <SafeImage
                 src={imageUrl}
                 alt="Preview"
                 fill
