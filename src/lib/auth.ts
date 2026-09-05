@@ -75,12 +75,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         });
       } else {
         set({
-          user: {
-            id: 'mock-cashier',
-            email: 'cashier@hasan.com',
-            name: 'Main POS Cashier',
-            role: 'cashier',
-          },
+          user: null,
           isLoading: false,
         });
       }
@@ -153,15 +148,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           isLoading: false,
         });
       } else {
-        set({
-          user: {
-            id: `role-${role}`,
-            email,
-            name: `${role.toUpperCase()} User`,
-            role,
-          },
-          isLoading: false,
-        });
+        set({ isLoading: false });
       }
     } catch (e) {
       console.error('Quick switch error:', e);

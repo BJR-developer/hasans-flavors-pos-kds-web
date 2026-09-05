@@ -14,9 +14,6 @@ import {
   fetchTablesFromDB,
   updateTableStatusInDB,
 } from '@/lib/api';
-import categoriesData from '@/data/categories.json';
-import menuFallback from '@/data/menu.json';
-import { INITIAL_ORDERS } from '@/data/mockOrders';
 import { Category, Dish, Order, OrderStatus, PaymentMethod, PaymentStatus, TableSession } from '@/types';
 
 export const QUERY_KEYS = {
@@ -27,7 +24,7 @@ export const QUERY_KEYS = {
   dailyStats: ['dailyStats'] as const,
 };
 
-// 1. Orders Query
+// 1. Orders Query - 100% Live from Supabase
 export function useOrders() {
   const queryClient = useQueryClient();
 
@@ -36,10 +33,10 @@ export function useOrders() {
     queryFn: async (): Promise<Order[]> => {
       try {
         const orders = await fetchOrdersFromDB();
-        return orders.length > 0 ? orders : INITIAL_ORDERS;
+        return orders;
       } catch (e) {
-        console.warn('Falling back to local initial orders:', e);
-        return INITIAL_ORDERS;
+        console.error('Error fetching orders from Supabase:', e);
+        return [];
       }
     },
     refetchInterval: 5000,
@@ -62,7 +59,7 @@ export function useOrders() {
   return query;
 }
 
-// 2. Dishes Query (useDishes and useMenu alias)
+// 2. Dishes Query (useDishes and useMenu alias) - 100% Live from Supabase
 export function useDishes() {
   const queryClient = useQueryClient();
 
@@ -71,10 +68,10 @@ export function useDishes() {
     queryFn: async (): Promise<Dish[]> => {
       try {
         const dishes = await fetchDishesFromDB();
-        return dishes.length > 0 ? dishes : (menuFallback as unknown as Dish[]);
+        return dishes;
       } catch (e) {
-        console.warn('Falling back to local dishes:', e);
-        return menuFallback as unknown as Dish[];
+        console.error('Error fetching dishes from Supabase:', e);
+        return [];
       }
     },
     staleTime: 1000 * 60 * 5,
@@ -99,14 +96,14 @@ export function useDishes() {
 
 export const useMenu = useDishes;
 
-// 3. Categories Query
+// 3. Categories Query - 100% Live from Supabase
 export function useCategories() {
   return useQuery<Category[]>({
     queryKey: QUERY_KEYS.categories,
     queryFn: async (): Promise<Category[]> => {
       try {
-        const { data } = await supabase.from('categories').select('*').order('sort_order');
-        if (data && data.length > 0) {
+        const { data, error } = await supabase.from('categories').select('*').order('sort_order');
+        if (!error && data && data.length > 0) {
           return data.map((c: any) => ({
             id: c.id,
             name: c.name,
@@ -117,15 +114,15 @@ export function useCategories() {
           }));
         }
       } catch (e) {
-        console.warn('Falling back to local categories:', e);
+        console.error('Error fetching categories from Supabase:', e);
       }
-      return categoriesData as Category[];
+      return [];
     },
     staleTime: 1000 * 60 * 10,
   });
 }
 
-// 4. Tables Query
+// 4. Tables Query - 100% Live from Supabase
 export function useTableSessions() {
   const queryClient = useQueryClient();
 
@@ -136,7 +133,7 @@ export function useTableSessions() {
         const tables = await fetchTablesFromDB();
         return tables;
       } catch (e) {
-        console.warn('Falling back to empty tables:', e);
+        console.error('Error fetching tables from Supabase:', e);
         return [];
       }
     },
@@ -159,7 +156,7 @@ export function useTableSessions() {
   return query;
 }
 
-// 5. Daily Stats Query
+// 5. Daily Stats Query - 100% Computed Dynamically from Supabase Data
 export function useDailyStats() {
   const { data: orders = [] } = useOrders();
   const { data: tables = [] } = useTableSessions();
@@ -192,7 +189,7 @@ export function useDailyStats() {
   });
 }
 
-// --- MUTATIONS ---
+// --- MUTATIONS (Direct Supabase Queries) ---
 
 // Create Order
 export function useCreateOrder() {

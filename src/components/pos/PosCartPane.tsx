@@ -12,8 +12,7 @@ import {
   RotateCcw,
 } from 'lucide-react';
 import { CartItem, OrderType, PaymentMethod, Order } from '@/types';
-import { TABLES } from '@/data/options';
-import { useCreateOrder } from '@/hooks/useRestaurantData';
+import { useCreateOrder, useTableSessions } from '@/hooks/useRestaurantData';
 
 interface PosCartPaneProps {
   items: CartItem[];
@@ -31,6 +30,15 @@ export function PosCartPane({
   onOrderCompleted,
 }: PosCartPaneProps) {
   const createOrderMutation = useCreateOrder();
+  const { data: tableSessions = [] } = useTableSessions();
+
+  // Dynamically populated tables from Supabase dining_tables
+  const liveTables = useMemo(() => {
+    if (tableSessions.length > 0) {
+      return tableSessions.map((t) => t.tableNumber);
+    }
+    return Array.from({ length: 12 }, (_, i) => `Table ${String(i + 1).padStart(2, '0')}`);
+  }, [tableSessions]);
 
   // Channel & Quick Table Picker
   const [orderType, setOrderType] = useState<OrderType>('dine_in');
@@ -156,7 +164,7 @@ export function PosCartPane({
         {/* Quick Table Chips (for Dine-In) */}
         {orderType === 'dine_in' && (
           <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
-            {TABLES.slice(0, 10).map((t) => {
+            {liveTables.slice(0, 12).map((t) => {
               const short = t.replace('Table ', 'T');
               const isSelected = selectedTable === t;
               return (
