@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -8,11 +8,7 @@ import {
   ChefHat,
   TableProperties,
   Boxes,
-  BarChart3,
-  Clock,
   RotateCcw,
-  Volume2,
-  VolumeX,
 } from 'lucide-react';
 import { useOrders, useResetStoreData } from '@/hooks/useRestaurantData';
 
@@ -21,93 +17,63 @@ export function Navbar() {
   const { data: orders = [] } = useOrders();
   const resetStore = useResetStoreData();
 
-  const [currentTime, setCurrentTime] = useState<string>('');
-  const [currentDate, setCurrentDate] = useState<string>('');
-  const [soundEnabled, setSoundEnabled] = useState(true);
-
-  useEffect(() => {
-    const updateTime = () => {
-      const now = new Date();
-      setCurrentTime(
-        now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
-      );
-      setCurrentDate(
-        now.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' })
-      );
-    };
-    updateTime();
-    const interval = setInterval(updateTime, 1000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const activeOrdersCount = orders.filter(
-    (o) => o.status === 'pending' || o.status === 'preparing' || o.status === 'ready'
-  ).length;
-
   const kitchenQueueCount = orders.filter(
     (o) => o.status === 'pending' || o.status === 'preparing'
+  ).length;
+
+  const activeOrdersCount = orders.filter(
+    (o) => o.status !== 'completed' && o.status !== 'cancelled'
   ).length;
 
   const navItems = [
     {
       href: '/pos',
-      label: 'POS Register',
+      label: 'Register',
       icon: UtensilsCrossed,
       badge: null,
     },
     {
       href: '/kds',
-      label: 'Kitchen KDS',
+      label: 'Kitchen',
       icon: ChefHat,
       badge: kitchenQueueCount > 0 ? kitchenQueueCount : null,
-      badgeColor: 'bg-[#BA1A20] text-white',
     },
     {
       href: '/orders',
-      label: 'Orders Table',
+      label: 'Orders',
       icon: TableProperties,
       badge: activeOrdersCount > 0 ? activeOrdersCount : null,
-      badgeColor: 'bg-[#B45309] text-white',
     },
     {
       href: '/inventory',
-      label: 'Menu & Stock 86',
+      label: 'Stock 86',
       icon: Boxes,
-      badge: null,
-    },
-    {
-      href: '/analytics',
-      label: 'Owner Overview',
-      icon: BarChart3,
       badge: null,
     },
   ];
 
   return (
-    <header className="bg-white border-b border-[#E9E8E7] sticky top-0 z-40 stitch-shadow">
-      <div className="max-w-[1720px] mx-auto px-4 lg:px-6 h-16 flex items-center justify-between gap-4">
-        {/* Brand & Terminal Info */}
-        <div className="flex items-center gap-3 min-w-max">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#BA1A20] to-[#8B0000] flex items-center justify-center text-white shadow-sm font-bold text-lg tracking-wider">
-            HF
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="font-extrabold text-[#2D2926] text-base tracking-tight">
-                HASAN&apos;S FLAVORS
+    <header className="bg-white border-b border-[#E5E5E5] sticky top-0 z-40">
+      <div className="max-w-[1720px] mx-auto px-4 lg:px-6 h-14 flex items-center justify-between gap-4">
+        {/* Brand */}
+        <div className="flex items-center gap-3">
+          <Link href="/pos" className="flex items-center gap-2.5 group">
+            <span className="w-8 h-8 rounded-lg bg-[#BA1A20] text-white flex items-center justify-center font-bold text-sm tracking-wide shadow-xs">
+              HF
+            </span>
+            <div>
+              <span className="font-extrabold text-[#1F1F1F] text-sm tracking-tight group-hover:text-[#BA1A20] transition-colors">
+                Hasan&apos;s Flavors
               </span>
-              <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-[#E8F5E9] text-[#2E7D32]">
-                Zabihah Halal
+              <span className="hidden sm:inline text-xs text-[#737373] ml-2 font-normal">
+                POS &amp; Kitchen
               </span>
             </div>
-            <p className="text-xs text-[#8F6F6C] font-medium">
-              Operations Cockpit • Register #01 & Kitchen Display
-            </p>
-          </div>
+          </Link>
         </div>
 
         {/* Center Primary Nav Links */}
-        <nav className="flex items-center gap-1.5 overflow-x-auto py-1">
+        <nav className="flex items-center gap-1">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive =
@@ -117,18 +83,18 @@ export function Navbar() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${
+                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                   isActive
-                    ? 'bg-[#FFF2F0] text-[#BA1A20] shadow-xs border border-[#FFDAD6]'
-                    : 'text-[#5B403D] hover:bg-[#F4F3F2] hover:text-[#2D2926]'
+                    ? 'bg-[#1F1F1F] text-white'
+                    : 'text-[#525252] hover:bg-[#F5F5F5] hover:text-[#1F1F1F]'
                 }`}
               >
-                <Icon className={`w-4 h-4 ${isActive ? 'text-[#BA1A20]' : 'text-[#8F6F6C]'}`} />
+                <Icon className="w-3.5 h-3.5" />
                 <span>{item.label}</span>
                 {item.badge !== null && (
                   <span
-                    className={`text-[10px] font-extrabold px-1.5 py-0.2 rounded-full ${
-                      item.badgeColor || 'bg-gray-200 text-gray-800'
+                    className={`text-[10px] font-bold px-1.5 py-0.2 rounded-full ${
+                      isActive ? 'bg-white text-[#1F1F1F]' : 'bg-[#BA1A20] text-white'
                     }`}
                   >
                     {item.badge}
@@ -139,41 +105,20 @@ export function Navbar() {
           })}
         </nav>
 
-        {/* Right Tools: Clock, Sound Toggle, Reset Data */}
-        <div className="flex items-center gap-2.5 min-w-max">
-          {/* Real-time Clock */}
-          <div className="hidden sm:flex items-center gap-2 bg-[#F4F3F2] border border-[#E9E8E7] px-3 py-1.5 rounded-xl text-xs font-medium text-[#5B403D]">
-            <Clock className="w-3.5 h-3.5 text-[#8F6F6C]" />
-            <span>{currentDate}</span>
-            <span className="font-bold text-[#2D2926]">{currentTime}</span>
-          </div>
-
-          {/* Sound Toggle */}
-          <button
-            type="button"
-            onClick={() => setSoundEnabled(!soundEnabled)}
-            title={soundEnabled ? 'Kitchen Sound Alerts On' : 'Kitchen Sound Alerts Muted'}
-            className={`p-2 rounded-xl border transition-all ${
-              soundEnabled
-                ? 'bg-[#FFF8E1] border-[#B45309]/30 text-[#B45309]'
-                : 'bg-[#F4F3F2] border-[#E9E8E7] text-[#8F6F6C]'
-            }`}
-          >
-            {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
-          </button>
-
-          {/* Reset Demo Data Button */}
+        {/* Right Tools */}
+        <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={() => {
-              if (confirm('Reset store demo orders and dish inventory stock back to initial data?')) {
+              if (confirm('Reset store demo data?')) {
                 resetStore.mutate();
               }
             }}
-            title="Reset Mock Demo Data"
-            className="p-2 rounded-xl border border-[#E9E8E7] bg-white hover:bg-[#F4F3F2] text-[#8F6F6C] hover:text-[#2D2926] transition-all"
+            title="Reset demo data"
+            className="p-1.5 rounded-lg text-[#737373] hover:text-[#1F1F1F] hover:bg-[#F5F5F5] transition-colors text-xs flex items-center gap-1"
           >
-            <RotateCcw className="w-4 h-4" />
+            <RotateCcw className="w-3.5 h-3.5" />
+            <span className="hidden md:inline text-[11px] font-medium">Reset Demo</span>
           </button>
         </div>
       </div>

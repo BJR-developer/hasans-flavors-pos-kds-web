@@ -15,24 +15,12 @@ import {
   Search,
   X,
   Printer,
-  Eye,
   ArrowUpDown,
   ArrowUp,
   ArrowDown,
   ChevronLeft,
   ChevronRight,
-  ChevronsLeft,
-  ChevronsRight,
-  CheckCircle2,
-  Clock,
-  Flame,
-  AlertCircle,
-  Utensils,
-  ShoppingBag,
-  Bike,
-  Receipt,
   FileSpreadsheet,
-  Check,
 } from 'lucide-react';
 import { Order, OrderStatus } from '@/types';
 import { useOrders, useUpdateOrderStatus, useUpdateOrderPayment } from '@/hooks/useRestaurantData';
@@ -48,7 +36,7 @@ export function OrdersTable() {
   const [sorting, setSorting] = useState<SortingState>([{ id: 'createdAt', desc: true }]);
   const [globalFilter, setGlobalFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 8 });
+  const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
 
   // Modals
   const [receiptOrder, setReceiptOrder] = useState<Order | null>(null);
@@ -58,45 +46,15 @@ export function OrdersTable() {
   const getStatusBadge = (status: OrderStatus) => {
     switch (status) {
       case 'pending':
-        return {
-          label: 'Received',
-          bg: 'bg-[#FFF8E1]',
-          text: 'text-[#B45309]',
-          border: 'border-[#FFE082]',
-          icon: Clock,
-        };
+        return { label: 'Received', color: 'text-[#B45309]', bg: 'bg-[#FFF8E1]' };
       case 'preparing':
-        return {
-          label: 'In Kitchen',
-          bg: 'bg-[#FFF2F0]',
-          text: 'text-[#BA1A20]',
-          border: 'border-[#FFDAD6]',
-          icon: Flame,
-        };
+        return { label: 'In Kitchen', color: 'text-[#BA1A20]', bg: 'bg-[#FFF2F0]' };
       case 'ready':
-        return {
-          label: 'Ready for Service',
-          bg: 'bg-[#E8F5E9]',
-          text: 'text-[#2E7D32]',
-          border: 'border-[#C8E6C9]',
-          icon: CheckCircle2,
-        };
+        return { label: 'Ready', color: 'text-[#2E7D32]', bg: 'bg-[#E8F5E9]' };
       case 'completed':
-        return {
-          label: 'Delivered / Completed',
-          bg: 'bg-[#F4F3F2]',
-          text: 'text-[#5B403D]',
-          border: 'border-[#E9E8E7]',
-          icon: Check,
-        };
+        return { label: 'Served', color: 'text-[#525252]', bg: 'bg-[#F5F5F5]' };
       case 'cancelled':
-        return {
-          label: 'Cancelled',
-          bg: 'bg-red-50',
-          text: 'text-red-700',
-          border: 'border-red-200',
-          icon: AlertCircle,
-        };
+        return { label: 'Cancelled', color: 'text-red-700', bg: 'bg-red-50' };
     }
   };
 
@@ -108,7 +66,6 @@ export function OrdersTable() {
         return o.status === 'pending' || o.status === 'preparing' || o.status === 'ready';
       }
       if (statusFilter === 'completed') return o.status === 'completed';
-      if (statusFilter === 'cancelled') return o.status === 'cancelled';
       return true;
     });
   }, [orders, statusFilter]);
@@ -121,15 +78,15 @@ export function OrdersTable() {
         header: ({ column }) => (
           <button
             onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-            className="flex items-center gap-1.5 hover:text-[#BA1A20] font-black text-xs uppercase"
+            className="flex items-center gap-1 hover:text-[#1F1F1F] font-bold text-xs uppercase"
           >
-            <span>Order #</span>
+            <span>Order</span>
             {column.getIsSorted() === 'asc' ? (
               <ArrowUp className="w-3 h-3" />
             ) : column.getIsSorted() === 'desc' ? (
               <ArrowDown className="w-3 h-3" />
             ) : (
-              <ArrowUpDown className="w-3 h-3 opacity-40" />
+              <ArrowUpDown className="w-3 h-3 opacity-30" />
             )}
           </button>
         ),
@@ -137,113 +94,37 @@ export function OrdersTable() {
           const o = row.original;
           return (
             <div>
-              <div className="font-mono font-black text-xs text-[#2D2926]">
+              <span className="font-mono font-bold text-xs text-[#1F1F1F]">
                 {o.orderNumber}
-              </div>
-              <div className="flex items-center gap-1 mt-1">
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#F4F3F2] border border-[#E9E8E7] text-[#5B403D] flex items-center gap-1">
-                  {o.type === 'dine_in' ? (
-                    <>
-                      <Utensils className="w-2.5 h-2.5" />
-                      <span>{o.tableNumber || 'Dine-In'}</span>
-                    </>
-                  ) : o.type === 'delivery' ? (
-                    <>
-                      <Bike className="w-2.5 h-2.5 text-[#BA1A20]" />
-                      <span>Delivery</span>
-                    </>
-                  ) : (
-                    <>
-                      <ShoppingBag className="w-2.5 h-2.5 text-[#B45309]" />
-                      <span>Takeout</span>
-                    </>
-                  )}
-                </span>
-              </div>
+              </span>
+              <span className="text-[11px] text-[#737373] ml-2">
+                {o.type === 'dine_in' ? o.tableNumber || 'Dine-In' : o.type === 'delivery' ? 'Delivery' : 'Takeout'}
+              </span>
             </div>
           );
         },
       },
       {
         accessorKey: 'createdAt',
-        header: ({ column }) => (
-          <button
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-            className="flex items-center gap-1.5 hover:text-[#BA1A20] font-black text-xs uppercase"
-          >
-            <span>Date & Time</span>
-            {column.getIsSorted() === 'asc' ? (
-              <ArrowUp className="w-3 h-3" />
-            ) : column.getIsSorted() === 'desc' ? (
-              <ArrowDown className="w-3 h-3" />
-            ) : (
-              <ArrowUpDown className="w-3 h-3 opacity-40" />
-            )}
-          </button>
-        ),
+        header: 'Time',
         cell: ({ row }) => {
           const d = new Date(row.original.createdAt);
           return (
-            <div className="text-xs">
-              <p className="font-bold text-[#2D2926]">
-                {d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-              </p>
-              <p className="text-[10px] text-[#8F6F6C]">
-                {d.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' })}
-              </p>
-            </div>
-          );
-        },
-      },
-      {
-        accessorKey: 'customerName',
-        header: ({ column }) => (
-          <button
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-            className="flex items-center gap-1.5 hover:text-[#BA1A20] font-black text-xs uppercase"
-          >
-            <span>Customer & Channel</span>
-            {column.getIsSorted() === 'asc' ? (
-              <ArrowUp className="w-3 h-3" />
-            ) : column.getIsSorted() === 'desc' ? (
-              <ArrowDown className="w-3 h-3" />
-            ) : (
-              <ArrowUpDown className="w-3 h-3 opacity-40" />
-            )}
-          </button>
-        ),
-        cell: ({ row }) => {
-          const o = row.original;
-          return (
-            <div className="text-xs">
-              <p className="font-bold text-[#2D2926] leading-snug">{o.customerName}</p>
-              <p className="text-[11px] text-[#8F6F6C] truncate max-w-[160px]">
-                {o.tableNumber || o.deliveryAddress || (o.type === 'delivery' ? 'Delivery' : 'Takeaway')}
-              </p>
-            </div>
+            <span className="text-xs text-[#525252]">
+              {d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            </span>
           );
         },
       },
       {
         id: 'itemsSummary',
-        header: 'Items Summary',
+        header: 'Items',
         cell: ({ row }) => {
           const o = row.original;
-          const firstItem = o.items[0];
-          const remainingCount = o.items.length - 1;
-          const totalQty = o.items.reduce((sum, it) => sum + it.quantity, 0);
-
           return (
-            <div className="text-xs max-w-xs">
-              <p className="font-bold text-[#2D2926] truncate">
-                {firstItem ? `${firstItem.quantity}x ${firstItem.dish.name}` : 'Order items'}
-              </p>
-              <p className="text-[10px] text-[#8F6F6C]">
-                {remainingCount > 0
-                  ? `+ ${remainingCount} other dish${remainingCount > 1 ? 'es' : ''} (${totalQty} items total)`
-                  : `${totalQty} item total`}
-              </p>
-            </div>
+            <span className="text-xs text-[#525252] truncate max-w-xs block">
+              {o.items.map((it) => `${it.quantity}x ${it.dish.name}`).join(', ')}
+            </span>
           );
         },
       },
@@ -252,7 +133,7 @@ export function OrdersTable() {
         header: ({ column }) => (
           <button
             onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-            className="flex items-center gap-1.5 hover:text-[#BA1A20] font-black text-xs uppercase"
+            className="flex items-center gap-1 hover:text-[#1F1F1F] font-bold text-xs uppercase"
           >
             <span>Total</span>
             {column.getIsSorted() === 'asc' ? (
@@ -260,89 +141,43 @@ export function OrdersTable() {
             ) : column.getIsSorted() === 'desc' ? (
               <ArrowDown className="w-3 h-3" />
             ) : (
-              <ArrowUpDown className="w-3 h-3 opacity-40" />
+              <ArrowUpDown className="w-3 h-3 opacity-30" />
             )}
           </button>
         ),
-        cell: ({ row }) => {
-          return (
-            <div className="text-xs">
-              <span className="font-black text-[#BA1A20] text-sm">
-                ₱{row.original.total.toLocaleString()}
-              </span>
-              <p className="text-[9px] text-[#8F6F6C]">Inc. 5% VAT</p>
-            </div>
-          );
-        },
+        cell: ({ row }) => (
+          <span className="font-bold text-xs text-[#1F1F1F]">
+            ₱{row.original.total.toLocaleString()}
+          </span>
+        ),
       },
       {
         accessorKey: 'paymentStatus',
-        header: ({ column }) => (
-          <button
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-            className="flex items-center gap-1.5 hover:text-[#BA1A20] font-black text-xs uppercase"
-          >
-            <span>Payment</span>
-            {column.getIsSorted() === 'asc' ? (
-              <ArrowUp className="w-3 h-3" />
-            ) : column.getIsSorted() === 'desc' ? (
-              <ArrowDown className="w-3 h-3" />
-            ) : (
-              <ArrowUpDown className="w-3 h-3 opacity-40" />
-            )}
-          </button>
-        ),
+        header: 'Payment',
         cell: ({ row }) => {
           const o = row.original;
           const isPaid = o.paymentStatus === 'paid';
-
           return (
-            <div className="space-y-1">
-              <span
-                className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider border ${
-                  isPaid
-                    ? 'bg-[#E8F5E9] text-[#2E7D32] border-[#C8E6C9]'
-                    : 'bg-[#FFF8E1] text-[#B45309] border-[#FFE082]'
-                }`}
-              >
-                {isPaid ? <CheckCircle2 className="w-3 h-3" /> : <Clock className="w-3 h-3" />}
-                <span>{o.paymentStatus}</span>
-              </span>
-
-              <p className="text-[10px] text-[#8F6F6C] font-semibold uppercase">
-                {o.paymentMethod}
-              </p>
-            </div>
+            <span
+              className={`text-[11px] font-semibold px-2 py-0.5 rounded ${
+                isPaid ? 'text-[#2E7D32] bg-[#E8F5E9]' : 'text-[#B45309] bg-[#FFF8E1]'
+              }`}
+            >
+              {o.paymentStatus.toUpperCase()}
+            </span>
           );
         },
       },
       {
         accessorKey: 'status',
-        header: ({ column }) => (
-          <button
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-            className="flex items-center gap-1.5 hover:text-[#BA1A20] font-black text-xs uppercase"
-          >
-            <span>Kitchen Status</span>
-            {column.getIsSorted() === 'asc' ? (
-              <ArrowUp className="w-3 h-3" />
-            ) : column.getIsSorted() === 'desc' ? (
-              <ArrowDown className="w-3 h-3" />
-            ) : (
-              <ArrowUpDown className="w-3 h-3 opacity-40" />
-            )}
-          </button>
-        ),
+        header: 'Status',
         cell: ({ row }) => {
           const meta = getStatusBadge(row.original.status);
-          const Icon = meta.icon;
-
           return (
             <span
-              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${meta.bg} ${meta.text} ${meta.border}`}
+              className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full ${meta.bg} ${meta.color}`}
             >
-              <Icon className="w-3.5 h-3.5" />
-              <span>{meta.label}</span>
+              {meta.label}
             </span>
           );
         },
@@ -355,26 +190,43 @@ export function OrdersTable() {
 
           return (
             <div className="flex items-center justify-end gap-1.5">
-              {/* View / Print Receipt */}
+              {/* Receipt */}
               <button
                 onClick={() => setReceiptOrder(o)}
-                title="Print 80mm Receipt Slip"
-                className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl border border-[#E9E8E7] bg-white hover:bg-[#FFF2F0] hover:border-[#FFDAD6] text-xs font-bold text-[#BA1A20] transition-all"
+                title="Print Receipt"
+                className="p-1 rounded text-[#737373] hover:text-[#1F1F1F] hover:bg-[#F5F5F5]"
               >
                 <Printer className="w-3.5 h-3.5" />
-                <span>Receipt</span>
               </button>
 
-              {/* View Details */}
-              <button
-                onClick={() => setDetailOrder(o)}
-                title="View Full Order Details"
-                className="p-1.5 rounded-xl border border-[#E9E8E7] bg-white hover:bg-[#F4F3F2] text-[#5B403D] hover:text-[#2D2926] transition-all"
-              >
-                <Eye className="w-4 h-4" />
-              </button>
+              {/* Quick Status Bumps */}
+              {o.status === 'pending' && (
+                <button
+                  onClick={() => updateStatusMutation.mutate({ orderId: o.id, status: 'preparing' })}
+                  className="px-2 py-1 rounded bg-[#F5F5F5] hover:bg-[#E5E5E5] text-[11px] font-semibold text-[#1F1F1F]"
+                >
+                  Cook
+                </button>
+              )}
 
-              {/* Quick Mark Paid button if unpaid */}
+              {o.status === 'preparing' && (
+                <button
+                  onClick={() => updateStatusMutation.mutate({ orderId: o.id, status: 'ready' })}
+                  className="px-2 py-1 rounded bg-[#FFF2F0] hover:bg-[#FFDAD6] text-[11px] font-semibold text-[#BA1A20]"
+                >
+                  Ready
+                </button>
+              )}
+
+              {o.status === 'ready' && (
+                <button
+                  onClick={() => updateStatusMutation.mutate({ orderId: o.id, status: 'completed' })}
+                  className="px-2 py-1 rounded bg-[#2E7D32] hover:bg-[#1B5E20] text-[11px] font-semibold text-white"
+                >
+                  Serve
+                </button>
+              )}
+
               {o.paymentStatus === 'unpaid' && (
                 <button
                   onClick={() =>
@@ -385,23 +237,9 @@ export function OrdersTable() {
                       changeDue: 0,
                     })
                   }
-                  title="Mark Paid"
-                  className="px-2 py-1 rounded-xl bg-[#2E7D32] hover:bg-[#1B5E20] text-white text-[10px] font-black uppercase tracking-wider transition-all"
+                  className="px-2 py-1 rounded bg-[#1F1F1F] hover:bg-[#383838] text-[11px] font-semibold text-white"
                 >
                   Pay
-                </button>
-              )}
-
-              {/* Quick bump to Complete if ready */}
-              {o.status === 'ready' && (
-                <button
-                  onClick={() =>
-                    updateStatusMutation.mutate({ orderId: o.id, status: 'completed' })
-                  }
-                  title="Complete Order"
-                  className="px-2 py-1 rounded-xl bg-[#BA1A20] hover:bg-[#8B0000] text-white text-[10px] font-black uppercase tracking-wider transition-all"
-                >
-                  Done
                 </button>
               )}
             </div>
@@ -412,7 +250,6 @@ export function OrdersTable() {
     [updateStatusMutation, updatePaymentMutation]
   );
 
-  // Global search filter matching
   const table = useReactTable({
     data: filteredData,
     columns,
@@ -431,135 +268,45 @@ export function OrdersTable() {
     globalFilterFn: (row, columnId, filterValue) => {
       const q = filterValue.toLowerCase();
       const o = row.original;
-      const numMatch = o.orderNumber.toLowerCase().includes(q);
-      const custMatch = o.customerName.toLowerCase().includes(q);
-      const tableMatch = (o.tableNumber || '').toLowerCase().includes(q);
-      const itemMatch = o.items.some((it) => it.dish.name.toLowerCase().includes(q));
-      return numMatch || custMatch || tableMatch || itemMatch;
+      return (
+        o.orderNumber.toLowerCase().includes(q) ||
+        o.customerName.toLowerCase().includes(q) ||
+        (o.tableNumber || '').toLowerCase().includes(q) ||
+        o.items.some((it) => it.dish.name.toLowerCase().includes(q))
+      );
     },
   });
 
-  // Export Table Data to CSV
   const handleExportCSV = () => {
-    const headers = ['Order Number', 'Date', 'Type', 'Table', 'Customer', 'Items Count', 'Total', 'Payment', 'Status'];
+    const headers = ['Order Number', 'Date', 'Type', 'Table', 'Total', 'Payment', 'Status'];
     const rows = orders.map((o) => [
       o.orderNumber,
       new Date(o.createdAt).toLocaleString(),
       o.type,
       o.tableNumber || 'N/A',
-      `"${o.customerName}"`,
-      o.items.reduce((s, i) => s + i.quantity, 0),
       o.total,
       o.paymentStatus,
       o.status,
     ]);
 
-    const csvContent =
-      'data:text/csv;charset=utf-8,' +
-      [headers.join(','), ...rows.map((e) => e.join(','))].join('\n');
-
-    const encodedUri = encodeURI(csvContent);
+    const csv = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map((e) => e.join(','))].join('\n');
     const link = document.createElement('a');
-    link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `hasans_orders_${new Date().toISOString().slice(0, 10)}.csv`);
-    document.body.appendChild(link);
+    link.href = encodeURI(csv);
+    link.download = `orders_${new Date().toISOString().slice(0, 10)}.csv`;
     link.click();
-    document.body.removeChild(link);
   };
 
   return (
-    <div className="flex-1 flex flex-col p-4 lg:p-8 max-w-[1720px] mx-auto w-full space-y-5">
+    <div className="flex-1 flex flex-col p-4 lg:p-6 max-w-[1720px] mx-auto w-full space-y-4">
       {/* Top Controls Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <Receipt className="w-5 h-5 text-[#BA1A20]" />
-            <h1 className="text-xl font-extrabold text-[#2D2926] tracking-tight">
-              Orders Management Table
-            </h1>
-          </div>
-          <p className="text-xs text-[#8F6F6C] font-medium mt-0.5">
-            Powered by TanStack Table &amp; TanStack Query • Live auto-syncing
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2.5">
-          <button
-            onClick={handleExportCSV}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white border border-[#E9E8E7] hover:bg-[#F4F3F2] text-xs font-bold text-[#5B403D] transition-all shadow-xs"
-          >
-            <FileSpreadsheet className="w-4 h-4 text-[#2E7D32]" />
-            <span>Export CSV</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Filter & Search Bar */}
-      <div className="bg-white rounded-2xl border border-[#E9E8E7] p-4 space-y-3.5 stitch-shadow">
-        {/* Search & Rows Per Page */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-          <div className="flex-1 relative max-w-md flex items-center">
-            <Search className="w-4 h-4 text-[#8F6F6C] absolute left-3.5 pointer-events-none" />
-            <input
-              type="text"
-              placeholder="Search order #, customer, table, or ordered dish..."
-              value={globalFilter ?? ''}
-              onChange={(e) => setGlobalFilter(e.target.value)}
-              className="w-full pl-10 pr-9 py-2 rounded-xl border border-[#E9E8E7] bg-[#FAF9F8] text-xs font-medium text-[#2D2926] focus:bg-white focus:outline-none focus:border-[#BA1A20] transition-all"
-            />
-            {globalFilter && (
-              <button
-                onClick={() => setGlobalFilter('')}
-                className="absolute right-3 p-0.5 text-[#8F6F6C] hover:text-[#2D2926]"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            )}
-          </div>
-
-          {/* Rows Per Page Selector */}
-          <div className="flex items-center gap-2 text-xs text-[#5B403D] font-bold">
-            <span>Show:</span>
-            {[8, 15, 25, 50].map((size) => (
-              <button
-                key={size}
-                onClick={() => table.setPageSize(size)}
-                className={`px-2.5 py-1 rounded-lg border text-xs font-bold transition-all ${
-                  table.getState().pagination.pageSize === size
-                    ? 'bg-[#BA1A20] text-white border-[#BA1A20] shadow-xs'
-                    : 'bg-[#FAF9F8] text-[#5B403D] border-[#E9E8E7] hover:bg-[#F4F3F2]'
-                }`}
-              >
-                {size}
-              </button>
-            ))}
-          </div>
-        </div>
-
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
         {/* Status Filter Tabs */}
-        <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-[#F1F0F0]">
+        <div className="flex items-center gap-1 overflow-x-auto no-scrollbar py-0.5">
           {[
-            { id: 'all', label: `All Orders (${orders.length})` },
-            {
-              id: 'unpaid',
-              label: `Unpaid (${orders.filter((o) => o.paymentStatus === 'unpaid').length})`,
-            },
-            {
-              id: 'active',
-              label: `In Progress (${
-                orders.filter(
-                  (o) => o.status === 'pending' || o.status === 'preparing' || o.status === 'ready'
-                ).length
-              })`,
-            },
-            {
-              id: 'completed',
-              label: `Completed (${orders.filter((o) => o.status === 'completed').length})`,
-            },
-            {
-              id: 'cancelled',
-              label: `Cancelled (${orders.filter((o) => o.status === 'cancelled').length})`,
-            },
+            { id: 'all', label: `All (${orders.length})` },
+            { id: 'active', label: `Active (${orders.filter((o) => o.status !== 'completed' && o.status !== 'cancelled').length})` },
+            { id: 'unpaid', label: `Unpaid (${orders.filter((o) => o.paymentStatus === 'unpaid').length})` },
+            { id: 'completed', label: `Completed (${orders.filter((o) => o.status === 'completed').length})` },
           ].map((tab) => {
             const isSelected = statusFilter === tab.id;
             return (
@@ -569,10 +316,10 @@ export function OrdersTable() {
                   setStatusFilter(tab.id);
                   table.setPageIndex(0);
                 }}
-                className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all ${
+                className={`px-3 py-1.5 rounded-md text-xs font-semibold whitespace-nowrap transition-colors ${
                   isSelected
-                    ? 'bg-[#FFF2F0] text-[#BA1A20] border border-[#FFDAD6] font-extrabold shadow-2xs'
-                    : 'bg-[#FAF9F8] text-[#5B403D] hover:bg-[#F4F3F2] border border-[#E9E8E7]'
+                    ? 'bg-[#1F1F1F] text-white'
+                    : 'text-[#525252] hover:bg-[#F5F5F5] hover:text-[#1F1F1F]'
                 }`}
               >
                 {tab.label}
@@ -580,20 +327,50 @@ export function OrdersTable() {
             );
           })}
         </div>
+
+        {/* Right Search & Export */}
+        <div className="flex items-center gap-2">
+          <div className="relative w-48 sm:w-60">
+            <Search className="w-3.5 h-3.5 text-[#A3A3A3] absolute left-3 top-2.5 pointer-events-none" />
+            <input
+              type="text"
+              placeholder="Filter orders..."
+              value={globalFilter ?? ''}
+              onChange={(e) => setGlobalFilter(e.target.value)}
+              className="w-full pl-8 pr-7 py-1.5 text-xs rounded-md border border-[#E5E5E5] bg-[#FAFAFA] text-[#1F1F1F] placeholder-[#A3A3A3] focus:bg-white focus:outline-none focus:border-[#1F1F1F] transition-colors"
+            />
+            {globalFilter && (
+              <button
+                onClick={() => setGlobalFilter('')}
+                className="absolute right-2.5 top-2 text-[#A3A3A3] hover:text-[#1F1F1F]"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+
+          <button
+            onClick={handleExportCSV}
+            title="Export CSV"
+            className="flex items-center gap-1 px-3 py-1.5 rounded-md bg-white border border-[#E5E5E5] text-xs font-medium text-[#525252] hover:text-[#1F1F1F] hover:bg-[#F5F5F5] transition-colors"
+          >
+            <FileSpreadsheet className="w-3.5 h-3.5 text-[#525252]" />
+            <span className="hidden sm:inline">Export</span>
+          </button>
+        </div>
       </div>
 
-      {/* TanStack Data Table Container */}
-      <div className="bg-white rounded-2xl border border-[#E9E8E7] overflow-hidden stitch-shadow">
+      {/* Clean TanStack Data Table */}
+      <div className="bg-white rounded-xl border border-[#E5E5E5] overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse min-w-[900px]">
-            {/* Header */}
+          <table className="w-full text-left border-collapse min-w-[750px]">
             <thead>
               {table.getHeaderGroups().map((headerGroup) => (
-                <tr key={headerGroup.id} className="bg-[#FAF9F8] border-b border-[#E9E8E7]">
+                <tr key={headerGroup.id} className="bg-[#FAFAFA] border-b border-[#E5E5E5]">
                   {headerGroup.headers.map((header) => (
                     <th
                       key={header.id}
-                      className="px-5 py-3.5 text-xs font-extrabold text-[#5B403D] uppercase tracking-wider"
+                      className="px-4 py-2.5 text-[11px] font-bold text-[#737373] uppercase tracking-wider"
                     >
                       {header.isPlaceholder
                         ? null
@@ -604,26 +381,18 @@ export function OrdersTable() {
               ))}
             </thead>
 
-            {/* Table Body */}
-            <tbody className="divide-y divide-[#F1F0F0]">
+            <tbody className="divide-y divide-[#F5F5F5]">
               {table.getRowModel().rows.length === 0 ? (
                 <tr>
-                  <td colSpan={columns.length} className="px-5 py-12 text-center text-[#8F6F6C]">
-                    <AlertCircle className="w-8 h-8 stroke-1 mx-auto text-[#8F6F6C] mb-2" />
-                    <p className="font-bold text-sm text-[#2D2926]">No orders match your filter</p>
-                    <p className="text-xs text-[#8F6F6C] mt-0.5">
-                      Try clearing the search box or selecting another status tab.
-                    </p>
+                  <td colSpan={columns.length} className="px-4 py-8 text-center text-xs text-[#A3A3A3]">
+                    No matching orders
                   </td>
                 </tr>
               ) : (
                 table.getRowModel().rows.map((row) => (
-                  <tr
-                    key={row.id}
-                    className="hover:bg-[#FAF9F8] transition-colors group"
-                  >
+                  <tr key={row.id} className="hover:bg-[#FAFAFA] transition-colors">
                     {row.getVisibleCells().map((cell) => (
-                      <td key={cell.id} className="px-5 py-3.5">
+                      <td key={cell.id} className="px-4 py-2.5">
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
                       </td>
                     ))}
@@ -634,82 +403,40 @@ export function OrdersTable() {
           </table>
         </div>
 
-        {/* TanStack Table Pagination Footer */}
-        <div className="px-5 py-3.5 bg-[#FAF9F8] border-t border-[#E9E8E7] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
-          <span className="text-[#8F6F6C] font-medium">
-            Showing{' '}
-            <span className="font-bold text-[#2D2926]">
-              {table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1}
-            </span>{' '}
-            to{' '}
-            <span className="font-bold text-[#2D2926]">
-              {Math.min(
-                (table.getState().pagination.pageIndex + 1) * table.getState().pagination.pageSize,
-                table.getFilteredRowModel().rows.length
-              )}
-            </span>{' '}
-            of{' '}
-            <span className="font-bold text-[#2D2926]">
-              {table.getFilteredRowModel().rows.length}
-            </span>{' '}
-            orders
+        {/* Minimal Pagination Footer */}
+        <div className="px-4 py-2.5 bg-[#FAFAFA] border-t border-[#E5E5E5] flex items-center justify-between gap-3 text-xs text-[#737373]">
+          <span>
+            {table.getFilteredRowModel().rows.length} total orders
           </span>
 
-          {/* Navigation Buttons */}
-          <div className="flex items-center gap-1.5">
-            <button
-              onClick={() => table.setPageIndex(0)}
-              disabled={!table.getCanPreviousPage()}
-              title="First Page"
-              className="p-1.5 rounded-lg border border-[#E9E8E7] bg-white hover:bg-[#F4F3F2] disabled:opacity-30 disabled:hover:bg-white text-[#2D2926] transition-all"
-            >
-              <ChevronsLeft className="w-4 h-4" />
-            </button>
-
+          <div className="flex items-center gap-1">
             <button
               onClick={() => table.previousPage()}
               disabled={!table.getCanPreviousPage()}
-              title="Previous Page"
-              className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-[#E9E8E7] bg-white hover:bg-[#F4F3F2] disabled:opacity-30 disabled:hover:bg-white text-xs font-bold text-[#2D2926] transition-all"
+              className="p-1 rounded border border-[#E5E5E5] bg-white text-[#525252] disabled:opacity-30 hover:bg-[#F5F5F5]"
             >
               <ChevronLeft className="w-3.5 h-3.5" />
-              <span>Prev</span>
             </button>
-
-            {/* Page indicator pill */}
-            <span className="px-3 py-1.5 rounded-lg bg-white border border-[#E9E8E7] text-xs font-bold text-[#2D2926]">
-              Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount() || 1}
+            <span className="px-2 text-[11px] font-medium text-[#1F1F1F]">
+              {table.getState().pagination.pageIndex + 1} / {table.getPageCount() || 1}
             </span>
-
             <button
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage()}
-              title="Next Page"
-              className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-[#E9E8E7] bg-white hover:bg-[#F4F3F2] disabled:opacity-30 disabled:hover:bg-white text-xs font-bold text-[#2D2926] transition-all"
+              className="p-1 rounded border border-[#E5E5E5] bg-white text-[#525252] disabled:opacity-30 hover:bg-[#F5F5F5]"
             >
-              <span>Next</span>
               <ChevronRight className="w-3.5 h-3.5" />
-            </button>
-
-            <button
-              onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-              disabled={!table.getCanNextPage()}
-              title="Last Page"
-              className="p-1.5 rounded-lg border border-[#E9E8E7] bg-white hover:bg-[#F4F3F2] disabled:opacity-30 disabled:hover:bg-white text-[#2D2926] transition-all"
-            >
-              <ChevronsRight className="w-4 h-4" />
             </button>
           </div>
         </div>
       </div>
 
-      {/* Printable Thermal Receipt Modal */}
+      {/* Modals */}
       <ThermalReceiptModal
         order={receiptOrder}
         onClose={() => setReceiptOrder(null)}
       />
 
-      {/* Order Deep Details Modal */}
       <OrderDetailsModal
         order={detailOrder}
         onClose={() => setDetailOrder(null)}
