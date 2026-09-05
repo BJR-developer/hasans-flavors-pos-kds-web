@@ -1,115 +1,176 @@
-'use client';
+import { create } from 'zustand';
+import { supabase } from './supabase';
 
-import { useState, useEffect } from 'react';
-import { UserProfile, UserRole } from '@/types';
+export type UserRole = 'owner' | 'cashier' | 'customer';
 
-const AUTH_STORAGE_KEY = 'hasan_pos_auth_user_v1';
-
-export const DEMO_ACCOUNTS: Record<UserRole, UserProfile> = {
-  staff: {
-    id: 'usr_staff_01',
-    name: 'Tariq Khan',
-    email: 'staff@hasan.com',
-    role: 'staff',
-    roleLabel: 'Staff Cashier (POS)',
-    avatarUrl: 'https://images.unsplash.com/photo-1583394838336-acd977736f90?auto=format&fit=crop&w=150&q=80',
-  },
-  kds: {
-    id: 'usr_kds_01',
-    name: 'Chef Zubair',
-    email: 'kds@hasan.com',
-    role: 'kds',
-    roleLabel: 'Head Chef (Kitchen KDS)',
-    avatarUrl: 'https://images.unsplash.com/photo-1577219491135-ce391730fb2c?auto=format&fit=crop&w=150&q=80',
-  },
-  owner: {
-    id: 'usr_owner_01',
-    name: 'Malik Hasan',
-    email: 'owner@hasan.com',
-    role: 'owner',
-    roleLabel: 'Restaurant Owner & Admin',
-    avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80',
-  },
-};
-
-export function getStoredAuthUser(): UserProfile | null {
-  if (typeof window === 'undefined') return null;
-  try {
-    const raw = localStorage.getItem(AUTH_STORAGE_KEY);
-    if (raw) return JSON.parse(raw);
-  } catch (err) {
-    console.warn('Error reading auth from localStorage', err);
-  }
-  return null;
+export interface AuthUser {
+  id: string;
+  email: string;
+  name: string;
+  role: UserRole;
+  phone?: string;
+  avatarUrl?: string;
 }
 
-export function setStoredAuthUser(user: UserProfile | null): void {
-  if (typeof window === 'undefined') return;
-  try {
-    if (user) {
-      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
-    } else {
-      localStorage.removeItem(AUTH_STORAGE_KEY);
-    }
-  } catch (err) {
-    console.error('Error saving auth to localStorage', err);
-  }
+interface AuthState {
+  user: AuthUser | null;
+  isLoading: boolean;
+  error: string | null;
+  initialize: () => Promise<void>;
+  signInWithPassword: (email: string, pass: string) => Promise<{ success: boolean; error?: string; role?: UserRole }>;
+  quickSwitchRole: (role: UserRole) => Promise<void>;
+  signOut: () => Promise<void>;
 }
 
-export function useAuth() {
-  const [user, setUser] = useState<UserProfile | null>(() => {
-    const saved = getStoredAuthUser();
-    return saved || DEMO_ACCOUNTS.staff;
-  });
-  const [isLoading, setIsLoading] = useState(false);
+export const useAuthStore = create<AuthState>((set, get) => ({
+  user: null,
+  isLoading: true,
+  error: null,
 
-  useEffect(() => {
-    const saved = getStoredAuthUser();
-    if (!saved) {
-      setStoredAuthUser(DEMO_ACCOUNTS.staff);
+  initialize: async () => {
+    try {
+      set({ isLoading: true });
+      const { data: { session } } = await supabase.auth.getSession();
+
+      if (session?.user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', session.user.id)
+          .single();
+
+        if (profile) {
+          set({
+            user: {
+              id: profile.id,
+              email: profile.email,
+              name: profile.full_name || profile.email.split('@')[0],
+              role: (profile.role as UserRole) || 'cashier',
+              phone: profile.phone,
+              avatarUrl: profile.avatar_url,
+            },
+            isLoading: false,
+          });
+          return;
+        }
+      }
+
+      // Default initial session fallback: Cashier role
+      const { data: cashierProfile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('role', 'cashier')
+        .single();
+
+      if (cashierProfile) {
+        set({
+          user: {
+            id: cashierProfile.id,
+            email: cashierProfile.email,
+            name: cashierProfile.full_name,
+            role: 'cashier',
+            phone: cashierProfile.phone,
+          },
+          isLoading: false,
+        });
+      } else {
+        set({
+          user: {
+            id: 'mock-cashier',
+            email: 'cashier@hasan.com',
+            name: 'Main POS Cashier',
+            role: 'cashier',
+          },
+          isLoading: false,
+        });
+      }
+    } catch (err: any) {
+      console.error('Auth initialization error:', err);
+      set({ isLoading: false });
     }
-  }, []);
+  },
 
-  const login = (email: string): { success: boolean; role: UserRole } => {
-    const clean = email.trim().toLowerCase();
-    let target: UserProfile = DEMO_ACCOUNTS.staff;
+  signInWithPassword: async (email: string, pass: string) => {
+    try {
+      set({ isLoading: true, error: null });
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password: pass,
+      });
 
-    if (clean.includes('kds') || clean.includes('chef') || clean.includes('kitchen')) {
-      target = DEMO_ACCOUNTS.kds;
-    } else if (clean.includes('owner') || clean.includes('admin') || clean.includes('manager')) {
-      target = DEMO_ACCOUNTS.owner;
-    } else {
-      target = {
-        id: `usr_${Date.now()}`,
-        name: clean.split('@')[0] || 'Staff Member',
-        email: clean,
-        role: 'staff',
-        roleLabel: 'Staff Cashier',
-      };
+      if (error) {
+        set({ isLoading: false, error: error.message });
+        return { success: false, error: error.message };
+      }
+
+      if (data.user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', data.user.id)
+          .single();
+
+        const role = (profile?.role as UserRole) || 'customer';
+        const user: AuthUser = {
+          id: data.user.id,
+          email: data.user.email || email,
+          name: profile?.full_name || email.split('@')[0],
+          role,
+          phone: profile?.phone,
+        };
+
+        set({ user, isLoading: false });
+        return { success: true, role };
+      }
+
+      set({ isLoading: false });
+      return { success: false, error: 'User not found' };
+    } catch (err: any) {
+      set({ isLoading: false, error: err.message });
+      return { success: false, error: err.message };
     }
+  },
 
-    setUser(target);
-    setStoredAuthUser(target);
-    return { success: true, role: target.role };
-  };
+  quickSwitchRole: async (role: UserRole) => {
+    set({ isLoading: true });
+    try {
+      const email = `${role}@hasan.com`;
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('email', email)
+        .single();
 
-  const quickLogin = (role: UserRole) => {
-    const target = DEMO_ACCOUNTS[role];
-    setUser(target);
-    setStoredAuthUser(target);
-    return target;
-  };
+      if (profile) {
+        set({
+          user: {
+            id: profile.id,
+            email: profile.email,
+            name: profile.full_name,
+            role: profile.role as UserRole,
+            phone: profile.phone,
+          },
+          isLoading: false,
+        });
+      } else {
+        set({
+          user: {
+            id: `role-${role}`,
+            email,
+            name: `${role.toUpperCase()} User`,
+            role,
+          },
+          isLoading: false,
+        });
+      }
+    } catch (e) {
+      console.error('Quick switch error:', e);
+      set({ isLoading: false });
+    }
+  },
 
-  const logout = () => {
-    setUser(null);
-    setStoredAuthUser(null);
-  };
-
-  return {
-    user,
-    isLoading,
-    login,
-    quickLogin,
-    logout,
-  };
-}
+  signOut: async () => {
+    await supabase.auth.signOut();
+    set({ user: null });
+  },
+}));

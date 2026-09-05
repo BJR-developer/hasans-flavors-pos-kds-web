@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
@@ -12,15 +12,20 @@ import {
   BarChart3,
   LogOut,
   LogIn,
+  ShieldAlert,
 } from 'lucide-react';
 import { useOrders } from '@/hooks/useRestaurantData';
-import { useAuth } from '@/lib/auth';
+import { useAuthStore } from '@/lib/auth';
 
 export function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
   const { data: orders = [] } = useOrders();
-  const { user, logout } = useAuth();
+  const { user, initialize, signOut, quickSwitchRole } = useAuthStore();
+
+  useEffect(() => {
+    initialize();
+  }, [initialize]);
 
   const isSignInPage = pathname === '/signin';
 
@@ -32,41 +37,51 @@ export function Navbar() {
     (o) => o.status !== 'completed' && o.status !== 'cancelled'
   ).length;
 
-  const navItems = [
-    {
-      href: '/pos',
-      label: 'Register',
-      icon: UtensilsCrossed,
-      badge: null,
-    },
-    {
-      href: '/kds',
-      label: 'Kitchen',
-      icon: ChefHat,
-      badge: kitchenQueueCount > 0 ? kitchenQueueCount : null,
-    },
-    {
-      href: '/orders',
-      label: 'Orders',
-      icon: TableProperties,
-      badge: activeOrdersCount > 0 ? activeOrdersCount : null,
-    },
-    {
-      href: '/inventory',
-      label: 'Menu & Stock',
-      icon: Boxes,
-      badge: null,
-    },
-    {
-      href: '/analytics',
-      label: 'Owner',
-      icon: BarChart3,
-      badge: null,
-    },
-  ];
+  // STRICT ROLE SEPARATION PER USER DIRECTIVE:
+  // - Owner: Can ONLY access Owner Dashboard (/analytics). Cannot access POS or Cashier tools.
+  // - Cashier: Manages POS (/pos), Kitchen (/kds), Orders (/orders), Stock (/inventory). Cannot access Owner Analytics.
+  const isOwner = user?.role === 'owner';
+  const isCashier = user?.role === 'cashier';
 
-  const handleSignOut = () => {
-    logout();
+  // Define navigation items based on role
+  const navItems = isOwner
+    ? [
+        {
+          href: '/analytics',
+          label: 'Owner Dashboard',
+          icon: BarChart3,
+          badge: null,
+        },
+      ]
+    : [
+        {
+          href: '/pos',
+          label: 'Register (POS)',
+          icon: UtensilsCrossed,
+          badge: null,
+        },
+        {
+          href: '/kds',
+          label: 'Kitchen (KDS)',
+          icon: ChefHat,
+          badge: kitchenQueueCount > 0 ? kitchenQueueCount : null,
+        },
+        {
+          href: '/orders',
+          label: 'Orders',
+          icon: TableProperties,
+          badge: activeOrdersCount > 0 ? activeOrdersCount : null,
+        },
+        {
+          href: '/inventory',
+          label: 'Menu & Stock',
+          icon: Boxes,
+          badge: null,
+        },
+      ];
+
+  const handleSignOut = async () => {
+    await signOut();
     router.push('/signin');
   };
 
@@ -75,7 +90,7 @@ export function Navbar() {
       <div className="max-w-[1720px] mx-auto px-3 sm:px-4 lg:px-6 h-14 flex items-center justify-between gap-2 sm:gap-4">
         {/* Brand */}
         <div className="flex items-center gap-2.5 shrink-0">
-          <Link href="/pos" className="flex items-center gap-2.5 group">
+          <Link href={isOwner ? '/analytics' : '/pos'} className="flex items-center gap-2.5 group">
             <div className="relative w-9 h-9 rounded-lg overflow-hidden bg-[#FFF2F0] border border-[#FFDAD6] flex items-center justify-center shrink-0 shadow-2xs">
               <Image
                 src="/logo.png"
@@ -91,7 +106,7 @@ export function Navbar() {
                 Hasan&apos;s Flavors
               </span>
               <span className="text-[10px] text-[#737373] font-medium block leading-none">
-                POS &amp; Kitchen Operations
+                {isOwner ? 'Owner Executive Portal' : 'POS & Kitchen Operations'}
               </span>
             </div>
           </Link>
@@ -102,14 +117,13 @@ export function Navbar() {
           <nav className="flex items-center gap-1 overflow-x-auto no-scrollbar py-0.5">
             {navItems.map((item) => {
               const Icon = item.icon;
-              const isActive =
-                pathname === item.href || (item.href === '/pos' && pathname === '/');
+              const isActive = pathname === item.href;
 
               return (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
                     isActive
                       ? 'bg-[#1F1F1F] text-white shadow-xs'
                       : 'text-[#525252] hover:bg-[#F5F5F5] hover:text-[#1F1F1F]'
@@ -132,13 +146,52 @@ export function Navbar() {
           </nav>
         )}
 
-        {/* Right Tools: User Profile / Sign In / Out */}
+        {/* Right Tools: Role Badge, Quick Role Switcher, Sign Out */}
         <div className="flex items-center gap-2 shrink-0">
           {!isSignInPage && user ? (
             <div className="flex items-center gap-1.5 sm:gap-2">
+              {/* Role Indicator Chip */}
               <div className="hidden md:flex flex-col text-right leading-none">
                 <span className="text-xs font-bold text-[#1F1F1F]">{user.name}</span>
-                <span className="text-[10px] text-[#737373] mt-0.5">{user.roleLabel}</span>
+                <span
+                  className={`text-[10px] font-extrabold mt-0.5 uppercase tracking-wider ${
+                    user.role === 'owner'
+                      ? 'text-[#B45309]'
+                      : user.role === 'cashier'
+                      ? 'text-[#BA1A20]'
+                      : 'text-[#2E7D32]'
+                  }`}
+                >
+                  {user.role}
+                </span>
+              </div>
+
+              {/* Fast Role Switch Pill for testing */}
+              <div className="flex items-center gap-1 bg-[#F5F5F5] p-1 rounded-lg border border-[#E5E5E5] text-[10px] font-bold">
+                <button
+                  type="button"
+                  onClick={async () => {
+                    await quickSwitchRole('cashier');
+                    router.push('/pos');
+                  }}
+                  className={`px-2 py-0.5 rounded transition-all ${
+                    user.role === 'cashier' ? 'bg-white text-[#1F1F1F] shadow-2xs' : 'text-[#737373] hover:text-[#1F1F1F]'
+                  }`}
+                >
+                  Cashier
+                </button>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    await quickSwitchRole('owner');
+                    router.push('/analytics');
+                  }}
+                  className={`px-2 py-0.5 rounded transition-all ${
+                    user.role === 'owner' ? 'bg-white text-[#B45309] shadow-2xs font-extrabold' : 'text-[#737373] hover:text-[#1F1F1F]'
+                  }`}
+                >
+                  Owner
+                </button>
               </div>
 
               <button

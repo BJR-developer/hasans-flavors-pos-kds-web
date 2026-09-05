@@ -3,175 +3,160 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { Utensils, ChefHat, BarChart3, ArrowRight, Lock, Mail } from 'lucide-react';
-import { useAuth, DEMO_ACCOUNTS } from '@/lib/auth';
-import { UserRole } from '@/types';
+import { LogIn, Shield, Store, BarChart3 } from 'lucide-react';
+import { useAuthStore, UserRole } from '@/lib/auth';
 
 export default function SignInPage() {
   const router = useRouter();
-  const { login, quickLogin } = useAuth();
+  const { signInWithPassword, quickSwitchRole, isLoading, error } = useAuthStore();
 
-  const [email, setEmail] = useState('staff@hasan.com');
-  const [password, setPassword] = useState('••••••••');
-  const [selectedRole, setSelectedRole] = useState<UserRole>('staff');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [localError, setLocalError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSignIn = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email.trim()) return;
+    setLocalError(null);
+    if (!email || !password) {
+      setLocalError('Please enter both email and password.');
+      return;
+    }
 
-    const res = login(email);
-    if (res.role === 'owner') {
-      router.push('/analytics');
-    } else if (res.role === 'kds') {
-      router.push('/kds');
+    setSubmitting(true);
+    const res = await signInWithPassword(email, password);
+    setSubmitting(false);
+
+    if (res.success) {
+      // Role redirection: Owner -> /analytics; Cashier -> /pos
+      if (res.role === 'owner') {
+        router.push('/analytics');
+      } else {
+        router.push('/pos');
+      }
     } else {
-      router.push('/pos');
+      setLocalError(res.error || 'Authentication failed');
     }
   };
 
-  const handleQuickRole = (role: UserRole) => {
-    setSelectedRole(role);
-    const acc = DEMO_ACCOUNTS[role];
-    setEmail(acc.email);
-    setPassword('spice1234');
-    quickLogin(role);
-
+  const handleQuickRole = async (role: UserRole) => {
+    await quickSwitchRole(role);
     if (role === 'owner') {
       router.push('/analytics');
-    } else if (role === 'kds') {
-      router.push('/kds');
     } else {
       router.push('/pos');
     }
   };
 
   return (
-    <div className="min-h-[calc(100vh-56px)] flex items-center justify-center p-4 bg-[#FAF9F8]">
-      <div className="w-full max-w-md bg-white rounded-2xl border border-[#E5E5E5] p-6 sm:p-8 shadow-sm space-y-6">
-        {/* Brand Header */}
+    <div className="min-h-[calc(100vh-56px)] flex items-center justify-center p-4 bg-[#FAFAFA]">
+      <div className="w-full max-w-md bg-white border border-[#E5E5E5] rounded-2xl p-6 sm:p-8 shadow-xs space-y-6">
+        {/* Brand Header with Logo */}
         <div className="text-center space-y-2">
-          <div className="relative w-14 h-14 rounded-2xl overflow-hidden bg-[#FFF2F0] border border-[#FFDAD6] mx-auto shadow-xs flex items-center justify-center">
+          <div className="mx-auto relative w-16 h-16 rounded-xl overflow-hidden bg-[#FFF2F0] border border-[#FFDAD6] flex items-center justify-center shadow-2xs">
             <Image
               src="/logo.png"
               alt="Hasan's Flavors Logo"
               fill
-              sizes="56px"
+              sizes="64px"
               priority
               className="object-cover"
             />
           </div>
-          <h1 className="text-xl font-black text-[#1F1F1F] tracking-tight">
-            Hasan&apos;s Flavors Operations
-          </h1>
+          <h1 className="text-xl font-black text-[#1F1F1F] tracking-tight">Hasan&apos;s Flavors</h1>
           <p className="text-xs text-[#737373]">
-            Select your staff role or sign in to access register, kitchen, and reports
+            Internal Operations Portal • Supabase Cloud Database Connected
           </p>
         </div>
 
-        {/* 1-Click Fast Role Sign-In Chips */}
-        <div className="space-y-2">
-          <label className="block text-[11px] font-bold text-[#737373] uppercase tracking-wider text-center">
-            Quick 1-Tap Access
+        {/* 1-Tap Quick Access Buttons with Strict Role Guidance */}
+        <div className="space-y-2.5">
+          <label className="text-[11px] font-bold text-[#737373] uppercase tracking-wider block">
+            Instant Role Switching
           </label>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-2 gap-2.5">
             <button
               type="button"
-              onClick={() => handleQuickRole('staff')}
-              className={`p-2.5 rounded-xl border flex flex-col items-center gap-1.5 transition-all ${
-                selectedRole === 'staff'
-                  ? 'border-[#BA1A20] bg-[#FFF2F0] text-[#BA1A20] shadow-xs'
-                  : 'border-[#E5E5E5] bg-white text-[#525252] hover:bg-[#F5F5F5]'
-              }`}
+              onClick={() => handleQuickRole('cashier')}
+              className="p-3 rounded-xl border border-[#E5E5E5] bg-[#FAFAFA] hover:bg-white hover:border-[#BA1A20] transition-all text-left group"
             >
-              <Utensils className="w-4 h-4" />
-              <span className="text-xs font-bold leading-tight">Cashier</span>
-              <span className="text-[9px] opacity-75">POS</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => handleQuickRole('kds')}
-              className={`p-2.5 rounded-xl border flex flex-col items-center gap-1.5 transition-all ${
-                selectedRole === 'kds'
-                  ? 'border-[#BA1A20] bg-[#FFF2F0] text-[#BA1A20] shadow-xs'
-                  : 'border-[#E5E5E5] bg-white text-[#525252] hover:bg-[#F5F5F5]'
-              }`}
-            >
-              <ChefHat className="w-4 h-4" />
-              <span className="text-xs font-bold leading-tight">Kitchen</span>
-              <span className="text-[9px] opacity-75">KDS</span>
+              <div className="flex items-center gap-1.5 text-xs font-bold text-[#1F1F1F] group-hover:text-[#BA1A20]">
+                <Store className="w-4 h-4 text-[#BA1A20]" />
+                <span>Cashier</span>
+              </div>
+              <p className="text-[10px] text-[#737373] mt-1 leading-tight">
+                POS Register, Kitchen KDS, Stock &amp; Orders
+              </p>
             </button>
 
             <button
               type="button"
               onClick={() => handleQuickRole('owner')}
-              className={`p-2.5 rounded-xl border flex flex-col items-center gap-1.5 transition-all ${
-                selectedRole === 'owner'
-                  ? 'border-[#BA1A20] bg-[#FFF2F0] text-[#BA1A20] shadow-xs'
-                  : 'border-[#E5E5E5] bg-white text-[#525252] hover:bg-[#F5F5F5]'
-              }`}
+              className="p-3 rounded-xl border border-[#E5E5E5] bg-[#FAFAFA] hover:bg-white hover:border-[#B45309] transition-all text-left group"
             >
-              <BarChart3 className="w-4 h-4" />
-              <span className="text-xs font-bold leading-tight">Owner</span>
-              <span className="text-[9px] opacity-75">Analytics</span>
+              <div className="flex items-center gap-1.5 text-xs font-bold text-[#1F1F1F] group-hover:text-[#B45309]">
+                <BarChart3 className="w-4 h-4 text-[#B45309]" />
+                <span>Owner</span>
+              </div>
+              <p className="text-[10px] text-[#737373] mt-1 leading-tight">
+                Executive Owner Dashboard &amp; Analytics Only
+              </p>
             </button>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <div className="flex-1 h-px bg-[#E5E5E5]" />
-          <span className="text-[10px] uppercase font-bold text-[#A3A3A3]">or sign in with email</span>
-          <div className="flex-1 h-px bg-[#E5E5E5]" />
+        <div className="relative flex py-1 items-center">
+          <div className="flex-grow border-t border-[#E5E5E5]"></div>
+          <span className="flex-shrink mx-3 text-[11px] font-semibold text-[#A3A3A3] uppercase">
+            Or Sign In With Account
+          </span>
+          <div className="flex-grow border-t border-[#E5E5E5]"></div>
         </div>
 
-        {/* Credentials Form */}
-        <form onSubmit={handleSignIn} className="space-y-4">
-          <div>
-            <label className="block text-xs font-bold text-[#1F1F1F] mb-1">
-              Email Address
-            </label>
-            <div className="relative">
-              <Mail className="w-4 h-4 text-[#A3A3A3] absolute left-3 top-2.5 pointer-events-none" />
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="staff@hasan.com"
-                className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-[#E5E5E5] bg-[#FAFAFA] text-[#1F1F1F] focus:bg-white focus:outline-none focus:border-[#1F1F1F] transition-colors"
-              />
+        {/* Email & Password Form */}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {(localError || error) && (
+            <div className="p-3 rounded-lg bg-[#FFF2F0] border border-[#FFDAD6] text-xs text-[#BA1A20] font-semibold flex items-center gap-2">
+              <Shield className="w-4 h-4 shrink-0" />
+              <span>{localError || error}</span>
             </div>
+          )}
+
+          <div className="space-y-1">
+            <label className="text-xs font-bold text-[#1F1F1F]">Email Address</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="cashier@hasan.com or owner@hasan.com"
+              className="w-full px-3 py-2 text-xs rounded-lg border border-[#E5E5E5] bg-[#FAFAFA] text-[#1F1F1F] focus:bg-white focus:outline-none focus:border-[#1F1F1F]"
+            />
           </div>
 
-          <div>
-            <label className="block text-xs font-bold text-[#1F1F1F] mb-1">
-              Password
-            </label>
-            <div className="relative">
-              <Lock className="w-4 h-4 text-[#A3A3A3] absolute left-3 top-2.5 pointer-events-none" />
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-[#E5E5E5] bg-[#FAFAFA] text-[#1F1F1F] focus:bg-white focus:outline-none focus:border-[#1F1F1F] transition-colors"
-              />
-            </div>
+          <div className="space-y-1">
+            <label className="text-xs font-bold text-[#1F1F1F]">Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••••••"
+              className="w-full px-3 py-2 text-xs rounded-lg border border-[#E5E5E5] bg-[#FAFAFA] text-[#1F1F1F] focus:bg-white focus:outline-none focus:border-[#1F1F1F]"
+            />
           </div>
 
           <button
             type="submit"
-            className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-[#BA1A20] hover:bg-[#8B0000] text-white text-xs font-bold transition-all shadow-xs"
+            disabled={submitting || isLoading}
+            className="w-full py-2.5 px-4 rounded-lg bg-[#1F1F1F] hover:bg-black text-white text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-2 disabled:opacity-50"
           >
-            <span>Sign In to Terminal</span>
-            <ArrowRight className="w-3.5 h-3.5" />
+            <LogIn className="w-3.5 h-3.5" />
+            <span>{submitting ? 'Authenticating...' : 'Sign In to Portal'}</span>
           </button>
         </form>
 
-        <p className="text-[10px] text-center text-[#A3A3A3]">
-          Hasan&apos;s Flavors Zabihah Halal Cuisine • Internal Staff Portal
-        </p>
+        <div className="text-center text-[10px] text-[#A3A3A3] leading-normal pt-2 border-t border-[#F5F5F5]">
+          Connected to Supabase Project: <code className="font-mono text-[#525252]">wplbfxyudyndgzkucbia</code>
+        </div>
       </div>
     </div>
   );

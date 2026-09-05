@@ -1,24 +1,23 @@
 'use client';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useEffect } from 'react';
+import { supabase } from '@/lib/supabase';
 import {
-  getStoredOrders,
-  getStoredDishes,
-  getTableSessions,
-  getDailyStats,
-  createOrder as apiCreateOrder,
-  updateOrderStatus as apiUpdateOrderStatus,
-  updateOrderPayment as apiUpdateOrderPayment,
-  toggleDishStock as apiToggleDishStock,
-  toggleItemInKitchen as apiToggleItemInKitchen,
-  updateDishPrice as apiUpdateDishPrice,
-  addDish as apiAddDish,
-  updateDish as apiUpdateDish,
-  deleteDish as apiDeleteDish,
-  resetStoreData as apiResetStoreData,
-} from '@/lib/store';
+  fetchDishesFromDB,
+  updateDishInDB,
+  createDishInDB,
+  deleteDishFromDB,
+  fetchOrdersFromDB,
+  createOrderInDB,
+  updateOrderStatusInDB,
+  fetchTablesFromDB,
+  updateTableStatusInDB,
+} from '@/lib/api';
 import categoriesData from '@/data/categories.json';
-import { Category, Dish, Order, OrderStatus, PaymentMethod, PaymentStatus } from '@/types';
+import menuFallback from '@/data/menu.json';
+import { INITIAL_ORDERS } from '@/data/mockOrders';
+import { Category, Dish, Order, OrderStatus, PaymentMethod, PaymentStatus, TableSession } from '@/types';
 
 export const QUERY_KEYS = {
   orders: ['orders'] as const,
@@ -30,54 +29,166 @@ export const QUERY_KEYS = {
 
 // 1. Orders Query
 export function useOrders() {
-  return useQuery({
+  const queryClient = useQueryClient();
+
+  const query = useQuery<Order[]>({
     queryKey: QUERY_KEYS.orders,
     queryFn: async (): Promise<Order[]> => {
-      return getStoredOrders();
-    },
-    refetchInterval: 3000, // Background poll every 3 seconds for live kitchen updates
-  });
-}
-
-// 2. Dishes Query
-export function useDishes() {
-  return useQuery({
-    queryKey: QUERY_KEYS.dishes,
-    queryFn: async (): Promise<Dish[]> => {
-      return getStoredDishes();
-    },
-  });
-}
-
-// 3. Categories Query
-export function useCategories() {
-  return useQuery({
-    queryKey: QUERY_KEYS.categories,
-    queryFn: async (): Promise<Category[]> => {
-      return categoriesData as Category[];
-    },
-  });
-}
-
-// 4. Tables Sessions Query
-export function useTableSessions() {
-  return useQuery({
-    queryKey: QUERY_KEYS.tables,
-    queryFn: async () => {
-      return getTableSessions();
+      try {
+        const orders = await fetchOrdersFromDB();
+        return orders.length > 0 ? orders : INITIAL_ORDERS;
+      } catch (e) {
+        console.warn('Falling back to local initial orders:', e);
+        return INITIAL_ORDERS;
+      }
     },
     refetchInterval: 5000,
   });
+
+  // Realtime subscription for orders
+  useEffect(() => {
+    const channel = supabase
+      .channel('public:orders')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, () => {
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.orders });
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
+
+  return query;
+}
+
+// 2. Dishes Query (useDishes and useMenu alias)
+export function useDishes() {
+  const queryClient = useQueryClient();
+
+  const query = useQuery<Dish[]>({
+    queryKey: QUERY_KEYS.dishes,
+    queryFn: async (): Promise<Dish[]> => {
+      try {
+        const dishes = await fetchDishesFromDB();
+        return dishes.length > 0 ? dishes : (menuFallback as unknown as Dish[]);
+      } catch (e) {
+        console.warn('Falling back to local dishes:', e);
+        return menuFallback as unknown as Dish[];
+      }
+    },
+    staleTime: 1000 * 60 * 5,
+  });
+
+  // Realtime subscription for dishes
+  useEffect(() => {
+    const channel = supabase
+      .channel('public:dishes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'dishes' }, () => {
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.dishes });
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
+
+  return query;
+}
+
+export const useMenu = useDishes;
+
+// 3. Categories Query
+export function useCategories() {
+  return useQuery<Category[]>({
+    queryKey: QUERY_KEYS.categories,
+    queryFn: async (): Promise<Category[]> => {
+      try {
+        const { data } = await supabase.from('categories').select('*').order('sort_order');
+        if (data && data.length > 0) {
+          return data.map((c: any) => ({
+            id: c.id,
+            name: c.name,
+            slug: c.slug,
+            icon: c.icon || 'restaurant',
+            count: 0,
+            imageUrl: c.image_url,
+          }));
+        }
+      } catch (e) {
+        console.warn('Falling back to local categories:', e);
+      }
+      return categoriesData as Category[];
+    },
+    staleTime: 1000 * 60 * 10,
+  });
+}
+
+// 4. Tables Query
+export function useTableSessions() {
+  const queryClient = useQueryClient();
+
+  const query = useQuery<TableSession[]>({
+    queryKey: QUERY_KEYS.tables,
+    queryFn: async (): Promise<TableSession[]> => {
+      try {
+        const tables = await fetchTablesFromDB();
+        return tables;
+      } catch (e) {
+        console.warn('Falling back to empty tables:', e);
+        return [];
+      }
+    },
+    refetchInterval: 5000,
+  });
+
+  useEffect(() => {
+    const channel = supabase
+      .channel('public:dining_tables')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'dining_tables' }, () => {
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.tables });
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
+
+  return query;
 }
 
 // 5. Daily Stats Query
 export function useDailyStats() {
+  const { data: orders = [] } = useOrders();
+  const { data: tables = [] } = useTableSessions();
+
   return useQuery({
-    queryKey: QUERY_KEYS.dailyStats,
+    queryKey: [...QUERY_KEYS.dailyStats, orders.length, tables.length],
     queryFn: async () => {
-      return getDailyStats();
+      const now = new Date();
+      const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(
+        now.getDate()
+      ).padStart(2, '0')}`;
+
+      const todayOrders = orders.filter((o) => (o.createdAt || '').startsWith(todayStr));
+      const totalSales = todayOrders
+        .filter((o) => o.paymentStatus === 'paid' && o.status !== 'cancelled')
+        .reduce((sum, o) => sum + o.total, 0);
+
+      const activeTables = tables.filter((t) => t.status !== 'available').length;
+
+      return {
+        todayRevenue: totalSales,
+        orderCount: todayOrders.length,
+        avgTicket: todayOrders.length > 0 ? Math.round(totalSales / todayOrders.length) : 0,
+        activeTables,
+        totalTables: tables.length,
+        avgPrepTimeMinutes: 18,
+        topSellingItems: [],
+      };
     },
-    refetchInterval: 5000,
   });
 }
 
@@ -89,7 +200,21 @@ export function useCreateOrder() {
 
   return useMutation({
     mutationFn: async (orderData: Omit<Order, 'id' | 'orderNumber' | 'createdAt'>) => {
-      return apiCreateOrder(orderData);
+      const id = `order_${Date.now()}`;
+      const now = new Date();
+      const orderNumber = `HF-${now.getFullYear()}${(now.getMonth() + 1).toString().padStart(2, '0')}${now
+        .getDate()
+        .toString()
+        .padStart(2, '0')}-${Math.floor(1000 + Math.random() * 9000)}`;
+
+      const fullOrder: Order = {
+        ...orderData,
+        id,
+        orderNumber,
+        createdAt: now.toISOString(),
+      };
+
+      return createOrderInDB(fullOrder);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.orders });
@@ -99,23 +224,22 @@ export function useCreateOrder() {
   });
 }
 
-// Update Order Status (Kitchen / Fulfillment)
+// Update Order Status (Kitchen KDS Bump / Complete)
 export function useUpdateOrderStatus() {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async ({ orderId, status }: { orderId: string; status: OrderStatus }) => {
-      return apiUpdateOrderStatus(orderId, status);
+      return updateOrderStatusInDB(orderId, status);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.orders });
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.tables });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.dailyStats });
     },
   });
 }
 
-// Update Payment Status
+// Update Order Payment
 export function useUpdateOrderPayment() {
   const queryClient = useQueryClient();
 
@@ -124,8 +248,6 @@ export function useUpdateOrderPayment() {
       orderId,
       paymentStatus,
       paymentMethod,
-      cashTendered,
-      changeDue,
     }: {
       orderId: string;
       paymentStatus: PaymentStatus;
@@ -133,23 +255,38 @@ export function useUpdateOrderPayment() {
       cashTendered?: number;
       changeDue?: number;
     }) => {
-      return apiUpdateOrderPayment(orderId, paymentStatus, paymentMethod, cashTendered, changeDue);
+      const updates: any = { payment_status: paymentStatus, updated_at: new Date().toISOString() };
+      if (paymentMethod) updates.payment_method = paymentMethod;
+
+      const { error } = await supabase.from('orders').update(updates).eq('id', orderId);
+      if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.orders });
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.tables });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.dailyStats });
     },
   });
 }
 
-// Toggle Item in Kitchen checklist
+// Toggle Kitchen Item Checklist
 export function useToggleItemInKitchen() {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async ({ orderId, cartItemId }: { orderId: string; cartItemId: string }) => {
-      return apiToggleItemInKitchen(orderId, cartItemId);
+      const { data: orderData } = await supabase.from('orders').select('items').eq('id', orderId).single();
+      if (!orderData) return;
+
+      const items = (orderData.items as any[]) || [];
+      const updatedItems = items.map((item) => {
+        if (item.cartItemId === cartItemId) {
+          return { ...item, completedInKitchen: !item.completedInKitchen };
+        }
+        return item;
+      });
+
+      const { error } = await supabase.from('orders').update({ items: updatedItems }).eq('id', orderId);
+      if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.orders });
@@ -157,13 +294,15 @@ export function useToggleItemInKitchen() {
   });
 }
 
-// Toggle Dish Stock (86 Out of Stock)
+// Toggle Dish Stock (Available / Out of Stock)
 export function useToggleDishStock() {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (dishId: string) => {
-      return apiToggleDishStock(dishId);
+      const { data } = await supabase.from('dishes').select('in_stock').eq('id', dishId).single();
+      const currentStock = data?.in_stock ?? true;
+      return updateDishInDB(dishId, { inStock: !currentStock });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.dishes });
@@ -177,7 +316,7 @@ export function useUpdateDishPrice() {
 
   return useMutation({
     mutationFn: async ({ dishId, price }: { dishId: string; price: number }) => {
-      return apiUpdateDishPrice(dishId, price);
+      return updateDishInDB(dishId, { price });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.dishes });
@@ -191,7 +330,7 @@ export function useAddDish() {
 
   return useMutation({
     mutationFn: async (dishData: Omit<Dish, 'id' | 'slug' | 'formattedPrice' | 'rating' | 'reviewCount'>) => {
-      return apiAddDish(dishData);
+      return createDishInDB(dishData as any);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.dishes });
@@ -205,7 +344,7 @@ export function useUpdateDish() {
 
   return useMutation({
     mutationFn: async ({ dishId, data }: { dishId: string; data: Partial<Dish> }) => {
-      return apiUpdateDish(dishId, data);
+      return updateDishInDB(dishId, data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.dishes });
@@ -219,24 +358,10 @@ export function useDeleteDish() {
 
   return useMutation({
     mutationFn: async (dishId: string) => {
-      return apiDeleteDish(dishId);
+      return deleteDishFromDB(dishId);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.dishes });
-    },
-  });
-}
-
-// Reset Demo Data
-export function useResetStoreData() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async () => {
-      return apiResetStoreData();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries();
     },
   });
 }
