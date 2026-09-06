@@ -8,6 +8,8 @@ import {
   updateDishInDB,
   createDishInDB,
   deleteDishFromDB,
+  deleteDishesFromDB,
+  updateDishesStockInDB,
   fetchOrdersFromDB,
   createOrderInDB,
   updateOrderStatusInDB,
@@ -26,9 +28,7 @@ export const QUERY_KEYS = {
 
 // 1. Orders Query - 100% Live from Supabase
 export function useOrders() {
-  const queryClient = useQueryClient();
-
-  const query = useQuery<Order[]>({
+  return useQuery<Order[]>({
     queryKey: QUERY_KEYS.orders,
     queryFn: async (): Promise<Order[]> => {
       try {
@@ -41,29 +41,11 @@ export function useOrders() {
     },
     refetchInterval: 5000,
   });
-
-  // Realtime subscription for orders
-  useEffect(() => {
-    const channel = supabase
-      .channel('public:orders')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, () => {
-        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.orders });
-      })
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [queryClient]);
-
-  return query;
 }
 
 // 2. Dishes Query (useDishes and useMenu alias) - 100% Live from Supabase
 export function useDishes() {
-  const queryClient = useQueryClient();
-
-  const query = useQuery<Dish[]>({
+  return useQuery<Dish[]>({
     queryKey: QUERY_KEYS.dishes,
     queryFn: async (): Promise<Dish[]> => {
       try {
@@ -76,22 +58,6 @@ export function useDishes() {
     },
     staleTime: 1000 * 60 * 5,
   });
-
-  // Realtime subscription for dishes
-  useEffect(() => {
-    const channel = supabase
-      .channel('public:dishes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'dishes' }, () => {
-        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.dishes });
-      })
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [queryClient]);
-
-  return query;
 }
 
 export const useMenu = useDishes;
@@ -124,9 +90,7 @@ export function useCategories() {
 
 // 4. Tables Query - 100% Live from Supabase
 export function useTableSessions() {
-  const queryClient = useQueryClient();
-
-  const query = useQuery<TableSession[]>({
+  return useQuery<TableSession[]>({
     queryKey: QUERY_KEYS.tables,
     queryFn: async (): Promise<TableSession[]> => {
       try {
@@ -139,21 +103,6 @@ export function useTableSessions() {
     },
     refetchInterval: 5000,
   });
-
-  useEffect(() => {
-    const channel = supabase
-      .channel('public:dining_tables')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'dining_tables' }, () => {
-        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.tables });
-      })
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [queryClient]);
-
-  return query;
 }
 
 // 5. Daily Stats Query - 100% Computed Dynamically from Supabase Data
@@ -356,6 +305,34 @@ export function useDeleteDish() {
   return useMutation({
     mutationFn: async (dishId: string) => {
       return deleteDishFromDB(dishId);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.dishes });
+    },
+  });
+}
+
+// Bulk Delete Dishes
+export function useBulkDeleteDishes() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (dishIds: string[]) => {
+      return deleteDishesFromDB(dishIds);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.dishes });
+    },
+  });
+}
+
+// Bulk Update Dish Stock (Mark Available / Out of Stock)
+export function useBulkUpdateDishStock() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ dishIds, inStock }: { dishIds: string[]; inStock: boolean }) => {
+      return updateDishesStockInDB(dishIds, inStock);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.dishes });

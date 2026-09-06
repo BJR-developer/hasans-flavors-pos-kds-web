@@ -7,6 +7,7 @@ export interface Dish {
   category: string;
   description: string;
   imageUrl: string;
+  imageUrls?: string[];
   spiceLevel: number; // 1 (Mild) to 4 (Fiery)
   isHalal: boolean;
   isChefSpecial: boolean;
@@ -17,6 +18,8 @@ export interface Dish {
   rating: string;
   reviewCount: number;
   station?: 'tandoor' | 'biryani_curry' | 'sides_drinks' | 'general';
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface Category {

@@ -18,7 +18,7 @@ interface AuthState {
   error: string | null;
   initialize: () => Promise<void>;
   signInWithPassword: (email: string, pass: string) => Promise<{ success: boolean; error?: string; role?: UserRole }>;
-  quickSwitchRole: (role: UserRole) => Promise<void>;
+  sendPasswordResetEmail: (email: string) => Promise<{ success: boolean; message?: string; error?: string }>;
   signOut: () => Promise<void>;
 }
 
@@ -29,10 +29,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   initialize: async () => {
     try {
-      set({ isLoading: true });
-      const { data: { session } } = await supabase.auth.getSession();
+      set({ isLoading: true, error: null });
+      const { data: { session }, error: sessionErr } = await supabase.auth.getSession();
 
-      if (session?.user) {
+      if (!sessionErr && session?.user) {
         const { data: profile } = await supabase
           .from('profiles')
           .select('*')
@@ -53,35 +53,30 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           });
           return;
         }
-      }
 
-      // Default initial session fallback: Cashier role
-      const { data: cashierProfile } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('role', 'cashier')
-        .single();
-
-      if (cashierProfile) {
+        // Auth user exists without profile
+        const meta = session.user.user_metadata || {};
         set({
           user: {
-            id: cashierProfile.id,
-            email: cashierProfile.email,
-            name: cashierProfile.full_name,
-            role: 'cashier',
-            phone: cashierProfile.phone,
+            id: session.user.id,
+            email: session.user.email || '',
+            name: meta.full_name || session.user.email?.split('@')[0] || 'Staff Member',
+            role: (meta.role as UserRole) || 'cashier',
+            phone: meta.phone,
           },
           isLoading: false,
         });
-      } else {
-        set({
-          user: null,
-          isLoading: false,
-        });
+        return;
       }
+
+      // Strictly unauthenticated when no valid Supabase session exists
+      set({
+        user: null,
+        isLoading: false,
+      });
     } catch (err: any) {
       console.error('Auth initialization error:', err);
-      set({ isLoading: false });
+      set({ user: null, isLoading: false, error: err?.message || 'Initialization failed' });
     }
   },
 
@@ -89,7 +84,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     try {
       set({ isLoading: true, error: null });
       const { data, error } = await supabase.auth.signInWithPassword({
-        email,
+        email: email.trim().toLowerCase(),
         password: pass,
       });
 
@@ -98,27 +93,27 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         return { success: false, error: error.message };
       }
 
-      if (data.user) {
+      if (data?.user) {
         const { data: profile } = await supabase
           .from('profiles')
           .select('*')
           .eq('id', data.user.id)
           .single();
 
-        const role = (profile?.role as UserRole) || 'customer';
+        const role = (profile?.role as UserRole) || (data.user.user_metadata?.role as UserRole) || 'cashier';
         const user: AuthUser = {
           id: data.user.id,
           email: data.user.email || email,
-          name: profile?.full_name || email.split('@')[0],
+          name: profile?.full_name || data.user.user_metadata?.full_name || email.split('@')[0],
           role,
-          phone: profile?.phone,
+          phone: profile?.phone || data.user.user_metadata?.phone,
         };
 
-        set({ user, isLoading: false });
+        set({ user, isLoading: false, error: null });
         return { success: true, role };
       }
 
-      set({ isLoading: false });
+      set({ isLoading: false, error: 'User not found' });
       return { success: false, error: 'User not found' };
     } catch (err: any) {
       set({ isLoading: false, error: err.message });
@@ -126,38 +121,37 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
   },
 
-  quickSwitchRole: async (role: UserRole) => {
-    set({ isLoading: true });
+  sendPasswordResetEmail: async (email: string) => {
     try {
-      const email = `${role}@hasan.com`;
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('email', email)
-        .single();
+      set({ isLoading: true, error: null });
+      const cleanEmail = email.trim().toLowerCase();
+      const redirectUrl = typeof window !== 'undefined' ? `${window.location.origin}/signin` : undefined;
 
-      if (profile) {
-        set({
-          user: {
-            id: profile.id,
-            email: profile.email,
-            name: profile.full_name,
-            role: profile.role as UserRole,
-            phone: profile.phone,
-          },
-          isLoading: false,
-        });
-      } else {
-        set({ isLoading: false });
-      }
-    } catch (e) {
-      console.error('Quick switch error:', e);
+      const { error } = await supabase.auth.resetPasswordForEmail(cleanEmail, {
+        redirectTo: redirectUrl,
+      });
+
       set({ isLoading: false });
+      if (error) {
+        set({ error: error.message });
+        return { success: false, error: error.message };
+      }
+      return {
+        success: true,
+        message: `Password reset verification email sent to ${cleanEmail}. Please check your inbox.`,
+      };
+    } catch (err: any) {
+      set({ isLoading: false, error: err?.message || 'Failed to send reset email' });
+      return { success: false, error: err?.message || 'Failed to send reset email' };
     }
   },
 
   signOut: async () => {
-    await supabase.auth.signOut();
-    set({ user: null });
+    try {
+      await supabase.auth.signOut();
+    } catch (e) {
+      console.warn('Sign out error:', e);
+    }
+    set({ user: null, error: null });
   },
 }));

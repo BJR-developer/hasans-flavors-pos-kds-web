@@ -11,6 +11,9 @@ export const mapDishFromDB = (row: any): Dish => ({
   category: row.category_name,
   description: row.description || '',
   imageUrl: row.image_url || '',
+  imageUrls: Array.isArray(row.image_urls) && row.image_urls.length > 0
+    ? row.image_urls
+    : (row.image_url ? [row.image_url] : []),
   spiceLevel: Number(row.spice_level || 0),
   isHalal: row.is_halal ?? true,
   isChefSpecial: row.is_chef_special ?? false,
@@ -20,6 +23,8 @@ export const mapDishFromDB = (row: any): Dish => ({
   calories: row.calories || '',
   rating: String(row.rating || '4.8'),
   reviewCount: Number(row.review_count || 10),
+  createdAt: row.created_at,
+  updatedAt: row.updated_at || row.created_at,
 });
 
 // Map database snake_case row to TypeScript Order
@@ -76,6 +81,12 @@ export const updateDishInDB = async (id: string, updates: Partial<Dish>): Promis
   if (updates.category !== undefined) dbPayload.category_name = updates.category;
   if (updates.description !== undefined) dbPayload.description = updates.description;
   if (updates.imageUrl !== undefined) dbPayload.image_url = updates.imageUrl;
+  if (updates.imageUrls !== undefined) {
+    dbPayload.image_urls = updates.imageUrls;
+    if (updates.imageUrls.length > 0 && !updates.imageUrl) {
+      dbPayload.image_url = updates.imageUrls[0];
+    }
+  }
   if (updates.inStock !== undefined) dbPayload.in_stock = updates.inStock;
   if (updates.isChefSpecial !== undefined) dbPayload.is_chef_special = updates.isChefSpecial;
   if (updates.isPopular !== undefined) dbPayload.is_popular = updates.isPopular;
@@ -102,7 +113,10 @@ export const createDishInDB = async (dish: Omit<Dish, 'id'>): Promise<Dish> => {
     formatted_price: `₱${dish.price.toLocaleString()}`,
     category_name: dish.category,
     description: dish.description || '',
-    image_url: dish.imageUrl || '',
+    image_url: dish.imageUrl || (dish.imageUrls && dish.imageUrls[0]) || '',
+    image_urls: dish.imageUrls && dish.imageUrls.length > 0 
+      ? dish.imageUrls 
+      : (dish.imageUrl ? [dish.imageUrl] : []),
     spice_level: dish.spiceLevel || 0,
     is_halal: dish.isHalal ?? true,
     is_chef_special: dish.isChefSpecial ?? false,
@@ -112,6 +126,8 @@ export const createDishInDB = async (dish: Omit<Dish, 'id'>): Promise<Dish> => {
     calories: dish.calories || '',
     rating: parseFloat(dish.rating) || 5.0,
     review_count: dish.reviewCount || 1,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
   };
 
   const { data, error } = await supabase
@@ -126,6 +142,21 @@ export const createDishInDB = async (dish: Omit<Dish, 'id'>): Promise<Dish> => {
 
 export const deleteDishFromDB = async (id: string): Promise<void> => {
   const { error } = await supabase.from('dishes').delete().eq('id', id);
+  if (error) throw error;
+};
+
+export const deleteDishesFromDB = async (ids: string[]): Promise<void> => {
+  if (!ids || ids.length === 0) return;
+  const { error } = await supabase.from('dishes').delete().in('id', ids);
+  if (error) throw error;
+};
+
+export const updateDishesStockInDB = async (ids: string[], inStock: boolean): Promise<void> => {
+  if (!ids || ids.length === 0) return;
+  const { error } = await supabase
+    .from('dishes')
+    .update({ in_stock: inStock, updated_at: new Date().toISOString() })
+    .in('id', ids);
   if (error) throw error;
 };
 
@@ -187,14 +218,17 @@ export const updateOrderStatusInDB = async (orderId: string, status: Order['stat
 export const fetchTablesFromDB = async (): Promise<TableSession[]> => {
   const { data, error } = await supabase
     .from('dining_tables')
-    .select('*')
-    .order('id');
+    .select('*');
 
   if (error) {
     console.error('Error fetching tables from DB:', error);
     throw error;
   }
-  return (data || []).map(mapTableFromDB);
+  return (data || []).map(mapTableFromDB).sort((a, b) => {
+    const numA = parseInt(a.tableNumber.replace(/\D/g, ''), 10) || 0;
+    const numB = parseInt(b.tableNumber.replace(/\D/g, ''), 10) || 0;
+    return numA - numB;
+  });
 };
 
 export const updateTableStatusInDB = async (

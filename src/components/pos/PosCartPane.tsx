@@ -35,14 +35,20 @@ export function PosCartPane({
   // Dynamically populated tables from Supabase dining_tables
   const liveTables = useMemo(() => {
     if (tableSessions.length > 0) {
-      return tableSessions.map((t) => t.tableNumber);
+      return [...tableSessions]
+        .sort((a, b) => {
+          const numA = parseInt(a.tableNumber.replace(/\D/g, ''), 10) || 0;
+          const numB = parseInt(b.tableNumber.replace(/\D/g, ''), 10) || 0;
+          return numA - numB;
+        })
+        .map((t) => t.tableNumber);
     }
-    return Array.from({ length: 12 }, (_, i) => `Table ${String(i + 1).padStart(2, '0')}`);
+    return Array.from({ length: 12 }, (_, i) => `Table ${i + 1}`);
   }, [tableSessions]);
 
   // Channel & Quick Table Picker
   const [orderType, setOrderType] = useState<OrderType>('dine_in');
-  const [selectedTable, setSelectedTable] = useState<string>('Table 01');
+  const [selectedTable, setSelectedTable] = useState<string>('Table 1');
 
   // Cash calculation
   const [cashTendered, setCashTendered] = useState<string>('');

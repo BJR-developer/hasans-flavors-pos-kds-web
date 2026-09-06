@@ -67,26 +67,26 @@
   box-shadow: 0 10px 25px rgba(45, 41, 38, 0.08), 0 2px 6px rgba(45, 41, 38, 0.05);
 }
 
-/* Robust Thermal Receipt Print Styles (80mm standard roll) */
+/* Print Styles */
 @media print {
   @page {
-    size: 80mm auto;
-    margin: 0mm;
+    size: auto;
+    margin: 8mm;
   }
 
   html,
   body {
     margin: 0 !important;
     padding: 0 !important;
-    width: 80mm !important;
-    max-width: 80mm !important;
+    width: 100% !important;
+    max-width: 100% !important;
     height: auto !important;
     min-height: 0 !important;
     overflow: visible !important;
     background: #ffffff !important;
     color: #000000 !important;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 
   /* Hide app navigation, buttons, and backdrop chrome */
@@ -97,17 +97,41 @@
     display: none !important;
   }
 
-  /* Unclip all parent scroll and max-height wrappers */
-  body * {
-    visibility: hidden;
-  }
-
-  #printable-thermal-receipt,
-  #printable-thermal-receipt * {
+  /* Ensure print sheets and contents are always visible */
+  .print-area,
+  .table-card-print-sheet,
+  .print-area *,
+  .table-card-print-sheet * {
     visibility: visible !important;
   }
 
-  #printable-thermal-receipt {
+  .table-card-print-sheet {
+    box-shadow: none !important;
+    border: none !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    page-break-after: always !important;
+    break-after: page !important;
+  }
+
+  /* Thermal Receipt Specific Rules (Only when thermal receipt slip is on page) */
+  body:has(#printable-thermal-receipt) {
+    width: 80mm !important;
+    max-width: 80mm !important;
+  }
+
+  body:has(#printable-thermal-receipt) * {
+    visibility: hidden;
+  }
+
+  body:has(#printable-thermal-receipt) #printable-thermal-receipt,
+  body:has(#printable-thermal-receipt) #printable-thermal-receipt * {
+    visibility: visible !important;
+  }
+
+  body:has(#printable-thermal-receipt) #printable-thermal-receipt {
     display: block !important;
     position: absolute !important;
     left: 0 !important;

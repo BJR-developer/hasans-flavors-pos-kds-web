@@ -13,6 +13,7 @@ import {
   LogOut,
   LogIn,
   ShieldAlert,
+  QrCode,
 } from 'lucide-react';
 import { useOrders } from '@/hooks/useRestaurantData';
 import { useAuthStore } from '@/lib/auth';
@@ -21,7 +22,7 @@ export function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
   const { data: orders = [] } = useOrders();
-  const { user, initialize, signOut, quickSwitchRole } = useAuthStore();
+  const { user, initialize, signOut } = useAuthStore();
 
   useEffect(() => {
     initialize();
@@ -38,12 +39,13 @@ export function Navbar() {
   ).length;
 
   // STRICT ROLE SEPARATION PER USER DIRECTIVE:
-  // - Owner: Can ONLY access Owner Dashboard (/analytics). Cannot access POS or Cashier tools.
-  // - Cashier: Manages POS (/pos), Kitchen (/kds), Orders (/orders), Stock (/inventory). Cannot access Owner Analytics.
+  // - Owner: Can ONLY access Owner Dashboard (/analytics) and Table Standees (/tables).
+  // - Cashier: Manages POS (/pos), Kitchen (/kds), Orders (/orders), Stock (/inventory), Table Standees (/tables).
+  // - Unauthenticated / Customer: Must NOT see any staff operations or links.
   const isOwner = user?.role === 'owner';
   const isCashier = user?.role === 'cashier';
 
-  // Define navigation items based on role
+  // Define navigation items based on role. Strictly staff/owner only.
   const navItems = isOwner
     ? [
         {
@@ -52,8 +54,15 @@ export function Navbar() {
           icon: BarChart3,
           badge: null,
         },
+        {
+          href: '/tables',
+          label: 'Table Standees',
+          icon: QrCode,
+          badge: null,
+        },
       ]
-    : [
+    : isCashier
+    ? [
         {
           href: '/pos',
           label: 'Register (POS)',
@@ -78,7 +87,14 @@ export function Navbar() {
           icon: Boxes,
           badge: null,
         },
-      ];
+        {
+          href: '/tables',
+          label: 'Table Standees',
+          icon: QrCode,
+          badge: null,
+        },
+      ]
+    : [];
 
   const handleSignOut = async () => {
     await signOut();
@@ -90,15 +106,15 @@ export function Navbar() {
       <div className="max-w-[1720px] mx-auto px-3 sm:px-4 lg:px-6 h-14 flex items-center justify-between gap-2 sm:gap-4">
         {/* Brand */}
         <div className="flex items-center gap-2.5 shrink-0">
-          <Link href={isOwner ? '/analytics' : '/pos'} className="flex items-center gap-2.5 group">
-            <div className="relative w-9 h-9 rounded-lg overflow-hidden bg-[#FFF2F0] border border-[#FFDAD6] flex items-center justify-center shrink-0 shadow-2xs">
+          <Link href={!user ? '/signin' : isOwner ? '/analytics' : '/pos'} className="flex items-center gap-2.5 group">
+            <div className="relative w-9 h-9 flex items-center justify-center shrink-0">
               <Image
                 src="/logo.png"
                 alt="Hasan's Flavors Logo"
                 fill
                 sizes="36px"
                 priority
-                className="object-cover"
+                className="object-contain"
               />
             </div>
             <div className="hidden xs:block">
@@ -106,7 +122,7 @@ export function Navbar() {
                 Hasan&apos;s Flavors
               </span>
               <span className="text-[10px] text-[#737373] font-medium block leading-none">
-                {isOwner ? 'Owner Executive Portal' : 'POS & Kitchen Operations'}
+                {!user ? 'Staff Portal • Please Sign In' : isOwner ? 'Owner Executive Portal' : 'POS & Kitchen Operations'}
               </span>
             </div>
           </Link>
@@ -164,34 +180,6 @@ export function Navbar() {
                 >
                   {user.role}
                 </span>
-              </div>
-
-              {/* Fast Role Switch Pill for testing */}
-              <div className="flex items-center gap-1 bg-[#F5F5F5] p-1 rounded-lg border border-[#E5E5E5] text-[10px] font-bold">
-                <button
-                  type="button"
-                  onClick={async () => {
-                    await quickSwitchRole('cashier');
-                    router.push('/pos');
-                  }}
-                  className={`px-2 py-0.5 rounded transition-all ${
-                    user.role === 'cashier' ? 'bg-white text-[#1F1F1F] shadow-2xs' : 'text-[#737373] hover:text-[#1F1F1F]'
-                  }`}
-                >
-                  Cashier
-                </button>
-                <button
-                  type="button"
-                  onClick={async () => {
-                    await quickSwitchRole('owner');
-                    router.push('/analytics');
-                  }}
-                  className={`px-2 py-0.5 rounded transition-all ${
-                    user.role === 'owner' ? 'bg-white text-[#B45309] shadow-2xs font-extrabold' : 'text-[#737373] hover:text-[#1F1F1F]'
-                  }`}
-                >
-                  Owner
-                </button>
               </div>
 
               <button

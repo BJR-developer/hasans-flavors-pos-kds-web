@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { X, Plus, Minus, Flame, Sparkles } from 'lucide-react';
+import { X, Plus, Minus, Flame, Sparkles, ChevronLeft, ChevronRight, Images } from 'lucide-react';
 import { Dish, CartItem, PortionOption, AddonOption } from '@/types';
 import { PORTION_OPTIONS, ADDON_OPTIONS, SPICE_LEVELS } from '@/data/options';
 import { SafeImage } from '@/components/common/SafeImage';
@@ -38,6 +38,11 @@ function DishCustomizerModalContent({
   const [selectedSpice, setSelectedSpice] = useState<number>(dish.spiceLevel || 2);
   const [selectedAddons, setSelectedAddons] = useState<AddonOption[]>([]);
   const [specialNotes, setSpecialNotes] = useState('');
+
+  // Multi-image navigation
+  const allImages = dish.imageUrls && dish.imageUrls.length > 0 ? dish.imageUrls : [dish.imageUrl].filter(Boolean);
+  const [selectedImgIdx, setSelectedImgIdx] = useState(0);
+  const currentImage = allImages[selectedImgIdx] || dish.imageUrl;
 
   const toggleAddon = (addon: AddonOption) => {
     setSelectedAddons((prev) => {
@@ -85,24 +90,71 @@ function DishCustomizerModalContent({
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
       <div className="relative bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden border border-[#E9E8E7] my-6 animate-in fade-in zoom-in-95 duration-200">
         {/* Top Header with Image & Title */}
-        <div className="relative h-44 bg-[#F4F3F2] overflow-hidden">
+        <div className="relative h-48 bg-[#F4F3F2] overflow-hidden group">
           <SafeImage
-            src={dish.imageUrl}
+            src={currentImage}
             alt={dish.name}
             fill
-            className="object-cover"
+            className="object-cover transition-all duration-300"
             sizes="(max-width: 768px) 100vw, 500px"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent" />
           
           <button
             onClick={onClose}
-            className="absolute top-3 right-3 p-2 rounded-full bg-black/50 hover:bg-black/70 text-white backdrop-blur-xs transition-all"
+            className="absolute top-3 right-3 p-2 rounded-full bg-black/50 hover:bg-black/70 text-white backdrop-blur-xs transition-all z-10 cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
 
-          <div className="absolute bottom-3 left-4 right-4 text-white">
+          {/* Multiple Images Navigation Controls */}
+          {allImages.length > 1 && (
+            <>
+              {/* Prev / Next Arrows */}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelectedImgIdx((prev) => (prev > 0 ? prev - 1 : allImages.length - 1));
+                }}
+                className="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-black/60 hover:bg-black/85 text-white flex items-center justify-center transition-all z-10 cursor-pointer shadow-xs"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelectedImgIdx((prev) => (prev < allImages.length - 1 ? prev + 1 : 0));
+                }}
+                className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-black/60 hover:bg-black/85 text-white flex items-center justify-center transition-all z-10 cursor-pointer shadow-xs"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+
+              {/* Photo Count Badge */}
+              <div className="absolute top-3 left-3 px-2 py-0.5 rounded-full bg-black/60 text-white text-[10px] font-bold backdrop-blur-xs flex items-center gap-1 z-10">
+                <Images className="w-3 h-3" />
+                <span>{selectedImgIdx + 1}/{allImages.length}</span>
+              </div>
+
+              {/* Dots indicator */}
+              <div className="absolute top-4 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-10">
+                {allImages.map((_, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => setSelectedImgIdx(i)}
+                    className={`h-1.5 rounded-full transition-all cursor-pointer ${
+                      i === selectedImgIdx ? 'w-4 bg-white' : 'w-1.5 bg-white/50'
+                    }`}
+                  />
+                ))}
+              </div>
+            </>
+          )}
+
+          <div className="absolute bottom-3 left-4 right-4 text-white z-10">
             <div className="flex items-center gap-2 mb-1">
               <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-[#BA1A20] text-white">
                 {dish.category}
