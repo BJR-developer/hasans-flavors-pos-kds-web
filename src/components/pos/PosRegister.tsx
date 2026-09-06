@@ -8,6 +8,7 @@ import { PosCartPane } from './PosCartPane';
 import { DishCustomizerModal } from './DishCustomizerModal';
 import { ThermalReceiptModal } from './ThermalReceiptModal';
 import { KeyboardShortcutsModal } from './KeyboardShortcutsModal';
+import { OrderDetailsModal } from '../orders/OrderDetailsModal';
 import { SafeImage } from '@/components/common/SafeImage';
 import { PORTION_OPTIONS } from '@/data/options';
 
@@ -23,6 +24,7 @@ export function PosRegister() {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [customizingDish, setCustomizingDish] = useState<Dish | null>(null);
   const [receiptOrder, setReceiptOrder] = useState<Order | null>(null);
+  const [detailOrder, setDetailOrder] = useState<Order | null>(null);
   const [isShortcutsModalOpen, setIsShortcutsModalOpen] = useState<boolean>(false);
 
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -49,6 +51,7 @@ export function PosRegister() {
         if (isShortcutsModalOpen) setIsShortcutsModalOpen(false);
         if (customizingDish) setCustomizingDish(null);
         if (receiptOrder) setReceiptOrder(null);
+        if (detailOrder) setDetailOrder(null);
         if (isTyping && searchInputRef.current) {
           searchInputRef.current.blur();
         }
@@ -362,6 +365,7 @@ export function PosRegister() {
           onRemoveItem={handleRemoveItem}
           onClearCart={() => setCartItems([])}
           onOrderCompleted={(order) => setReceiptOrder(order)}
+          onViewOrderDetails={(order) => setDetailOrder(order)}
         />
       </aside>
 
@@ -404,6 +408,14 @@ export function PosRegister() {
       <ThermalReceiptModal
         order={receiptOrder}
         onClose={() => setReceiptOrder(null)}
+      />
+
+      <OrderDetailsModal
+        order={detailOrder}
+        onClose={() => setDetailOrder(null)}
+        onPrintReceipt={(order) => {
+          setReceiptOrder(order);
+        }}
       />
 
       <KeyboardShortcutsModal

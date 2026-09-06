@@ -28,27 +28,46 @@ export const mapDishFromDB = (row: any): Dish => ({
 });
 
 // Map database snake_case row to TypeScript Order
-export const mapOrderFromDB = (row: any): Order => ({
-  id: row.id,
-  orderNumber: row.order_number,
-  customerName: row.customer_name,
-  customerPhone: row.customer_phone || undefined,
-  tableNumber: row.table_number || undefined,
-  type: row.type,
-  status: row.status,
-  paymentStatus: row.payment_status,
-  paymentMethod: row.payment_method,
-  subtotal: Number(row.subtotal),
-  tax: Number(row.tax),
-  serviceFee: 0,
-  deliveryFee: Number(row.delivery_fee || 0),
-  discount: 0,
-  total: Number(row.total),
-  specialNotes: row.notes || undefined,
-  items: Array.isArray(row.items) ? row.items : [],
-  createdAt: row.created_at,
-  estimatedMinutes: 20,
-});
+export const mapOrderFromDB = (row: any): Order => {
+  const subtotal = Number(row.subtotal || 0);
+  const tax = Number(row.tax || 0);
+  const deliveryFee = Number(row.delivery_fee || 0);
+  const discount = Number(row.discount || 0);
+  const total = Number(row.total || 0);
+  const amountPaid = Number(
+    row.amount_paid !== undefined && row.amount_paid !== null
+      ? row.amount_paid
+      : row.payment_status === 'paid'
+      ? total
+      : 0
+  );
+  const balanceDue = Math.max(0, total - amountPaid);
+
+  return {
+    id: row.id,
+    orderNumber: row.order_number,
+    customerName: row.customer_name,
+    customerPhone: row.customer_phone || undefined,
+    tableNumber: row.table_number || undefined,
+    type: row.type,
+    status: row.status,
+    paymentStatus: row.payment_status,
+    paymentMethod: row.payment_method,
+    subtotal,
+    tax,
+    serviceFee: 0,
+    deliveryFee,
+    discount,
+    total,
+    amountPaid,
+    balanceDue,
+    paymentHistory: Array.isArray(row.payment_history) ? row.payment_history : [],
+    specialNotes: row.notes || undefined,
+    items: Array.isArray(row.items) ? row.items : [],
+    createdAt: row.created_at,
+    estimatedMinutes: 20,
+  };
+};
 
 // Map database row to TableSession
 export const mapTableFromDB = (row: any): TableSession => ({
@@ -175,6 +194,13 @@ export const fetchOrdersFromDB = async (): Promise<Order[]> => {
 };
 
 export const createOrderInDB = async (order: Order): Promise<Order> => {
+  const amountPaid =
+    order.amountPaid !== undefined
+      ? order.amountPaid
+      : order.paymentStatus === 'paid'
+      ? order.total
+      : 0;
+
   const dbPayload = {
     id: order.id,
     order_number: order.orderNumber,
@@ -188,7 +214,18 @@ export const createOrderInDB = async (order: Order): Promise<Order> => {
     subtotal: order.subtotal,
     tax: order.tax,
     delivery_fee: order.deliveryFee || 0,
+    discount: order.discount || 0,
     total: order.total,
+    amount_paid: amountPaid,
+    payment_history: order.paymentHistory || (amountPaid > 0 ? [
+      {
+        id: `pay_${Date.now()}`,
+        amount: amountPaid,
+        method: order.paymentMethod,
+        timestamp: new Date().toISOString(),
+        note: 'Initial payment',
+      }
+    ] : []),
     notes: order.specialNotes || null,
     items: order.items,
     created_at: order.createdAt,
@@ -202,16 +239,176 @@ export const createOrderInDB = async (order: Order): Promise<Order> => {
     .single();
 
   if (error) throw error;
+
+  // If dine-in order, automatically occupy the dining table
+  if (order.type === 'dine_in' && order.tableNumber) {
+    await updateTableStatusInDB(order.tableNumber, 'occupied', order.id).catch((err) =>
+      console.warn('Failed to update table status on order creation:', err)
+    );
+  }
+
   return mapOrderFromDB(data);
 };
 
-export const updateOrderStatusInDB = async (orderId: string, status: Order['status']): Promise<void> => {
+export const updateOrderStatusInDB = async (
+  orderId: string,
+  status: Order['status'],
+  tableNumber?: string
+): Promise<void> => {
   const { error } = await supabase
     .from('orders')
     .update({ status, updated_at: new Date().toISOString() })
     .eq('id', orderId);
 
   if (error) throw error;
+
+  // If order is completed or cancelled and tableNumber is given (or fetched), release table if paid
+  if (status === 'completed' || status === 'cancelled') {
+    try {
+      const { data: ord } = await supabase.from('orders').select('table_number, payment_status, type').eq('id', orderId).single();
+      if (ord && ord.type === 'dine_in' && ord.table_number) {
+        // If cancelled or paid, table is freed
+        if (status === 'cancelled' || ord.payment_status === 'paid') {
+          await updateTableStatusInDB(ord.table_number, 'available', undefined);
+        }
+      }
+    } catch (e) {
+      console.warn('Error releasing table on order status update:', e);
+    }
+  }
+};
+
+export const updateOrderPaymentInDB = async (
+  orderId: string,
+  updates: {
+    paymentStatus: Order['paymentStatus'];
+    paymentMethod?: Order['paymentMethod'];
+    amountPaid?: number;
+    paymentHistory?: any[];
+    closeOrder?: boolean;
+  }
+): Promise<void> => {
+  const dbUpdates: any = {
+    payment_status: updates.paymentStatus,
+    updated_at: new Date().toISOString(),
+  };
+
+  if (updates.paymentMethod) dbUpdates.payment_method = updates.paymentMethod;
+  if (updates.amountPaid !== undefined) dbUpdates.amount_paid = updates.amountPaid;
+  if (updates.paymentHistory !== undefined) dbUpdates.payment_history = updates.paymentHistory;
+  if (updates.closeOrder) dbUpdates.status = 'completed';
+
+  const { data, error } = await supabase
+    .from('orders')
+    .update(dbUpdates)
+    .eq('id', orderId)
+    .select()
+    .single();
+
+  if (error) throw error;
+
+  // If paid in full and completed, free table
+  if (data && data.type === 'dine_in' && data.table_number) {
+    if (data.payment_status === 'paid' && (data.status === 'completed' || updates.closeOrder)) {
+      await updateTableStatusInDB(data.table_number, 'available', undefined).catch(console.warn);
+    } else if (data.payment_status === 'paid') {
+      // Still at table but bill paid
+      await updateTableStatusInDB(data.table_number, 'billing', data.id).catch(console.warn);
+    }
+  }
+};
+
+export const addItemsToOrderInDB = async (
+  orderId: string,
+  additionalItems: any[]
+): Promise<Order> => {
+  const { data: existing, error: fetchError } = await supabase
+    .from('orders')
+    .select('*')
+    .eq('id', orderId)
+    .single();
+
+  if (fetchError || !existing) throw fetchError || new Error('Order not found');
+
+  const currentItems = Array.isArray(existing.items) ? existing.items : [];
+  const mergedItems = [...currentItems, ...additionalItems];
+
+  const subtotal = mergedItems.reduce((sum: number, it: any) => sum + (Number(it.totalPrice) || 0), 0);
+  const tax = Math.round(subtotal * 0.05);
+  const deliveryFee = Number(existing.delivery_fee || 0);
+  const discount = Number(existing.discount || 0);
+  const total = Math.max(0, subtotal + tax + deliveryFee - discount);
+  const amountPaid = Number(existing.amount_paid || 0);
+
+  // If new total exceeds amountPaid, it becomes unpaid or partially_paid
+  let paymentStatus = existing.payment_status;
+  if (amountPaid >= total && total > 0) {
+    paymentStatus = 'paid';
+  } else if (amountPaid > 0 && amountPaid < total) {
+    paymentStatus = 'partially_paid';
+  } else {
+    paymentStatus = 'unpaid';
+  }
+
+  const { data, error } = await supabase
+    .from('orders')
+    .update({
+      items: mergedItems,
+      subtotal,
+      tax,
+      total,
+      payment_status: paymentStatus,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', orderId)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return mapOrderFromDB(data);
+};
+
+export const applyDiscountToOrderInDB = async (
+  orderId: string,
+  discount: number
+): Promise<Order> => {
+  const { data: existing, error: fetchError } = await supabase
+    .from('orders')
+    .select('*')
+    .eq('id', orderId)
+    .single();
+
+  if (fetchError || !existing) throw fetchError || new Error('Order not found');
+
+  const subtotal = Number(existing.subtotal || 0);
+  const tax = Number(existing.tax || 0);
+  const deliveryFee = Number(existing.delivery_fee || 0);
+  const total = Math.max(0, subtotal + tax + deliveryFee - discount);
+  const amountPaid = Number(existing.amount_paid || 0);
+
+  let paymentStatus = existing.payment_status;
+  if (amountPaid >= total && total > 0) {
+    paymentStatus = 'paid';
+  } else if (amountPaid > 0 && amountPaid < total) {
+    paymentStatus = 'partially_paid';
+  } else {
+    paymentStatus = 'unpaid';
+  }
+
+  const { data, error } = await supabase
+    .from('orders')
+    .update({
+      discount,
+      total,
+      payment_status: paymentStatus,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', orderId)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return mapOrderFromDB(data);
 };
 
 // 3. TABLES API

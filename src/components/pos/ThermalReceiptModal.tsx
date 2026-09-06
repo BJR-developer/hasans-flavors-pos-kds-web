@@ -34,7 +34,20 @@ export function ThermalReceiptModal({ order, onClose }: ThermalReceiptModalProps
         <div className="flex items-center justify-between px-5 py-3.5 bg-[#F4F3F2] border-b border-[#E9E8E7]">
           <div className="flex items-center gap-2 text-xs font-bold text-[#2D2926]">
             <Printer className="w-4 h-4 text-[#BA1A20]" />
-            <span>Thermal Receipt Slip (80mm)</span>
+            <span>
+              {order.paymentStatus === 'paid'
+                ? 'Official Sales Receipt (80mm)'
+                : 'Guest Bill / Table Check (80mm)'}
+            </span>
+            <span
+              className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${
+                order.paymentStatus === 'paid'
+                  ? 'bg-green-100 text-green-800'
+                  : 'bg-amber-100 text-amber-800'
+              }`}
+            >
+              {order.paymentStatus}
+            </span>
           </div>
           <div className="flex items-center gap-2">
             <button
@@ -42,7 +55,7 @@ export function ThermalReceiptModal({ order, onClose }: ThermalReceiptModalProps
               className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-[#BA1A20] hover:bg-[#8B0000] text-white text-xs font-bold transition-all shadow-xs"
             >
               <Printer className="w-3.5 h-3.5" />
-              <span>Print</span>
+              <span>{order.paymentStatus === 'paid' ? 'Print Receipt' : 'Print Bill'}</span>
             </button>
             <button
               onClick={onClose}
@@ -68,6 +81,14 @@ export function ThermalReceiptModal({ order, onClose }: ThermalReceiptModalProps
               <p className="text-[10px] tracking-wide text-gray-700">AUTHENTIC HALAL CUISINE</p>
               <p className="text-[9px] text-gray-500 mt-0.5">Zabihah Halal Certified • Fresh Daily</p>
               <p className="text-[9px] text-gray-500">Tel: +63 (02) 8842-6100</p>
+              <div className="mt-2 pt-1 border-t border-solid border-gray-300">
+                <p className="text-[11px] font-black tracking-wider text-black uppercase">
+                  {order.paymentStatus === 'paid' ? 'OFFICIAL SALES RECEIPT' : 'GUEST BILL / TABLE CHECK'}
+                </p>
+                <p className={`text-[9px] font-bold ${order.paymentStatus === 'paid' ? 'text-green-700' : 'text-amber-700'}`}>
+                  {order.paymentStatus === 'paid' ? '★ PAID IN FULL ★' : '⚠ OPEN BILL — PAYMENT PENDING ⚠'}
+                </p>
+              </div>
             </div>
 
             {/* Order Metadata */}
@@ -184,8 +205,8 @@ export function ThermalReceiptModal({ order, onClose }: ThermalReceiptModalProps
             {/* Payment Record */}
             <div className="py-2 border-b border-dashed border-gray-400 text-[10px] space-y-0.5">
               <div className="flex justify-between">
-                <span>Payment Method:</span>
-                <span className="uppercase font-bold">{order.paymentMethod}</span>
+                <span>Order Status:</span>
+                <span className="uppercase font-bold text-black">{order.status}</span>
               </div>
               <div className="flex justify-between">
                 <span>Payment Status:</span>
@@ -197,6 +218,22 @@ export function ThermalReceiptModal({ order, onClose }: ThermalReceiptModalProps
                   {order.paymentStatus}
                 </span>
               </div>
+              <div className="flex justify-between">
+                <span>Payment Method:</span>
+                <span className="uppercase font-bold">{order.paymentMethod}</span>
+              </div>
+              {order.amountPaid !== undefined && order.amountPaid > 0 && order.paymentStatus !== 'paid' && (
+                <>
+                  <div className="flex justify-between text-gray-700">
+                    <span>Amount Paid:</span>
+                    <span>₱{order.amountPaid.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between font-bold text-red-600">
+                    <span>Balance Due:</span>
+                    <span>₱{(order.balanceDue ?? Math.max(0, order.total - order.amountPaid)).toLocaleString()}</span>
+                  </div>
+                </>
+              )}
               {order.cashTendered !== undefined && order.cashTendered > 0 && (
                 <>
                   <div className="flex justify-between">
@@ -239,7 +276,7 @@ export function ThermalReceiptModal({ order, onClose }: ThermalReceiptModalProps
             className="flex items-center gap-2 px-5 py-2 rounded-xl bg-[#BA1A20] hover:bg-[#8B0000] text-white text-xs font-bold transition-all shadow-sm"
           >
             <Printer className="w-4 h-4" />
-            <span>Print Receipt</span>
+            <span>{order.paymentStatus === 'paid' ? 'Print Receipt' : 'Print Bill'}</span>
           </button>
         </div>
       </div>

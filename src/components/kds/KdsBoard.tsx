@@ -16,7 +16,7 @@ export function KdsBoard() {
 
   // Active tickets
   const pendingOrders = orders
-    .filter((o) => o.status === 'pending')
+    .filter((o) => o.status === 'pending' || o.status === 'sent_to_kitchen')
     .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
 
   const preparingOrders = orders
@@ -27,11 +27,15 @@ export function KdsBoard() {
     .filter((o) => o.status === 'ready')
     .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
 
+  const servedOrders = orders
+    .filter((o) => o.status === 'served')
+    .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+
   const completedOrders = orders
     .filter((o) => o.status === 'completed')
     .slice(0, 6);
 
-  const allActiveOrders = [...pendingOrders, ...preparingOrders, ...readyOrders];
+  const allActiveOrders = [...pendingOrders, ...preparingOrders, ...readyOrders, ...servedOrders];
 
   const stations = [
     { id: 'all', label: 'All Stations' },
@@ -161,18 +165,18 @@ export function KdsBoard() {
               </div>
             </div>
 
-            {/* 4. Completed */}
+            {/* 4. Served */}
             <div className="flex flex-col bg-[#F5F5F5] rounded-xl p-3 overflow-hidden border border-[#E5E5E5]">
               <div className="flex items-center justify-between pb-2 mb-2 border-b border-[#E5E5E5]">
-                <span className="text-xs font-bold text-[#737373] uppercase tracking-wide">
-                  Served
+                <span className="text-xs font-bold text-blue-700 uppercase tracking-wide">
+                  Served ({servedOrders.length})
                 </span>
               </div>
               <div className="flex-1 overflow-y-auto space-y-3 pr-0.5">
-                {completedOrders.length === 0 ? (
-                  <p className="text-xs text-[#A3A3A3] text-center py-8">No recent orders</p>
+                {servedOrders.length === 0 ? (
+                  <p className="text-xs text-[#A3A3A3] text-center py-8">No served orders</p>
                 ) : (
-                  completedOrders.map((order) => (
+                  servedOrders.map((order) => (
                     <KdsTicketCard
                       key={order.id}
                       order={order}

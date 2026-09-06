@@ -59,9 +59,25 @@ export interface CartItem {
 }
 
 export type OrderType = 'dine_in' | 'takeout' | 'delivery';
-export type OrderStatus = 'pending' | 'preparing' | 'ready' | 'completed' | 'cancelled';
+export type OrderStatus =
+  | 'draft'
+  | 'pending'
+  | 'sent_to_kitchen'
+  | 'preparing'
+  | 'ready'
+  | 'served'
+  | 'completed'
+  | 'cancelled';
 export type PaymentMethod = 'cash' | 'gcash' | 'card';
-export type PaymentStatus = 'paid' | 'unpaid';
+export type PaymentStatus = 'unpaid' | 'partially_paid' | 'paid' | 'refunded';
+
+export interface PaymentRecord {
+  id: string;
+  amount: number;
+  method: PaymentMethod;
+  timestamp: string;
+  note?: string;
+}
 
 export interface Order {
   id: string;
@@ -78,9 +94,12 @@ export interface Order {
   deliveryFee: number;
   discount: number;
   total: number;
+  amountPaid?: number;
+  balanceDue?: number;
   status: OrderStatus;
   paymentMethod: PaymentMethod;
   paymentStatus: PaymentStatus;
+  paymentHistory?: PaymentRecord[];
   createdAt: string;
   estimatedMinutes: number;
   specialNotes?: string;

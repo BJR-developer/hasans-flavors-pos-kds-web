@@ -13,10 +13,13 @@ import {
   fetchOrdersFromDB,
   createOrderInDB,
   updateOrderStatusInDB,
+  updateOrderPaymentInDB,
+  addItemsToOrderInDB,
+  applyDiscountToOrderInDB,
   fetchTablesFromDB,
   updateTableStatusInDB,
 } from '@/lib/api';
-import { Category, Dish, Order, OrderStatus, PaymentMethod, PaymentStatus, TableSession } from '@/types';
+import { Category, Dish, Order, OrderStatus, PaymentMethod, PaymentStatus, TableSession, CartItem } from '@/types';
 
 export const QUERY_KEYS = {
   orders: ['orders'] as const,
@@ -170,16 +173,17 @@ export function useCreateOrder() {
   });
 }
 
-// Update Order Status (Kitchen KDS Bump / Complete)
+// Update Order Status (Kitchen KDS Bump / Complete / Cancel)
 export function useUpdateOrderStatus() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ orderId, status }: { orderId: string; status: OrderStatus }) => {
-      return updateOrderStatusInDB(orderId, status);
+    mutationFn: async ({ orderId, status, tableNumber }: { orderId: string; status: OrderStatus; tableNumber?: string }) => {
+      return updateOrderStatusInDB(orderId, status, tableNumber);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.orders });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.tables });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.dailyStats });
     },
   });
@@ -194,18 +198,57 @@ export function useUpdateOrderPayment() {
       orderId,
       paymentStatus,
       paymentMethod,
+      amountPaid,
+      paymentHistory,
+      closeOrder,
     }: {
       orderId: string;
       paymentStatus: PaymentStatus;
       paymentMethod?: PaymentMethod;
+      amountPaid?: number;
+      paymentHistory?: any[];
       cashTendered?: number;
       changeDue?: number;
+      closeOrder?: boolean;
     }) => {
-      const updates: any = { payment_status: paymentStatus, updated_at: new Date().toISOString() };
-      if (paymentMethod) updates.payment_method = paymentMethod;
+      return updateOrderPaymentInDB(orderId, {
+        paymentStatus,
+        paymentMethod,
+        amountPaid,
+        paymentHistory,
+        closeOrder,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.orders });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.tables });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.dailyStats });
+    },
+  });
+}
 
-      const { error } = await supabase.from('orders').update(updates).eq('id', orderId);
-      if (error) throw error;
+// Add Items to an Existing Order
+export function useAddItemsToOrder() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ orderId, items }: { orderId: string; items: CartItem[] }) => {
+      return addItemsToOrderInDB(orderId, items);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.orders });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.dailyStats });
+    },
+  });
+}
+
+// Apply Discount to an Existing Order
+export function useApplyDiscount() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ orderId, discount }: { orderId: string; discount: number }) => {
+      return applyDiscountToOrderInDB(orderId, discount);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.orders });

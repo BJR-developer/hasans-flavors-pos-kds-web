@@ -21,6 +21,10 @@ import {
   ChevronLeft,
   ChevronRight,
   FileSpreadsheet,
+  AlertCircle,
+  Eye,
+  CheckCircle2,
+  Utensils,
 } from 'lucide-react';
 import { Order, OrderStatus } from '@/types';
 import { useOrders, useUpdateOrderStatus, useUpdateOrderPayment } from '@/hooks/useRestaurantData';
@@ -45,14 +49,19 @@ export function OrdersTable() {
   // Status Badge Helper
   const getStatusBadge = (status: OrderStatus) => {
     switch (status) {
+      case 'draft':
+        return { label: 'Draft', color: 'text-gray-600', bg: 'bg-gray-100' };
       case 'pending':
+      case 'sent_to_kitchen':
         return { label: 'Received', color: 'text-[#B45309]', bg: 'bg-[#FFF8E1]' };
       case 'preparing':
         return { label: 'In Kitchen', color: 'text-[#BA1A20]', bg: 'bg-[#FFF2F0]' };
       case 'ready':
         return { label: 'Ready', color: 'text-[#2E7D32]', bg: 'bg-[#E8F5E9]' };
+      case 'served':
+        return { label: 'Served', color: 'text-blue-700', bg: 'bg-blue-50' };
       case 'completed':
-        return { label: 'Served', color: 'text-[#525252]', bg: 'bg-[#F5F5F5]' };
+        return { label: 'Closed', color: 'text-[#525252]', bg: 'bg-[#F5F5F5]' };
       case 'cancelled':
         return { label: 'Cancelled', color: 'text-red-700', bg: 'bg-red-50' };
     }
@@ -61,14 +70,28 @@ export function OrdersTable() {
   // Pre-filter data by status tabs
   const filteredData = useMemo(() => {
     return orders.filter((o) => {
-      if (statusFilter === 'unpaid') return o.paymentStatus === 'unpaid';
-      if (statusFilter === 'active') {
-        return o.status === 'pending' || o.status === 'preparing' || o.status === 'ready';
+      if (statusFilter === 'unpaid') {
+        return o.paymentStatus === 'unpaid' || o.paymentStatus === 'partially_paid';
       }
+      if (statusFilter === 'open') {
+        return o.status !== 'completed' && o.status !== 'cancelled';
+      }
+      if (statusFilter === 'ready') return o.status === 'ready';
+      if (statusFilter === 'served') return o.status === 'served';
       if (statusFilter === 'completed') return o.status === 'completed';
       return true;
     });
   }, [orders, statusFilter]);
+
+  // Count unpaid orders for banner
+  const unpaidDineInOrders = useMemo(() => {
+    return orders.filter(
+      (o) =>
+        o.type === 'dine_in' &&
+        (o.paymentStatus === 'unpaid' || o.paymentStatus === 'partially_paid') &&
+        o.status !== 'cancelled'
+    );
+  }, [orders]);
 
   // Define Columns using TanStack Table ColumnDef
   const columns = useMemo<ColumnDef<Order>[]>(
@@ -94,11 +117,20 @@ export function OrdersTable() {
           const o = row.original;
           return (
             <div>
-              <span className="font-mono font-bold text-xs text-[#1F1F1F]">
-                {o.orderNumber}
-              </span>
-              <span className="text-[11px] text-[#737373] ml-2">
-                {o.type === 'dine_in' ? o.tableNumber || 'Dine-In' : o.type === 'delivery' ? 'Delivery' : 'Takeout'}
+              <div className="flex items-center gap-1.5">
+                <span className="font-mono font-bold text-xs text-[#1F1F1F]">
+                  {o.orderNumber}
+                </span>
+                <span className="text-[10px] uppercase font-bold px-1.5 py-0.2 rounded bg-[#F5F5F5] text-[#525252]">
+                  {o.type === 'dine_in'
+                    ? o.tableNumber || 'Dine-In'
+                    : o.type === 'delivery'
+                    ? 'Delivery'
+                    : 'Takeout'}
+                </span>
+              </div>
+              <span className="text-[11px] text-[#737373] block truncate max-w-[140px]">
+                {o.customerName}
               </span>
             </div>
           );
@@ -135,7 +167,7 @@ export function OrdersTable() {
             onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
             className="flex items-center gap-1 hover:text-[#1F1F1F] font-bold text-xs uppercase"
           >
-            <span>Total</span>
+            <span>Amount</span>
             {column.getIsSorted() === 'asc' ? (
               <ArrowUp className="w-3 h-3" />
             ) : column.getIsSorted() === 'desc' ? (
@@ -145,37 +177,60 @@ export function OrdersTable() {
             )}
           </button>
         ),
-        cell: ({ row }) => (
-          <span className="font-bold text-xs text-[#1F1F1F]">
-            ₱{row.original.total.toLocaleString()}
-          </span>
-        ),
+        cell: ({ row }) => {
+          const o = row.original;
+          const balance = o.balanceDue !== undefined ? o.balanceDue : o.paymentStatus === 'paid' ? 0 : o.total;
+
+          return (
+            <div>
+              <span className="font-bold text-xs text-[#1F1F1F] block">
+                ₱{o.total.toLocaleString()}
+              </span>
+              {balance > 0 && o.paymentStatus !== 'paid' && (
+                <span className="text-[10px] font-bold text-[#BA1A20] block">
+                  Due: ₱{balance.toLocaleString()}
+                </span>
+              )}
+            </div>
+          );
+        },
       },
       {
         accessorKey: 'paymentStatus',
-        header: 'Payment',
+        header: 'Payment Status',
         cell: ({ row }) => {
           const o = row.original;
           const isPaid = o.paymentStatus === 'paid';
+          const isPartial = o.paymentStatus === 'partially_paid';
+
           return (
-            <span
-              className={`text-[11px] font-semibold px-2 py-0.5 rounded ${
-                isPaid ? 'text-[#2E7D32] bg-[#E8F5E9]' : 'text-[#B45309] bg-[#FFF8E1]'
-              }`}
-            >
-              {o.paymentStatus.toUpperCase()}
-            </span>
+            <div className="flex flex-col items-start gap-0.5">
+              <span
+                className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase ${
+                  isPaid
+                    ? 'text-[#2E7D32] bg-[#E8F5E9]'
+                    : isPartial
+                    ? 'text-amber-900 bg-amber-100 border border-amber-300'
+                    : 'text-[#B45309] bg-[#FFF8E1] border border-[#FFE082]'
+                }`}
+              >
+                {o.paymentStatus}
+              </span>
+              <span className="text-[10px] text-[#737373] uppercase">
+                {o.paymentMethod || 'cash'}
+              </span>
+            </div>
           );
         },
       },
       {
         accessorKey: 'status',
-        header: 'Status',
+        header: 'Order Status',
         cell: ({ row }) => {
           const meta = getStatusBadge(row.original.status);
           return (
             <span
-              className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full ${meta.bg} ${meta.color}`}
+              className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase ${meta.bg} ${meta.color}`}
             >
               {meta.label}
             </span>
@@ -187,20 +242,31 @@ export function OrdersTable() {
         header: () => <span className="text-right block">Actions</span>,
         cell: ({ row }) => {
           const o = row.original;
+          const balance = o.balanceDue !== undefined ? o.balanceDue : o.paymentStatus === 'paid' ? 0 : o.total;
+          const isFullyPaid = o.paymentStatus === 'paid' || balance === 0;
 
           return (
             <div className="flex items-center justify-end gap-1.5">
-              {/* Receipt */}
+              {/* View / Manage Details Modal */}
+              <button
+                onClick={() => setDetailOrder(o)}
+                title="View & Settle Order"
+                className="p-1.5 rounded-lg text-[#525252] hover:text-[#1F1F1F] hover:bg-[#F5F5F5] transition-colors"
+              >
+                <Eye className="w-3.5 h-3.5" />
+              </button>
+
+              {/* Print Slip (Bill if unpaid, Receipt if paid) */}
               <button
                 onClick={() => setReceiptOrder(o)}
-                title="Print Receipt"
-                className="p-1 rounded text-[#737373] hover:text-[#1F1F1F] hover:bg-[#F5F5F5]"
+                title={isFullyPaid ? 'Print Receipt' : 'Print Bill'}
+                className="p-1.5 rounded-lg text-[#525252] hover:text-[#1F1F1F] hover:bg-[#F5F5F5] transition-colors"
               >
                 <Printer className="w-3.5 h-3.5" />
               </button>
 
-              {/* Quick Status Bumps */}
-              {o.status === 'pending' && (
+              {/* Quick Status Progression Buttons */}
+              {(o.status === 'pending' || o.status === 'sent_to_kitchen') && (
                 <button
                   onClick={() => updateStatusMutation.mutate({ orderId: o.id, status: 'preparing' })}
                   className="px-2 py-1 rounded bg-[#F5F5F5] hover:bg-[#E5E5E5] text-[11px] font-semibold text-[#1F1F1F]"
@@ -220,26 +286,36 @@ export function OrdersTable() {
 
               {o.status === 'ready' && (
                 <button
-                  onClick={() => updateStatusMutation.mutate({ orderId: o.id, status: 'completed' })}
-                  className="px-2 py-1 rounded bg-[#2E7D32] hover:bg-[#1B5E20] text-[11px] font-semibold text-white"
+                  onClick={() => updateStatusMutation.mutate({ orderId: o.id, status: 'served' })}
+                  className="px-2 py-1 rounded bg-blue-600 hover:bg-blue-700 text-[11px] font-semibold text-white"
                 >
                   Serve
                 </button>
               )}
 
-              {o.paymentStatus === 'unpaid' && (
+              {/* Pay Action for Unpaid */}
+              {!isFullyPaid && (
                 <button
-                  onClick={() =>
-                    updatePaymentMutation.mutate({
-                      orderId: o.id,
-                      paymentStatus: 'paid',
-                      cashTendered: o.total,
-                      changeDue: 0,
-                    })
-                  }
-                  className="px-2 py-1 rounded bg-[#1F1F1F] hover:bg-[#383838] text-[11px] font-semibold text-white"
+                  onClick={() => setDetailOrder(o)}
+                  className="px-2.5 py-1 rounded bg-[#2E7D32] hover:bg-[#1B5E20] text-[11px] font-bold text-white shadow-xs"
                 >
                   Pay
+                </button>
+              )}
+
+              {/* Close Order when Served & Paid */}
+              {isFullyPaid && o.status === 'served' && (
+                <button
+                  onClick={() =>
+                    updateStatusMutation.mutate({
+                      orderId: o.id,
+                      status: 'completed',
+                      tableNumber: o.tableNumber,
+                    })
+                  }
+                  className="px-2 py-1 rounded bg-[#1F1F1F] hover:bg-black text-[11px] font-semibold text-white"
+                >
+                  Close
                 </button>
               )}
             </div>
@@ -298,15 +374,61 @@ export function OrdersTable() {
 
   return (
     <div className="flex-1 flex flex-col p-4 lg:p-6 max-w-[1720px] mx-auto w-full space-y-4">
+      {/* Top Warning Banner for Unpaid Dine-in Orders */}
+      {unpaidDineInOrders.length > 0 && (
+        <div className="p-3 bg-[#FFF8E1] border border-[#FFE082] rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 shadow-xs">
+          <div className="flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 text-[#B45309] shrink-0" />
+            <span className="text-xs font-bold text-[#78350F]">
+              {unpaidDineInOrders.length} Unpaid Dine-In Table{unpaidDineInOrders.length > 1 ? 's' : ''} currently open or served
+            </span>
+          </div>
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+            {unpaidDineInOrders.slice(0, 6).map((o) => (
+              <button
+                key={o.id}
+                onClick={() => setDetailOrder(o)}
+                className="px-2 py-1 rounded-md bg-white border border-[#FFE082] text-[11px] font-extrabold text-[#78350F] hover:bg-[#FEF3C7] transition-colors"
+              >
+                {o.tableNumber || o.orderNumber}: ₱{o.total.toLocaleString()}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Top Controls Header */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
         {/* Status Filter Tabs */}
         <div className="flex items-center gap-1 overflow-x-auto no-scrollbar py-0.5">
           {[
             { id: 'all', label: `All (${orders.length})` },
-            { id: 'active', label: `Active (${orders.filter((o) => o.status !== 'completed' && o.status !== 'cancelled').length})` },
-            { id: 'unpaid', label: `Unpaid (${orders.filter((o) => o.paymentStatus === 'unpaid').length})` },
-            { id: 'completed', label: `Completed (${orders.filter((o) => o.status === 'completed').length})` },
+            {
+              id: 'open',
+              label: `Open (${
+                orders.filter((o) => o.status !== 'completed' && o.status !== 'cancelled').length
+              })`,
+            },
+            {
+              id: 'unpaid',
+              label: `Unpaid (${
+                orders.filter(
+                  (o) => o.paymentStatus === 'unpaid' || o.paymentStatus === 'partially_paid'
+                ).length
+              })`,
+            },
+            {
+              id: 'ready',
+              label: `Ready (${orders.filter((o) => o.status === 'ready').length})`,
+            },
+            {
+              id: 'served',
+              label: `Served (${orders.filter((o) => o.status === 'served').length})`,
+            },
+            {
+              id: 'completed',
+              label: `Completed (${orders.filter((o) => o.status === 'completed').length})`,
+            },
           ].map((tab) => {
             const isSelected = statusFilter === tab.id;
             return (
@@ -360,17 +482,17 @@ export function OrdersTable() {
         </div>
       </div>
 
-      {/* Clean TanStack Data Table */}
-      <div className="bg-white rounded-xl border border-[#E5E5E5] overflow-hidden">
+      {/* Main Table Container */}
+      <div className="bg-white border border-[#E5E5E5] rounded-xl overflow-hidden shadow-xs">
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse min-w-[750px]">
+          <table className="w-full text-left border-collapse">
             <thead>
               {table.getHeaderGroups().map((headerGroup) => (
-                <tr key={headerGroup.id} className="bg-[#FAFAFA] border-b border-[#E5E5E5]">
+                <tr key={headerGroup.id} className="border-b border-[#E5E5E5] bg-[#FAFAFA]">
                   {headerGroup.headers.map((header) => (
                     <th
                       key={header.id}
-                      className="px-4 py-2.5 text-[11px] font-bold text-[#737373] uppercase tracking-wider"
+                      className="px-4 py-3 text-xs font-bold text-[#525252] select-none"
                     >
                       {header.isPlaceholder
                         ? null
@@ -380,19 +502,34 @@ export function OrdersTable() {
                 </tr>
               ))}
             </thead>
-
             <tbody className="divide-y divide-[#F5F5F5]">
               {table.getRowModel().rows.length === 0 ? (
                 <tr>
-                  <td colSpan={columns.length} className="px-4 py-8 text-center text-xs text-[#A3A3A3]">
-                    No matching orders
+                  <td
+                    colSpan={columns.length}
+                    className="h-48 text-center text-xs text-[#A3A3A3]"
+                  >
+                    No orders found matching the filter criteria.
                   </td>
                 </tr>
               ) : (
                 table.getRowModel().rows.map((row) => (
-                  <tr key={row.id} className="hover:bg-[#FAFAFA] transition-colors">
+                  <tr
+                    key={row.id}
+                    className="hover:bg-[#FAFAFA] transition-colors group cursor-pointer"
+                    onClick={() => setDetailOrder(row.original)}
+                  >
                     {row.getVisibleCells().map((cell) => (
-                      <td key={cell.id} className="px-4 py-2.5">
+                      <td
+                        key={cell.id}
+                        className="px-4 py-3 text-xs text-[#1F1F1F]"
+                        onClick={(e) => {
+                          // Prevent triggering row click if an action button was clicked
+                          if ((e.target as HTMLElement).closest('button')) {
+                            e.stopPropagation();
+                          }
+                        }}
+                      >
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
                       </td>
                     ))}
@@ -403,27 +540,40 @@ export function OrdersTable() {
           </table>
         </div>
 
-        {/* Minimal Pagination Footer */}
-        <div className="px-4 py-2.5 bg-[#FAFAFA] border-t border-[#E5E5E5] flex items-center justify-between gap-3 text-xs text-[#737373]">
-          <span>
-            {table.getFilteredRowModel().rows.length} total orders
-          </span>
+        {/* Minimal Footer Pagination */}
+        <div className="px-4 py-3 border-t border-[#E5E5E5] bg-[#FAFAFA] flex items-center justify-between text-xs text-[#737373]">
+          <div>
+            Showing{' '}
+            <span className="font-semibold text-[#1F1F1F]">
+              {table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1}
+            </span>{' '}
+            to{' '}
+            <span className="font-semibold text-[#1F1F1F]">
+              {Math.min(
+                (table.getState().pagination.pageIndex + 1) *
+                  table.getState().pagination.pageSize,
+                filteredData.length
+              )}
+            </span>{' '}
+            of <span className="font-semibold text-[#1F1F1F]">{filteredData.length}</span> orders
+          </div>
 
           <div className="flex items-center gap-1">
             <button
               onClick={() => table.previousPage()}
               disabled={!table.getCanPreviousPage()}
-              className="p-1 rounded border border-[#E5E5E5] bg-white text-[#525252] disabled:opacity-30 hover:bg-[#F5F5F5]"
+              className="p-1 rounded border border-[#E5E5E5] bg-white text-[#525252] hover:bg-[#F5F5F5] disabled:opacity-40 disabled:hover:bg-white"
             >
               <ChevronLeft className="w-3.5 h-3.5" />
             </button>
-            <span className="px-2 text-[11px] font-medium text-[#1F1F1F]">
-              {table.getState().pagination.pageIndex + 1} / {table.getPageCount() || 1}
+            <span className="px-2 text-xs font-medium">
+              Page {table.getState().pagination.pageIndex + 1} of{' '}
+              {Math.max(1, table.getPageCount())}
             </span>
             <button
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage()}
-              className="p-1 rounded border border-[#E5E5E5] bg-white text-[#525252] disabled:opacity-30 hover:bg-[#F5F5F5]"
+              className="p-1 rounded border border-[#E5E5E5] bg-white text-[#525252] hover:bg-[#F5F5F5] disabled:opacity-40 disabled:hover:bg-white"
             >
               <ChevronRight className="w-3.5 h-3.5" />
             </button>
@@ -440,9 +590,8 @@ export function OrdersTable() {
       <OrderDetailsModal
         order={detailOrder}
         onClose={() => setDetailOrder(null)}
-        onPrintReceipt={(o) => {
-          setDetailOrder(null);
-          setReceiptOrder(o);
+        onPrintReceipt={(order) => {
+          setReceiptOrder(order);
         }}
       />
     </div>

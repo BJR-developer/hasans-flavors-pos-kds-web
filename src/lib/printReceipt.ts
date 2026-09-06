@@ -199,6 +199,13 @@ export function generateThermalReceiptHtml(order: Order): string {
       <div class="brand-sub">AUTHENTIC HALAL CUISINE</div>
       <div style="font-size: 9px; margin-bottom: 2px;">Zabihah Halal Certified • Fresh Daily</div>
       <div style="font-size: 9px;">Hotline: +63 (02) 8842-6100</div>
+      <div class="divider-solid"></div>
+      <div style="font-size: 11px; font-weight: 900; letter-spacing: 0.5px; padding: 2px 0;">
+        ${order.paymentStatus === 'paid' ? 'OFFICIAL SALES RECEIPT' : 'GUEST BILL / TABLE CHECK'}
+      </div>
+      <div style="font-size: 9px; font-weight: bold; color: ${order.paymentStatus === 'paid' ? '#000' : '#444'};">
+        ${order.paymentStatus === 'paid' ? '★ PAID IN FULL ★' : '⚠ OPEN BILL — PAYMENT PENDING ⚠'}
+      </div>
     </div>
 
     <div class="divider-dashed"></div>
@@ -263,14 +270,34 @@ export function generateThermalReceiptHtml(order: Order): string {
 
     <!-- Grand Total Due -->
     <div class="grand-total">
-      <span>TOTAL DUE:</span>
+      <span>TOTAL AMOUNT:</span>
       <span>₱${order.total.toLocaleString()}</span>
     </div>
 
     <!-- Payment Breakdown -->
     <div class="total-row" style="font-size: 10px;">
-      <span>Tender: <span class="uppercase bold">${order.paymentMethod}</span></span>
-      <span>Status: <span class="uppercase bold">${order.paymentStatus}</span></span>
+      <span>Payment Status:</span>
+      <span class="uppercase bold" style="color: ${order.paymentStatus === 'paid' ? '#000' : '#d32f2f'};">
+        ${order.paymentStatus === 'paid' ? 'PAID' : order.paymentStatus === 'partially_paid' ? 'PARTIALLY PAID' : 'UNPAID'}
+      </span>
+    </div>
+    ${
+      order.amountPaid !== undefined && order.amountPaid > 0 && order.paymentStatus !== 'paid'
+        ? `
+        <div class="total-row" style="font-size: 10px;">
+          <span>Amount Paid:</span>
+          <span>₱${order.amountPaid.toLocaleString()}</span>
+        </div>
+        <div class="total-row bold" style="font-size: 11px; color: #d32f2f;">
+          <span>BALANCE DUE:</span>
+          <span>₱${(order.balanceDue ?? Math.max(0, order.total - order.amountPaid)).toLocaleString()}</span>
+        </div>
+        `
+        : ''
+    }
+    <div class="total-row" style="font-size: 10px;">
+      <span>Tender / Method:</span>
+      <span class="uppercase bold">${order.paymentMethod || 'Cash'}</span>
     </div>
     ${
       order.cashTendered !== undefined && order.cashTendered > 0
@@ -292,8 +319,10 @@ export function generateThermalReceiptHtml(order: Order): string {
     <!-- Barcode & Footer Notes -->
     <div class="text-center">
       <div class="barcode-box">*HF${order.orderNumber.replace('#', '')}*</div>
-      <div class="footer-note bold">Thank you for dining with Hasan's Flavors!</div>
-      <div class="footer-note" style="font-size: 8px;">Please retain this receipt for warranty and order inquiry.</div>
+      <div class="footer-note bold">
+        ${order.paymentStatus === 'paid' ? "Thank you for dining with Hasan's Flavors!" : 'Please present this bill to cashier upon exit.'}
+      </div>
+      <div class="footer-note" style="font-size: 8px;">${order.paymentStatus === 'paid' ? 'Official receipt for dining & tax purposes.' : 'Table check slip • Valid before payment'}</div>
       <div class="footer-note" style="font-size: 8px;">www.hasansflavors.com</div>
     </div>
   </div>

@@ -49,20 +49,23 @@ export function KdsTicketCard({ order, stationFilter = 'all' }: KdsTicketCardPro
   const handleBumpNext = () => {
     playBumpChime();
     let nextStatus: OrderStatus = 'preparing';
-    if (order.status === 'pending') nextStatus = 'preparing';
+    if (order.status === 'pending' || order.status === 'sent_to_kitchen') nextStatus = 'preparing';
     else if (order.status === 'preparing') nextStatus = 'ready';
-    else if (order.status === 'ready') nextStatus = 'completed';
+    else if (order.status === 'ready') nextStatus = 'served';
+    else if (order.status === 'served') nextStatus = 'completed';
 
-    updateStatus.mutate({ orderId: order.id, status: nextStatus });
+    updateStatus.mutate({ orderId: order.id, status: nextStatus, tableNumber: order.tableNumber });
   };
 
   const handleBumpPrevious = () => {
     playBumpChime();
     let prevStatus: OrderStatus = 'pending';
-    if (order.status === 'ready') prevStatus = 'preparing';
+    if (order.status === 'completed') prevStatus = 'served';
+    else if (order.status === 'served') prevStatus = 'ready';
+    else if (order.status === 'ready') prevStatus = 'preparing';
     else if (order.status === 'preparing') prevStatus = 'pending';
 
-    updateStatus.mutate({ orderId: order.id, status: prevStatus });
+    updateStatus.mutate({ orderId: order.id, status: prevStatus, tableNumber: order.tableNumber });
   };
 
   const handleToggleItem = (cartItemId: string) => {
@@ -86,7 +89,7 @@ export function KdsTicketCard({ order, stationFilter = 'all' }: KdsTicketCardPro
             : 'bg-[#FAFAFA] border-[#E5E5E5]'
         }`}
       >
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 flex-wrap">
           <span className="font-mono font-black text-sm text-[#1F1F1F]">
             {order.orderNumber}
           </span>
@@ -96,6 +99,18 @@ export function KdsTicketCard({ order, stationFilter = 'all' }: KdsTicketCardPro
               : order.type === 'delivery'
               ? 'Delivery'
               : 'Takeout'}
+          </span>
+          {/* Payment Status Indicator for Service / Kitchen Staff */}
+          <span
+            className={`text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded ${
+              order.paymentStatus === 'paid'
+                ? 'bg-[#E8F5E9] text-[#2E7D32]'
+                : order.paymentStatus === 'partially_paid'
+                ? 'bg-amber-100 text-amber-900 border border-amber-300'
+                : 'bg-[#FFF8E1] text-[#B45309] border border-[#FFE082]'
+            }`}
+          >
+            {order.paymentStatus === 'paid' ? 'PAID' : 'UNPAID'}
           </span>
         </div>
 
@@ -177,7 +192,7 @@ export function KdsTicketCard({ order, stationFilter = 'all' }: KdsTicketCardPro
 
       {/* Bump Button */}
       <div className="p-2.5 bg-[#FAFAFA] border-t border-[#E5E5E5] flex items-center gap-2">
-        {order.status !== 'pending' && (
+        {(order.status !== 'pending' && order.status !== 'sent_to_kitchen') && (
           <button
             type="button"
             onClick={handleBumpPrevious}
@@ -192,14 +207,16 @@ export function KdsTicketCard({ order, stationFilter = 'all' }: KdsTicketCardPro
           type="button"
           onClick={handleBumpNext}
           className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-bold text-white transition-colors ${
-            order.status === 'pending'
+            order.status === 'pending' || order.status === 'sent_to_kitchen'
               ? 'bg-[#BA1A20] hover:bg-[#8B0000]'
               : order.status === 'preparing'
               ? 'bg-[#1F1F1F] hover:bg-[#383838]'
+              : order.status === 'ready'
+              ? 'bg-blue-600 hover:bg-blue-700'
               : 'bg-[#2E7D32] hover:bg-[#1B5E20]'
           }`}
         >
-          {order.status === 'pending' && (
+          {(order.status === 'pending' || order.status === 'sent_to_kitchen') && (
             <>
               <span>Start Cooking</span>
               <ArrowRight className="w-3 h-3" />
@@ -211,8 +228,14 @@ export function KdsTicketCard({ order, stationFilter = 'all' }: KdsTicketCardPro
               <ArrowRight className="w-3 h-3" />
             </>
           )}
-          {order.status === 'ready' && <span>Serve Order</span>}
-          {order.status === 'completed' && <span>Archive</span>}
+          {order.status === 'ready' && (
+            <>
+              <span>Mark Served</span>
+              <ArrowRight className="w-3 h-3" />
+            </>
+          )}
+          {order.status === 'served' && <span>Archive Order</span>}
+          {order.status === 'completed' && <span>Archived</span>}
         </button>
       </div>
     </div>
