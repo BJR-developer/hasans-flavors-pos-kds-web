@@ -82,6 +82,30 @@ export function PosCartPane({
     return Array.from({ length: 12 }, (_, i) => `Table ${i + 1}`);
   }, [tableSessions]);
 
+  // Only tables that are genuinely available (not occupied, no open active orders)
+  const availableTables = useMemo(() => {
+    return liveTables.filter((t) => {
+      const isOccupiedInSession = tableSessions.some(
+        (ts) => ts.tableNumber === t && ts.status !== 'available'
+      );
+      const hasOpenOrder = allOrders.some(
+        (o) =>
+          o.type === 'dine_in' &&
+          o.tableNumber === t &&
+          o.status !== 'completed' &&
+          o.status !== 'cancelled'
+      );
+      return !isOccupiedInSession && !hasOpenOrder;
+    });
+  }, [liveTables, tableSessions, allOrders]);
+
+  // Ensure selectedTable defaults to the first available table
+  React.useEffect(() => {
+    if (availableTables.length > 0 && !availableTables.includes(selectedTable)) {
+      setSelectedTable(availableTables[0]);
+    }
+  }, [availableTables, selectedTable]);
+
   // Find if selected table has an active order (for new orders)
   const activeTableOrder = useMemo(() => {
     if (loadedOrder || orderType !== 'dine_in') return null;
@@ -333,46 +357,44 @@ export function PosCartPane({
               </button>
             </div>
 
-            {/* Table Chips for Dine-In */}
+            {/* Table Chips for Dine-In (Available Tables) */}
             {orderType === 'dine_in' && (
               <div>
-                <div className="flex items-center justify-between text-[11px] font-semibold text-[#737373] mb-1">
-                  <span>Select Table</span>
-                  {activeTableOrder && (
-                    <span className="text-[#B45309] font-bold flex items-center gap-1">
-                      <AlertCircle className="w-3 h-3" /> Has Active Order
-                    </span>
-                  )}
+                <div className="flex items-center justify-between text-[11px] font-semibold text-[#737373] mb-1.5">
+                  <span className="font-semibold text-neutral-800">
+                    Available Tables ({availableTables.length})
+                  </span>
+                  <span className="text-[10px] text-emerald-700 font-medium">
+                    Ready to Seat
+                  </span>
                 </div>
-                <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
-                  {liveTables.slice(0, 12).map((t) => {
-                    const short = t.replace('Table ', 'T');
-                    const isSelected = selectedTable === t;
-                    const isOccupied = tableSessions.some(
-                      (ts) => ts.tableNumber === t && ts.status !== 'available'
-                    );
+                {availableTables.length === 0 ? (
+                  <div className="p-2.5 bg-neutral-50 border border-neutral-200 rounded-lg text-xs text-neutral-500 text-center font-medium">
+                    All tables are currently occupied
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+                    {availableTables.map((t) => {
+                      const short = t.replace('Table ', 'T');
+                      const isSelected = selectedTable === t;
 
-                    return (
-                      <button
-                        key={t}
-                        type="button"
-                        onClick={() => setSelectedTable(t)}
-                        className={`relative px-2.5 py-1 rounded-md text-[11px] font-bold shrink-0 transition-colors ${
-                          isSelected
-                            ? 'bg-[#1F1F1F] text-white'
-                            : isOccupied
-                            ? 'bg-[#FFF8E1] text-[#B45309] border border-[#FFE082]'
-                            : 'bg-[#F5F5F5] text-[#525252] hover:bg-[#E5E5E5]'
-                        }`}
-                      >
-                        {short}
-                        {isOccupied && (
-                          <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#B45309] ml-1" />
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
+                      return (
+                        <button
+                          key={t}
+                          type="button"
+                          onClick={() => setSelectedTable(t)}
+                          className={`px-2.5 py-1 rounded-md text-[11px] font-bold shrink-0 transition-colors ${
+                            isSelected
+                              ? 'bg-[#1F1F1F] text-white shadow-2xs'
+                              : 'bg-[#F5F5F5] text-[#525252] hover:bg-[#E5E5E5]'
+                          }`}
+                        >
+                          {short}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             )}
           </>
