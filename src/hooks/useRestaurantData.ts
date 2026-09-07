@@ -152,10 +152,36 @@ export function useCreateOrder() {
     mutationFn: async (orderData: Omit<Order, 'id' | 'orderNumber' | 'createdAt'>) => {
       const id = `order_${Date.now()}`;
       const now = new Date();
-      const orderNumber = `HF-${now.getFullYear()}${(now.getMonth() + 1).toString().padStart(2, '0')}${now
-        .getDate()
-        .toString()
-        .padStart(2, '0')}-${Math.floor(1000 + Math.random() * 9000)}`;
+
+      // Daily sequential order number: #1, #2 ... #10, #11, #38
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
+
+      let nextSeq = 1;
+      try {
+        const { data: todayOrders } = await supabase
+          .from('orders')
+          .select('order_number')
+          .gte('created_at', todayStart.toISOString());
+
+        if (todayOrders && todayOrders.length > 0) {
+          let maxSeq = 0;
+          for (const o of todayOrders) {
+            const match = (o.order_number || '').match(/#?(\d+)/);
+            if (match) {
+              const n = parseInt(match[1], 10);
+              if (n > maxSeq && n < 10000) {
+                maxSeq = n;
+              }
+            }
+          }
+          nextSeq = maxSeq > 0 ? maxSeq + 1 : todayOrders.length + 1;
+        }
+      } catch (err) {
+        console.warn('Could not calculate daily order seq from DB:', err);
+      }
+
+      const orderNumber = `#${nextSeq}`;
 
       const fullOrder: Order = {
         ...orderData,

@@ -8,7 +8,6 @@ import {
   Minus,
   Utensils,
   ShoppingBag,
-  Bike,
   Printer,
   RotateCcw,
   Send,
@@ -101,7 +100,7 @@ export function PosCartPane({
     [items]
   );
   const tax = useMemo(() => Math.round(subtotal * 0.05), [subtotal]);
-  const deliveryFee = (!loadedOrder && orderType === 'delivery') ? 65 : (loadedOrder?.deliveryFee || 0);
+  const deliveryFee = loadedOrder?.deliveryFee || 0;
   const total = useMemo(() => subtotal + tax + deliveryFee, [subtotal, tax, deliveryFee]);
 
   // Check if items changed compared to loaded order
@@ -126,8 +125,6 @@ export function PosCartPane({
       setPaymentTiming('pay_later');
     } else if (type === 'takeout') {
       setPaymentTiming('pay_now');
-    } else if (type === 'delivery') {
-      setPaymentTiming('pay_later');
     }
   };
 
@@ -145,9 +142,7 @@ export function PosCartPane({
         customerName:
           orderType === 'dine_in'
             ? selectedTable
-            : orderType === 'takeout'
-            ? 'Takeout Guest'
-            : 'Delivery Order',
+            : 'Takeout Guest',
         items,
         subtotal,
         tax,
@@ -162,7 +157,7 @@ export function PosCartPane({
         paymentStatus: finalPaymentStatus,
         cashTendered: isPayNow && paymentMethod === 'cash' ? (tenderedNum > 0 ? tenderedNum : total) : undefined,
         changeDue: isPayNow && paymentMethod === 'cash' ? (tenderedNum > 0 ? changeDue : 0) : undefined,
-        estimatedMinutes: orderType === 'delivery' ? 35 : 20,
+        estimatedMinutes: 20,
       };
 
       const created = await createOrderMutation.mutateAsync(orderPayload);
@@ -309,8 +304,8 @@ export function PosCartPane({
           </div>
         ) : (
           <>
-            {/* 3 Channel Buttons */}
-            <div className="grid grid-cols-3 gap-1 bg-[#F5F5F5] p-1 rounded-lg">
+            {/* 2 Channel Buttons: Dine-In & Takeout */}
+            <div className="grid grid-cols-2 gap-1 bg-[#F5F5F5] p-1 rounded-lg">
               <button
                 type="button"
                 onClick={() => handleChannelChange('dine_in')}
@@ -335,19 +330,6 @@ export function PosCartPane({
               >
                 <ShoppingBag className="w-3.5 h-3.5" />
                 <span>Takeout</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleChannelChange('delivery')}
-                className={`flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-semibold transition-all ${
-                  orderType === 'delivery'
-                    ? 'bg-white text-[#1F1F1F] shadow-xs'
-                    : 'text-[#737373] hover:text-[#1F1F1F]'
-                }`}
-              >
-                <Bike className="w-3.5 h-3.5" />
-                <span>Delivery</span>
               </button>
             </div>
 
@@ -648,8 +630,6 @@ export function PosCartPane({
                 <span>
                   {orderType === 'dine_in'
                     ? 'Pay Later (Standard)'
-                    : orderType === 'delivery'
-                    ? 'Cash on Delivery'
                     : 'Pay on Pickup'}
                 </span>
               </button>

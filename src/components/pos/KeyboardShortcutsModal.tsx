@@ -32,12 +32,6 @@ export function KeyboardShortcutsModal({ isOpen, onClose }: KeyboardShortcutsMod
       category: 'Service Channels',
     },
     {
-      key: '3',
-      title: 'Delivery Channel',
-      description: 'Switch active ticket channel to Online Delivery.',
-      category: 'Service Channels',
-    },
-    {
       key: 'Enter',
       altKey: 'Space',
       title: 'Charge Cash & Print',
