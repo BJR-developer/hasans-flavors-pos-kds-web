@@ -524,106 +524,138 @@ export default function TableStandeesPage() {
       `}</style>
 
       {/* ================= TOP NAVIGATION BAR (NO PRINT) ================= */}
-      <div className="no-print bg-white border-b border-[#E2E8F0] sticky top-14 z-30 shadow-2xs">
+      <div className="no-print bg-white border-b border-neutral-200 sticky top-14 z-30 shadow-2xs">
         <div className="max-w-[1720px] mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-3">
-          {/* Title & Table Selector */}
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-[#FC8019]/10 text-[#FC8019] flex items-center justify-center font-black">
-              <Box className="w-4 h-4" />
-            </div>
+          {/* Left: Clean Title */}
+          <div className="flex items-center gap-2.5 shrink-0">
             <div>
-              <h1 className="text-sm sm:text-base font-black text-[#0F172A] tracking-tight leading-none">
-                Double-Sided Table Card Studio
+              <h1 className="text-sm font-bold text-neutral-900 tracking-tight leading-none">
+                Table Standees
               </h1>
-              <p className="text-[11px] text-[#64748B] mt-0.5 hidden sm:block">
-                Minimalist Tabletop Card • Side 1 (Order QR) &amp; Side 2 (Wi-Fi QR)
+              <p className="text-[11px] text-neutral-500 mt-0.5 hidden lg:block">
+                Double-Sided QR Cards (Order &amp; Wi-Fi)
               </p>
-            </div>
-
-            {/* Table Dropdown */}
-            <div className="ml-2 flex items-center gap-1.5 bg-[#F1F5F9] px-2.5 py-1 rounded-lg border border-[#E2E8F0]">
-              <span className="text-[11px] font-bold text-[#64748B]">Table:</span>
-              <select
-                value={selectedTableNumber}
-                onChange={(e) => setSelectedTableNumber(e.target.value)}
-                className="bg-transparent text-xs font-black text-[#0F172A] focus:outline-none cursor-pointer"
-              >
-                {tables.map((t) => (
-                  <option key={t.tableNumber} value={t.tableNumber}>
-                    {t.tableNumber} {t.status === 'occupied' ? '(Occupied)' : ''}
-                  </option>
-                ))}
-              </select>
             </div>
           </div>
 
-          {/* View Switcher: 3D Simulator vs 2D Print */}
-          <div className="flex items-center gap-2">
-            {/* Color Palette Toggle: Obsidian vs Ivory */}
-            <div className="hidden md:flex items-center bg-[#F1F5F9] p-0.5 rounded-lg border border-[#E2E8F0] text-xs">
-              <button
-                onClick={() => setThemeMode('obsidian')}
-                className={`flex items-center gap-1 px-2.5 py-1 rounded-md font-bold transition-all cursor-pointer ${themeMode === 'obsidian'
-                    ? 'bg-[#181614] text-white shadow-2xs'
-                    : 'text-[#64748B] hover:text-[#0F172A]'
+          {/* Center: Minimalist 1-Click Table Selector Strip */}
+          <div className="flex items-center gap-1 overflow-x-auto no-scrollbar bg-neutral-100 p-1 rounded-xl">
+            <button
+              type="button"
+              onClick={() => setPrintMode('all')}
+              className={`px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
+                printMode === 'all'
+                  ? 'bg-neutral-900 text-white shadow-2xs'
+                  : 'text-neutral-600 hover:text-neutral-900'
+              }`}
+            >
+              All ({tables.length})
+            </button>
+            <div className="w-px h-3.5 bg-neutral-300 mx-0.5 shrink-0" />
+            {tables.map((t) => {
+              const num = t.tableNumber.replace(/\D/g, '');
+              const isSelected = printMode === 'single' && selectedTableNumber === t.tableNumber;
+              return (
+                <button
+                  key={t.tableNumber}
+                  type="button"
+                  onClick={() => {
+                    setSelectedTableNumber(t.tableNumber);
+                    setPrintMode('single');
+                  }}
+                  className={`min-w-[28px] h-7 px-1.5 rounded-lg text-xs font-semibold flex items-center justify-center transition-all shrink-0 ${
+                    isSelected
+                      ? 'bg-neutral-900 text-white shadow-2xs'
+                      : 'text-neutral-600 hover:text-neutral-900'
                   }`}
+                  title={t.tableNumber}
+                >
+                  {num || t.tableNumber}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Right: Restrained View Controls & Print Action */}
+          <div className="flex items-center gap-2 shrink-0">
+            {/* Theme Toggle: Obsidian vs Ivory */}
+            <div className="hidden sm:flex items-center bg-neutral-100 p-0.5 rounded-lg text-xs">
+              <button
+                type="button"
+                onClick={() => setThemeMode('obsidian')}
+                className={`flex items-center gap-1 px-2.5 py-1 rounded-md font-medium transition-all ${
+                  themeMode === 'obsidian'
+                    ? 'bg-neutral-900 text-white shadow-2xs'
+                    : 'text-neutral-600 hover:text-neutral-900'
+                }`}
               >
-                <div className="w-2.5 h-2.5 rounded-full bg-[#181614] border border-white/20" />
+                <div className="w-2 h-2 rounded-full bg-neutral-900 border border-white/30" />
                 <span>Obsidian</span>
               </button>
               <button
+                type="button"
                 onClick={() => setThemeMode('ivory')}
-                className={`flex items-center gap-1 px-2.5 py-1 rounded-md font-bold transition-all cursor-pointer ${themeMode === 'ivory'
-                    ? 'bg-white text-[#181614] shadow-2xs'
-                    : 'text-[#64748B] hover:text-[#0F172A]'
-                  }`}
+                className={`flex items-center gap-1 px-2.5 py-1 rounded-md font-medium transition-all ${
+                  themeMode === 'ivory'
+                    ? 'bg-white text-neutral-900 shadow-2xs font-semibold'
+                    : 'text-neutral-600 hover:text-neutral-900'
+                }`}
               >
-                <div className="w-2.5 h-2.5 rounded-full bg-[#FAF8F5] border border-black/20" />
+                <div className="w-2 h-2 rounded-full bg-neutral-200 border border-neutral-400" />
                 <span>Ivory</span>
               </button>
             </div>
 
-            <div className="flex items-center bg-[#F1F5F9] p-0.5 rounded-lg border border-[#E2E8F0]">
+            {/* View Mode Switcher: 3D Simulator vs Print Sheet */}
+            <div className="flex items-center bg-neutral-100 p-0.5 rounded-lg text-xs">
               <button
+                type="button"
                 onClick={() => setViewMode('3d_tabletop')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold transition-all cursor-pointer ${viewMode === '3d_tabletop'
-                    ? 'bg-white text-[#FC8019] shadow-xs'
-                    : 'text-[#64748B] hover:text-[#0F172A]'
-                  }`}
+                className={`flex items-center gap-1.5 px-3 py-1 rounded-md font-medium transition-all ${
+                  viewMode === '3d_tabletop'
+                    ? 'bg-white text-neutral-900 shadow-2xs font-semibold'
+                    : 'text-neutral-600 hover:text-neutral-900'
+                }`}
               >
                 <Rotate3d className="w-3.5 h-3.5" />
-                <span>3D Card View</span>
+                <span>3D Card</span>
               </button>
               <button
+                type="button"
                 onClick={() => setViewMode('print_sheet')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold transition-all cursor-pointer ${viewMode === 'print_sheet'
-                    ? 'bg-white text-[#0F172A] shadow-xs'
-                    : 'text-[#64748B] hover:text-[#0F172A]'
-                  }`}
+                className={`flex items-center gap-1.5 px-3 py-1 rounded-md font-medium transition-all ${
+                  viewMode === 'print_sheet'
+                    ? 'bg-white text-neutral-900 shadow-2xs font-semibold'
+                    : 'text-neutral-600 hover:text-neutral-900'
+                }`}
               >
                 <FileText className="w-3.5 h-3.5" />
-                <span>Print Both Sides</span>
+                <span>Print Sheet</span>
               </button>
             </div>
-          </div>
 
-          {/* Actions */}
-          <div className="flex items-center gap-2">
+            {/* Download QR */}
             <button
+              type="button"
               onClick={handleDownloadQR}
-              className="px-2.5 py-1.5 rounded-lg border border-[#E2E8F0] bg-white hover:bg-[#F8FAFC] text-xs font-bold text-[#0F172A] flex items-center gap-1.5 transition-colors cursor-pointer"
-              title="Download High-Res QR PNG"
+              className="p-1.5 rounded-lg border border-neutral-200 bg-white hover:bg-neutral-50 text-neutral-700 transition-colors"
+              title={`Download QR for ${activeTable.tableNumber}`}
             >
-              <Download className="w-3.5 h-3.5 text-[#64748B]" />
-              <span className="hidden md:inline">Download QR</span>
+              <Download className="w-3.5 h-3.5" />
             </button>
 
+            {/* Single Dynamic Print Button */}
             <button
+              type="button"
               onClick={handlePrint}
-              className="px-3.5 py-1.5 rounded-lg bg-[#FC8019] hover:bg-[#E57212] text-white text-xs font-extrabold flex items-center gap-1.5 transition-all shadow-xs cursor-pointer"
+              className="px-3.5 py-1.5 rounded-lg bg-neutral-900 hover:bg-black text-white text-xs font-semibold flex items-center gap-1.5 transition-all shadow-2xs"
             >
               <Printer className="w-3.5 h-3.5" />
-              <span>Print Cards</span>
+              <span>
+                {printMode === 'all'
+                  ? `Print All (${tables.length} Tables)`
+                  : `Print ${activeTable.tableNumber}`}
+              </span>
             </button>
           </div>
         </div>
@@ -688,11 +720,13 @@ export default function TableStandeesPage() {
               <div className="flex items-center gap-2">
                 {/* Turntable Auto Spin */}
                 <button
+                  type="button"
                   onClick={() => setAutoRotate(!autoRotate)}
-                  className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-[11px] font-bold border transition-all cursor-pointer ${autoRotate
-                      ? 'bg-[#FC8019] text-white border-[#FC8019]'
-                      : 'bg-white text-[#64748B] border-[#E2E8F0] hover:text-[#0F172A]'
-                    }`}
+                  className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-[11px] font-medium border transition-all cursor-pointer ${
+                    autoRotate
+                      ? 'bg-neutral-900 text-white border-neutral-900 shadow-2xs'
+                      : 'bg-white text-neutral-600 border-neutral-200 hover:text-neutral-900 hover:bg-neutral-50'
+                  }`}
                 >
                   <RefreshCw className={`w-3 h-3 ${autoRotate ? 'animate-spin' : ''}`} />
                   <span>{autoRotate ? 'Auto-Rotating' : 'Auto-Spin 360°'}</span>
@@ -934,19 +968,20 @@ export default function TableStandeesPage() {
 
               {/* Floating Instructions Tag */}
               <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between pointer-events-none">
-                <div className="px-3 py-1.5 rounded-lg bg-white/90 backdrop-blur-md text-[#0F172A] text-[11px] font-mono flex items-center gap-2 border border-[#CBD5E1] shadow-xs">
-                  <Rotate3d className="w-3.5 h-3.5 text-[#FC8019]" />
+                <div className="px-3 py-1.5 rounded-lg bg-white/95 backdrop-blur-md text-neutral-800 text-[11px] font-medium flex items-center gap-2 border border-neutral-200 shadow-2xs">
+                  <Rotate3d className="w-3.5 h-3.5 text-neutral-500" />
                   <span>
                     Click &amp; drag anywhere to rotate 360° • Both Sides &amp; 14mm Rigid Card
                   </span>
                 </div>
 
                 <button
+                  type="button"
                   onClick={() => setViewMode('print_sheet')}
-                  className="pointer-events-auto px-3.5 py-1.5 rounded-lg bg-white hover:bg-[#F8FAFC] text-[#0F172A] text-xs font-black shadow-md border border-[#E2E8F0] transition-all flex items-center gap-1.5 cursor-pointer"
+                  className="pointer-events-auto px-3.5 py-1.5 rounded-lg bg-white hover:bg-neutral-50 text-neutral-900 text-xs font-semibold shadow-2xs border border-neutral-200 transition-all flex items-center gap-1.5 cursor-pointer"
                 >
-                  <FileText className="w-3.5 h-3.5 text-[#FC8019]" />
-                  <span>Switch to 2D Print Layout</span>
+                  <FileText className="w-3.5 h-3.5 text-neutral-500" />
+                  <span>View Print Sheet</span>
                 </button>
               </div>
             </div>
@@ -957,30 +992,6 @@ export default function TableStandeesPage() {
              Minimalist 2-sided print layout with cutting markers
              ========================================================================= */
           <div className="space-y-6">
-            <div className="no-print bg-white border border-[#E2E8F0] rounded-xl p-4 shadow-xs flex flex-wrap items-center justify-between gap-3 text-xs">
-              <div className="flex items-center gap-2">
-                <Scissors className="w-4 h-4 text-[#FC8019] shrink-0" />
-                <span className="text-[#475569]">
-                  <strong>Print Instructions:</strong> Print both Side 1 (Front) and Side 2 (Back) on heavy cardstock or photo paper. Cut along the borders and place into your tabletop acrylic stands or wooden card holders.
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setPrintMode(printMode === 'single' ? 'all' : 'single')}
-                  className="px-3 py-1.5 bg-[#F1F5F9] hover:bg-[#E2E8F0] rounded-lg font-bold text-xs text-[#0F172A] cursor-pointer"
-                >
-                  Mode: {printMode === 'single' ? `Single (${activeTable.tableNumber})` : `All ${tables.length} Tables`}
-                </button>
-                <button
-                  onClick={handlePrint}
-                  className="px-4 py-1.5 bg-[#FC8019] text-white rounded-lg font-black text-xs shadow-xs hover:bg-[#E57212] cursor-pointer flex items-center gap-1.5"
-                >
-                  <Printer className="w-3.5 h-3.5" />
-                  <span>Print Both Sides</span>
-                </button>
-              </div>
-            </div>
-
             {/* Clean Minimalist Print Sheet Container */}
             <div className="print-area space-y-8">
               {(printMode === 'single' ? [activeTable] : tables).map((tableItem) => (
