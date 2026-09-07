@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { X, Plus, Minus, Flame, Sparkles, ChevronLeft, ChevronRight, Images } from 'lucide-react';
-import { Dish, CartItem, PortionOption, AddonOption } from '@/types';
+import { X, Plus, Minus, Flame, Sparkles, ChevronLeft, ChevronRight, Images, Layers } from 'lucide-react';
+import { Dish, CartItem, PortionOption, AddonOption, SelectedVariant } from '@/types';
 import { PORTION_OPTIONS, ADDON_OPTIONS, SPICE_LEVELS } from '@/data/options';
 import { SafeImage } from '@/components/common/SafeImage';
 
@@ -39,6 +39,21 @@ function DishCustomizerModalContent({
   const [selectedAddons, setSelectedAddons] = useState<AddonOption[]>([]);
   const [specialNotes, setSpecialNotes] = useState('');
 
+  const hasCustomVariants = !!(dish.variants && dish.variants.length > 0);
+
+  // Custom Variants Selection Map
+  const [selectedVariantsMap, setSelectedVariantsMap] = useState<Record<string, string>>(() => {
+    const map: Record<string, string> = {};
+    if (dish.variants && dish.variants.length > 0) {
+      dish.variants.forEach((g) => {
+        if (g.options && g.options.length > 0) {
+          map[g.id] = g.options[0].id;
+        }
+      });
+    }
+    return map;
+  });
+
   // Multi-image navigation
   const allImages = dish.imageUrls && dish.imageUrls.length > 0 ? dish.imageUrls : [dish.imageUrl].filter(Boolean);
   const [selectedImgIdx, setSelectedImgIdx] = useState(0);
@@ -53,7 +68,16 @@ function DishCustomizerModalContent({
   };
 
   const addonsTotal = selectedAddons.reduce((sum, a) => sum + a.price, 0);
-  const unitPrice = dish.price + selectedPortion.priceDelta + addonsTotal;
+
+  const variantsDelta = hasCustomVariants
+    ? dish.variants!.reduce((sum, g) => {
+        const selectedId = selectedVariantsMap[g.id];
+        const opt = g.options.find((o) => o.id === selectedId);
+        return sum + (opt ? opt.priceDelta : 0);
+      }, 0)
+    : selectedPortion.priceDelta;
+
+  const unitPrice = dish.price + variantsDelta + addonsTotal;
   const totalPrice = unitPrice * quantity;
 
   const handleAdd = () => {
@@ -68,6 +92,20 @@ function DishCustomizerModalContent({
       station = 'sides_drinks';
     }
 
+    const selectedVariants: SelectedVariant[] = hasCustomVariants
+      ? dish.variants!.map((g) => {
+          const selectedId = selectedVariantsMap[g.id];
+          const opt = g.options.find((o) => o.id === selectedId) || g.options[0];
+          return {
+            groupId: g.id,
+            groupName: g.name,
+            optionId: opt.id,
+            optionName: opt.name,
+            priceDelta: opt.priceDelta,
+          };
+        })
+      : [];
+
     const cartItem: CartItem = {
       cartItemId: `item_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
       dish,
@@ -75,6 +113,7 @@ function DishCustomizerModalContent({
       portion: selectedPortion,
       spiceLevel: selectedSpice,
       selectedAddons,
+      selectedVariants: selectedVariants.length > 0 ? selectedVariants : undefined,
       specialNotes: specialNotes.trim() || undefined,
       unitPrice,
       totalPrice,
@@ -176,69 +215,118 @@ function DishCustomizerModalContent({
 
         {/* Customization Options Body */}
         <div className="p-5 max-h-[58vh] overflow-y-auto space-y-5">
-          {/* Portion Selection */}
-          <div>
-            <label className="block text-xs font-extrabold text-[#2D2926] uppercase tracking-wider mb-2">
-              Select Portion Size
-            </label>
-            <div className="grid grid-cols-3 gap-2">
-              {PORTION_OPTIONS.map((portion) => {
-                const isSelected = selectedPortion.id === portion.id;
+          {/* Render Custom Product Variants if configured */}
+          {hasCustomVariants ? (
+            <div className="space-y-4">
+              {dish.variants!.map((group) => {
+                const selectedOptId = selectedVariantsMap[group.id];
+
                 return (
-                  <button
-                    key={portion.id}
-                    type="button"
-                    onClick={() => setSelectedPortion(portion)}
-                    className={`p-2.5 rounded-xl border text-left transition-all ${
-                      isSelected
-                        ? 'border-[#BA1A20] bg-[#FFF2F0] text-[#BA1A20] shadow-xs'
-                        : 'border-[#E9E8E7] bg-white text-[#5B403D] hover:bg-[#F4F3F2]'
-                    }`}
-                  >
-                    <p className="text-xs font-bold leading-snug">{portion.name}</p>
-                    <p className="text-[10px] text-[#8F6F6C]">{portion.serves}</p>
-                    <p className="text-xs font-extrabold mt-1">
-                      {portion.priceDelta === 0 ? 'Included' : `+₱${portion.priceDelta}`}
-                    </p>
-                  </button>
+                  <div key={group.id}>
+                    <label className="block text-xs font-extrabold text-[#2D2926] uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                      <Layers className="w-3.5 h-3.5 text-[#BA1A20]" />
+                      <span>{group.name}</span>
+                    </label>
+
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                      {group.options.map((option) => {
+                        const isSelected = selectedOptId === option.id;
+
+                        return (
+                          <button
+                            key={option.id}
+                            type="button"
+                            onClick={() =>
+                              setSelectedVariantsMap((prev) => ({
+                                ...prev,
+                                [group.id]: option.id,
+                              }))
+                            }
+                            className={`p-2.5 rounded-xl border text-left transition-all ${
+                              isSelected
+                                ? 'border-[#BA1A20] bg-[#FFF2F0] text-[#BA1A20] shadow-xs'
+                                : 'border-[#E9E8E7] bg-white text-[#5B403D] hover:bg-[#F4F3F2]'
+                            }`}
+                          >
+                            <p className="text-xs font-bold leading-snug">{option.name}</p>
+                            <p className="text-xs font-extrabold mt-1">
+                              {option.priceDelta === 0 ? 'Included' : `+₱${option.priceDelta}`}
+                            </p>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
                 );
               })}
             </div>
-          </div>
+          ) : (
+            <>
+              {/* Fallback Standard Portion Selection */}
+              <div>
+                <label className="block text-xs font-extrabold text-[#2D2926] uppercase tracking-wider mb-2">
+                  Select Portion Size
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  {PORTION_OPTIONS.map((portion) => {
+                    const isSelected = selectedPortion.id === portion.id;
+                    return (
+                      <button
+                        key={portion.id}
+                        type="button"
+                        onClick={() => setSelectedPortion(portion)}
+                        className={`p-2.5 rounded-xl border text-left transition-all ${
+                          isSelected
+                            ? 'border-[#BA1A20] bg-[#FFF2F0] text-[#BA1A20] shadow-xs'
+                            : 'border-[#E9E8E7] bg-white text-[#5B403D] hover:bg-[#F4F3F2]'
+                        }`}
+                      >
+                        <p className="text-xs font-bold leading-snug">{portion.name}</p>
+                        <p className="text-[10px] text-[#8F6F6C]">{portion.serves}</p>
+                        <p className="text-xs font-extrabold mt-1">
+                          {portion.priceDelta === 0 ? 'Included' : `+₱${portion.priceDelta}`}
+                        </p>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
 
-          {/* Spice Level Selection */}
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <label className="text-xs font-extrabold text-[#2D2926] uppercase tracking-wider flex items-center gap-1.5">
-                <Flame className="w-3.5 h-3.5 text-[#BA1A20]" />
-                Spice Level
-              </label>
-              <span className="text-xs font-bold text-[#B45309]">
-                {SPICE_LEVELS.find((s) => s.level === selectedSpice)?.label}
-              </span>
-            </div>
+              {/* Fallback Standard Spice Level Selection */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-xs font-extrabold text-[#2D2926] uppercase tracking-wider flex items-center gap-1.5">
+                    <Flame className="w-3.5 h-3.5 text-[#BA1A20]" />
+                    Spice Level
+                  </label>
+                  <span className="text-xs font-bold text-[#B45309]">
+                    {SPICE_LEVELS.find((s) => s.level === selectedSpice)?.label}
+                  </span>
+                </div>
 
-            <div className="grid grid-cols-4 gap-2">
-              {SPICE_LEVELS.map((spice) => {
-                const isSelected = selectedSpice === spice.level;
-                return (
-                  <button
-                    key={spice.level}
-                    type="button"
-                    onClick={() => setSelectedSpice(spice.level)}
-                    className={`p-2 rounded-xl border text-center transition-all ${
-                      isSelected
-                        ? 'border-[#BA1A20] bg-[#FFF2F0] text-[#BA1A20] shadow-xs'
-                        : 'border-[#E9E8E7] bg-white text-[#5B403D] hover:bg-[#F4F3F2]'
-                    }`}
-                  >
-                    <div className="text-base">{spice.icon}</div>
-                    <p className="text-[10px] font-bold mt-0.5">{spice.label}</p>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+                <div className="grid grid-cols-4 gap-2">
+                  {SPICE_LEVELS.map((spice) => {
+                    const isSelected = selectedSpice === spice.level;
+                    return (
+                      <button
+                        key={spice.level}
+                        type="button"
+                        onClick={() => setSelectedSpice(spice.level)}
+                        className={`p-2 rounded-xl border text-center transition-all ${
+                          isSelected
+                            ? 'border-[#BA1A20] bg-[#FFF2F0] text-[#BA1A20] shadow-xs'
+                            : 'border-[#E9E8E7] bg-white text-[#5B403D] hover:bg-[#F4F3F2]'
+                        }`}
+                      >
+                        <div className="text-base">{spice.icon}</div>
+                        <p className="text-[10px] font-bold mt-0.5">{spice.label}</p>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </>
+          )}
 
           {/* Add-ons Checklist */}
           <div>

@@ -41,29 +41,29 @@ export function KdsBoard() {
     });
   }, [recent24hOrders, searchQuery]);
 
-  // Active Kanban Columns
+  // Active Kanban Columns - Newest orders at the top, older orders at the bottom
   const pendingOrders = useMemo(() => {
     return filteredOrders
       .filter((o) => o.status === 'pending' || o.status === 'sent_to_kitchen')
-      .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   }, [filteredOrders]);
 
   const preparingOrders = useMemo(() => {
     return filteredOrders
       .filter((o) => o.status === 'preparing')
-      .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   }, [filteredOrders]);
 
   const readyOrders = useMemo(() => {
     return filteredOrders
       .filter((o) => o.status === 'ready')
-      .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   }, [filteredOrders]);
 
   const servedOrders = useMemo(() => {
     return filteredOrders
       .filter((o) => o.status === 'served')
-      .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   }, [filteredOrders]);
 
   const allActiveOrders = [...pendingOrders, ...preparingOrders, ...readyOrders, ...servedOrders];

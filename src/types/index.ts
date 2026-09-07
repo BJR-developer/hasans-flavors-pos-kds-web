@@ -1,3 +1,24 @@
+export interface DishVariantOption {
+  id: string;
+  name: string;
+  priceDelta: number;
+}
+
+export interface DishVariantGroup {
+  id: string;
+  name: string;
+  required?: boolean;
+  options: DishVariantOption[];
+}
+
+export interface SelectedVariant {
+  groupId: string;
+  groupName: string;
+  optionId: string;
+  optionName: string;
+  priceDelta: number;
+}
+
 export interface Dish {
   id: string;
   name: string;
@@ -9,6 +30,7 @@ export interface Dish {
   imageUrl: string;
   imageUrls?: string[];
   spiceLevel: number; // 1 (Mild) to 4 (Fiery)
+  variants?: DishVariantGroup[];
   isHalal: boolean;
   isChefSpecial: boolean;
   isPopular: boolean;
@@ -51,6 +73,7 @@ export interface CartItem {
   portion: PortionOption;
   spiceLevel: number;
   selectedAddons: AddonOption[];
+  selectedVariants?: SelectedVariant[];
   specialNotes?: string;
   unitPrice: number;
   totalPrice: number;

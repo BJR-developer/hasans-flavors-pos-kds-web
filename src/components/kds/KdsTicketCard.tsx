@@ -48,6 +48,22 @@ export function KdsTicketCard({
   const isUrgent =
     order.status !== 'completed' && order.status !== 'cancelled' && elapsedMinutes >= 15;
 
+  // Spice label helper
+  const getSpiceLabel = (level?: number) => {
+    switch (level) {
+      case 1:
+        return 'Mild';
+      case 2:
+        return 'Medium';
+      case 3:
+        return 'Hot Spicy';
+      case 4:
+        return 'Very Spicy';
+      default:
+        return null;
+    }
+  };
+
   const displayedItems = order.items.filter((it) => {
     if (stationFilter === 'all') return true;
     return it.station === stationFilter;
@@ -150,6 +166,14 @@ export function KdsTicketCard({
         </div>
       </div>
 
+      {/* Order-Level Special Dining / Cooking Instructions */}
+      {order.specialNotes && (
+        <div className="px-3 py-1.5 bg-amber-50 border-b border-amber-200 text-[11px] text-amber-900 font-semibold flex items-start gap-1">
+          <span className="text-amber-700 uppercase text-[10px] tracking-wide font-black">Instruction:</span>
+          <span>{order.specialNotes}</span>
+        </div>
+      )}
+
       {/* Items List */}
       <div className="p-3.5 flex-1 divide-y divide-neutral-100 space-y-2 overflow-y-auto max-h-[260px]">
         {displayedItems.map((item) => {
@@ -193,12 +217,34 @@ export function KdsTicketCard({
                   </span>
                 </div>
 
-                {/* Modifiers */}
-                <div className="flex flex-wrap items-center gap-1 mt-0.5 text-[10px] text-neutral-500">
-                  {item.portion?.priceDelta > 0 && <span>• {item.portion.name}</span>}
-                  {item.spiceLevel && item.spiceLevel > 2 && (
-                    <span className="text-red-700 font-semibold">• Spicy</span>
+                {/* Modifiers: Variants, Portions, Spice, Addons */}
+                <div className="flex flex-wrap items-center gap-1.5 mt-0.5 text-[10px] text-neutral-500">
+                  {/* Custom Variants if present */}
+                  {item.selectedVariants && item.selectedVariants.length > 0 ? (
+                    item.selectedVariants.map((v, idx) => (
+                      <span key={idx} className="bg-neutral-100 px-1.5 py-0.5 rounded text-neutral-800 font-medium">
+                        {v.groupName}: {v.optionName}
+                      </span>
+                    ))
+                  ) : (
+                    <>
+                      {item.portion?.priceDelta > 0 && <span>• {item.portion.name}</span>}
+                    </>
                   )}
+
+                  {/* Explicit Human-Readable Spice Level */}
+                  {item.spiceLevel && getSpiceLabel(item.spiceLevel) && (
+                    <span className={`px-1.5 py-0.5 rounded font-bold ${
+                      item.spiceLevel >= 4
+                        ? 'bg-red-100 text-red-700'
+                        : item.spiceLevel === 3
+                        ? 'bg-amber-100 text-amber-800'
+                        : 'bg-neutral-100 text-neutral-700'
+                    }`}>
+                      Spice: {getSpiceLabel(item.spiceLevel)}
+                    </span>
+                  )}
+
                   {item.selectedAddons?.map((a) => (
                     <span key={a.id}>• +{a.name}</span>
                   ))}
@@ -241,14 +287,14 @@ export function KdsTicketCard({
             <span>Update Order</span>
           </button>
 
-          {/* Cancel Order */}
+          {/* Cancel Order with explicit text */}
           <button
             type="button"
             onClick={handleCancelOrder}
             title="Cancel this order"
-            className="p-1.5 rounded-lg text-neutral-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+            className="px-2 py-1.5 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 text-[11px] font-semibold transition-colors"
           >
-            <XCircle className="w-3.5 h-3.5" />
+            Cancel
           </button>
         </div>
 

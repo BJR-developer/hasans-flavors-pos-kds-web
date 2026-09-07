@@ -15,6 +15,7 @@ export const mapDishFromDB = (row: any): Dish => ({
     ? row.image_urls
     : (row.image_url ? [row.image_url] : []),
   spiceLevel: Number(row.spice_level || 0),
+  variants: Array.isArray(row.variants) ? row.variants : [],
   isHalal: row.is_halal ?? true,
   isChefSpecial: row.is_chef_special ?? false,
   isPopular: row.is_popular ?? false,
@@ -109,6 +110,7 @@ export const updateDishInDB = async (id: string, updates: Partial<Dish>): Promis
   if (updates.inStock !== undefined) dbPayload.in_stock = updates.inStock;
   if (updates.isChefSpecial !== undefined) dbPayload.is_chef_special = updates.isChefSpecial;
   if (updates.isPopular !== undefined) dbPayload.is_popular = updates.isPopular;
+  if (updates.variants !== undefined) dbPayload.variants = updates.variants;
 
   const { data, error } = await supabase
     .from('dishes')
@@ -137,6 +139,7 @@ export const createDishInDB = async (dish: Omit<Dish, 'id'>): Promise<Dish> => {
       ? dish.imageUrls 
       : (dish.imageUrl ? [dish.imageUrl] : []),
     spice_level: dish.spiceLevel || 0,
+    variants: dish.variants || [],
     is_halal: dish.isHalal ?? true,
     is_chef_special: dish.isChefSpecial ?? false,
     is_popular: dish.isPopular ?? false,

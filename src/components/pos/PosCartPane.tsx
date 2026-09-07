@@ -142,6 +142,21 @@ export function PosCartPane({
   const tenderedNum = parseFloat(cashTendered.replace(/,/g, '')) || total;
   const changeDue = Math.max(0, tenderedNum - total);
 
+  const getSpiceLabel = (level?: number) => {
+    switch (level) {
+      case 1:
+        return 'Mild';
+      case 2:
+        return 'Medium';
+      case 3:
+        return 'Hot Spicy';
+      case 4:
+        return 'Very Spicy';
+      default:
+        return null;
+    }
+  };
+
   // Switch channel handler
   const handleChannelChange = (type: OrderType) => {
     setOrderType(type);
@@ -325,6 +340,12 @@ export function PosCartPane({
                   : loadedOrder.customerName}
               </span>
             </div>
+            {loadedOrder.specialNotes && (
+              <div className="pt-1 border-t border-neutral-200 text-[10.5px] text-amber-900 font-medium">
+                <span className="font-bold text-amber-800">Instruction: </span>
+                <span>{loadedOrder.specialNotes}</span>
+              </div>
+            )}
           </div>
         ) : (
           <>
@@ -428,11 +449,37 @@ export function PosCartPane({
                   </span>
                 </div>
 
-                <div className="flex items-center gap-1.5 text-[10px] text-[#737373] mt-0.5">
+                <div className="flex flex-wrap items-center gap-1 text-[10px] text-[#737373] mt-0.5">
                   <span>₱{item.unitPrice.toLocaleString()}</span>
-                  {item.portion?.priceDelta > 0 && <span>• {item.portion.name}</span>}
-                  {item.spiceLevel && (
-                    <span className="text-neutral-500">• Lv.{item.spiceLevel}</span>
+                  {item.selectedVariants && item.selectedVariants.length > 0 ? (
+                    item.selectedVariants.map((v, idx) => (
+                      <span key={idx} className="bg-[#EFEFEF] px-1.5 py-0.2 rounded font-medium text-neutral-800">
+                        {v.groupName}: {v.optionName}
+                      </span>
+                    ))
+                  ) : (
+                    <>
+                      {item.portion?.priceDelta > 0 && <span>• {item.portion.name}</span>}
+                    </>
+                  )}
+                  {item.spiceLevel && getSpiceLabel(item.spiceLevel) && (
+                    <span className={`px-1 py-0.2 rounded font-semibold ${
+                      item.spiceLevel >= 4
+                        ? 'bg-red-100 text-red-700'
+                        : item.spiceLevel === 3
+                        ? 'bg-amber-100 text-amber-800'
+                        : 'bg-neutral-100 text-neutral-600'
+                    }`}>
+                      Spice: {getSpiceLabel(item.spiceLevel)}
+                    </span>
+                  )}
+                  {item.selectedAddons?.map((a) => (
+                    <span key={a.id}>• +{a.name}</span>
+                  ))}
+                  {item.specialNotes && (
+                    <span className="text-amber-800 italic block w-full mt-0.5">
+                      Note: {item.specialNotes}
+                    </span>
                   )}
                 </div>
               </div>

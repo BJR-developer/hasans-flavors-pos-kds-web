@@ -63,6 +63,22 @@ export function OrderDetailsModal({
   const isFullyPaid = currentOrder.paymentStatus === 'paid' || balanceDue === 0;
   const activeStatus = optimisticStatus || currentOrder.status;
 
+  // Spice label helper
+  const getSpiceLabel = (level?: number) => {
+    switch (level) {
+      case 1:
+        return 'Mild';
+      case 2:
+        return 'Medium';
+      case 3:
+        return 'Hot Spicy';
+      case 4:
+        return 'Very Spicy';
+      default:
+        return null;
+    }
+  };
+
   // Instant optimistic status progression
   const handleStatusChange = (status: OrderStatus) => {
     if (status === 'completed' && !isFullyPaid) {
@@ -140,6 +156,14 @@ export function OrderDetailsModal({
         {/* Body Content */}
         <div className="p-6 max-h-[65vh] overflow-y-auto space-y-6">
 
+          {/* Order-Level Special Dining / Cooking Instructions */}
+          {currentOrder.specialNotes && (
+            <div className="p-3 bg-amber-50 rounded-xl border border-amber-200 text-xs text-amber-900">
+              <span className="font-bold text-amber-800 uppercase text-[10px] tracking-wide block mb-0.5">Special Instructions:</span>
+              <span className="font-medium">{currentOrder.specialNotes}</span>
+            </div>
+          )}
+
           {/* Ordered Items List */}
           <div>
             <div className="flex items-center justify-between pb-2 border-b border-neutral-100 mb-3">
@@ -159,21 +183,55 @@ export function OrderDetailsModal({
             </div>
 
             {/* Line items */}
-            <div className="space-y-2">
+            <div className="space-y-2.5">
               {currentOrder.items.map((item) => (
-                <div key={item.cartItemId} className="flex items-baseline justify-between text-xs py-0.5">
-                  <div className="flex items-baseline gap-2">
-                    <span className="font-mono text-neutral-400 text-[11px] w-4">
+                <div key={item.cartItemId} className="flex items-start justify-between text-xs py-1 border-b border-neutral-50 last:border-0">
+                  <div className="flex items-start gap-2 min-w-0 flex-1">
+                    <span className="font-mono text-neutral-400 text-[11px] w-4 mt-0.5">
                       {item.quantity}×
                     </span>
-                    <span className="text-neutral-900 font-medium">{item.dish.name}</span>
-                    {item.spiceLevel && (
-                      <span className="text-[10px] text-neutral-400 font-normal">
-                        Lv.{item.spiceLevel}
-                      </span>
-                    )}
+                    <div className="min-w-0 flex-1">
+                      <span className="text-neutral-900 font-medium">{item.dish.name}</span>
+                      
+                      {/* Variants & Spice details */}
+                      <div className="flex flex-wrap items-center gap-1.5 mt-0.5 text-[10.5px]">
+                        {item.selectedVariants && item.selectedVariants.length > 0 ? (
+                          item.selectedVariants.map((v, idx) => (
+                            <span key={idx} className="bg-neutral-100 text-neutral-800 px-1.5 py-0.2 rounded font-medium">
+                              {v.groupName}: {v.optionName}
+                            </span>
+                          ))
+                        ) : (
+                          item.portion?.priceDelta > 0 && (
+                            <span className="text-neutral-500">• {item.portion.name}</span>
+                          )
+                        )}
+
+                        {item.spiceLevel && getSpiceLabel(item.spiceLevel) && (
+                          <span className={`px-1.5 py-0.2 rounded font-bold ${
+                            item.spiceLevel >= 4
+                              ? 'bg-red-100 text-red-700'
+                              : item.spiceLevel === 3
+                              ? 'bg-amber-100 text-amber-800'
+                              : 'bg-neutral-100 text-neutral-600'
+                          }`}>
+                            Spice: {getSpiceLabel(item.spiceLevel)}
+                          </span>
+                        )}
+
+                        {item.selectedAddons?.map((a) => (
+                          <span key={a.id} className="text-neutral-500">• +{a.name}</span>
+                        ))}
+                      </div>
+
+                      {item.specialNotes && (
+                        <p className="text-[10px] text-amber-800 italic mt-0.5">
+                          Note: {item.specialNotes}
+                        </p>
+                      )}
+                    </div>
                   </div>
-                  <span className="font-mono text-neutral-800 tabular-nums">
+                  <span className="font-mono text-neutral-800 tabular-nums font-semibold shrink-0 ml-2">
                     ₱{item.totalPrice.toLocaleString()}
                   </span>
                 </div>

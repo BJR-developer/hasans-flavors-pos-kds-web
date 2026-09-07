@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, useRef } from 'react';
-import { X, Sparkles, UploadCloud, Loader2, Trash2, CheckCircle2, Star, Plus } from 'lucide-react';
-import { Dish, Category } from '@/types';
+import { X, Sparkles, UploadCloud, Loader2, Trash2, CheckCircle2, Star, Plus, Layers, Zap } from 'lucide-react';
+import { Dish, Category, DishVariantGroup, DishVariantOption } from '@/types';
 import { useAddDish, useUpdateDish } from '@/hooks/useRestaurantData';
 import { SafeImage } from '@/components/common/SafeImage';
 import { supabase } from '@/lib/supabase';
@@ -68,6 +68,78 @@ function ProductFormContent({
   const [isChefSpecial, setIsChefSpecial] = useState(
     () => (dishToEdit ? dishToEdit.isChefSpecial || false : false)
   );
+
+  // Custom Product Variants State
+  const [variants, setVariants] = useState<DishVariantGroup[]>(() => {
+    if (dishToEdit?.variants && dishToEdit.variants.length > 0) {
+      return dishToEdit.variants;
+    }
+    return [];
+  });
+
+  // Variant helper functions
+  const handleAddVariantGroup = (name = 'New Option Group', prefilledOptions?: DishVariantOption[]) => {
+    const newGroup: DishVariantGroup = {
+      id: `grp_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+      name,
+      required: true,
+      options: prefilledOptions || [
+        { id: `opt_${Date.now()}_1`, name: 'Option 1', priceDelta: 0 },
+        { id: `opt_${Date.now()}_2`, name: 'Option 2', priceDelta: 50 },
+      ],
+    };
+    setVariants((prev) => [...prev, newGroup]);
+  };
+
+  const handleRemoveVariantGroup = (groupId: string) => {
+    setVariants((prev) => prev.filter((g) => g.id !== groupId));
+  };
+
+  const handleUpdateGroupName = (groupId: string, newName: string) => {
+    setVariants((prev) =>
+      prev.map((g) => (g.id === groupId ? { ...g, name: newName } : g))
+    );
+  };
+
+  const handleAddOptionToGroup = (groupId: string) => {
+    setVariants((prev) =>
+      prev.map((g) => {
+        if (g.id !== groupId) return g;
+        const newOpt: DishVariantOption = {
+          id: `opt_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+          name: '',
+          priceDelta: 0,
+        };
+        return { ...g, options: [...g.options, newOpt] };
+      })
+    );
+  };
+
+  const handleRemoveOptionFromGroup = (groupId: string, optionId: string) => {
+    setVariants((prev) =>
+      prev.map((g) => {
+        if (g.id !== groupId) return g;
+        return { ...g, options: g.options.filter((o) => o.id !== optionId) };
+      })
+    );
+  };
+
+  const handleUpdateOption = (
+    groupId: string,
+    optionId: string,
+    field: 'name' | 'priceDelta',
+    val: string | number
+  ) => {
+    setVariants((prev) =>
+      prev.map((g) => {
+        if (g.id !== groupId) return g;
+        return {
+          ...g,
+          options: g.options.map((o) => (o.id === optionId ? { ...o, [field]: val } : o)),
+        };
+      })
+    );
+  };
 
   // Image upload states
   const [isUploading, setIsUploading] = useState(false);
@@ -222,6 +294,7 @@ function ProductFormContent({
           inStock,
           isChefSpecial,
           station,
+          variants,
         },
       });
     } else {
@@ -240,6 +313,7 @@ function ProductFormContent({
         preparationTime,
         calories: '450 kcal',
         station,
+        variants,
       });
     }
 
@@ -490,6 +564,165 @@ function ProductFormContent({
               <p className="text-[11px] text-[#BA1A20] font-semibold mt-1.5">
                 {uploadError}
               </p>
+            )}
+          </div>
+
+          {/* Custom Product Variants Builder */}
+          <div className="pt-3 border-t border-neutral-200 space-y-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <label className="block text-xs font-bold text-neutral-900">
+                  Product Variants &amp; Sizing ({variants.length})
+                </label>
+                <p className="text-[11px] text-neutral-500">
+                  Define custom sizes (e.g. Regular, XXL), protein choices, or custom spice options
+                </p>
+              </div>
+
+              {/* Quick Prefill Dropdown / Buttons */}
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() =>
+                    handleAddVariantGroup('Portion / Size', [
+                      { id: `opt_${Date.now()}_1`, name: 'Regular', priceDelta: 0 },
+                      { id: `opt_${Date.now()}_2`, name: 'Large', priceDelta: 80 },
+                      { id: `opt_${Date.now()}_3`, name: 'Family Bilao', priceDelta: 350 },
+                    ])
+                  }
+                  className="px-2 py-1 rounded bg-neutral-100 hover:bg-neutral-200 text-neutral-700 text-[10.5px] font-semibold transition-colors flex items-center gap-1"
+                >
+                  <Zap className="w-3 h-3 text-amber-600" />
+                  <span>+ Size</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    handleAddVariantGroup('Spice Level', [
+                      { id: `opt_${Date.now()}_1`, name: 'Mild', priceDelta: 0 },
+                      { id: `opt_${Date.now()}_2`, name: 'Medium', priceDelta: 0 },
+                      { id: `opt_${Date.now()}_3`, name: 'Hot Spicy', priceDelta: 0 },
+                      { id: `opt_${Date.now()}_4`, name: 'Very Spicy', priceDelta: 0 },
+                    ])
+                  }
+                  className="px-2 py-1 rounded bg-neutral-100 hover:bg-neutral-200 text-neutral-700 text-[10.5px] font-semibold transition-colors flex items-center gap-1"
+                >
+                  <Zap className="w-3 h-3 text-red-600" />
+                  <span>+ Spice</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    handleAddVariantGroup('Meat / Protein', [
+                      { id: `opt_${Date.now()}_1`, name: 'Chicken', priceDelta: 0 },
+                      { id: `opt_${Date.now()}_2`, name: 'Beef', priceDelta: 50 },
+                      { id: `opt_${Date.now()}_3`, name: 'Mutton / Lamb', priceDelta: 90 },
+                    ])
+                  }
+                  className="px-2 py-1 rounded bg-neutral-100 hover:bg-neutral-200 text-neutral-700 text-[10.5px] font-semibold transition-colors flex items-center gap-1"
+                >
+                  <Zap className="w-3 h-3 text-neutral-700" />
+                  <span>+ Protein</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleAddVariantGroup('Custom Option')}
+                  className="px-2 py-1 rounded bg-neutral-900 hover:bg-black text-white text-[10.5px] font-semibold transition-colors flex items-center gap-1"
+                >
+                  <Plus className="w-3 h-3" />
+                  <span>Custom</span>
+                </button>
+              </div>
+            </div>
+
+            {/* List of Variant Groups */}
+            {variants.length > 0 ? (
+              <div className="space-y-3">
+                {variants.map((grp) => (
+                  <div
+                    key={grp.id}
+                    className="p-3 bg-neutral-50 rounded-xl border border-neutral-200 space-y-2.5"
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-1.5 flex-1">
+                        <Layers className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
+                        <input
+                          type="text"
+                          value={grp.name}
+                          onChange={(e) => handleUpdateGroupName(grp.id, e.target.value)}
+                          placeholder="Variant Group Name (e.g. Size, Crust, Spice)"
+                          className="px-2 py-1 text-xs font-bold text-neutral-900 bg-white border border-neutral-200 rounded-md flex-1 focus:outline-none focus:border-neutral-400"
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveVariantGroup(grp.id)}
+                        className="p-1 rounded text-neutral-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                        title="Remove Variant Group"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+
+                    {/* Options Table */}
+                    <div className="space-y-1.5 pl-5">
+                      {grp.options.map((opt) => (
+                        <div key={opt.id} className="flex items-center gap-2">
+                          <input
+                            type="text"
+                            value={opt.name}
+                            onChange={(e) => handleUpdateOption(grp.id, opt.id, 'name', e.target.value)}
+                            placeholder="Option label (e.g. Large, XXL, Boneless)"
+                            className="px-2 py-1 text-xs text-neutral-800 bg-white border border-neutral-200 rounded-md flex-1 focus:outline-none focus:border-neutral-400"
+                          />
+                          <div className="flex items-center gap-1 w-24 shrink-0">
+                            <span className="text-[10px] text-neutral-400 font-mono">+₱</span>
+                            <input
+                              type="number"
+                              value={opt.priceDelta}
+                              onChange={(e) =>
+                                handleUpdateOption(
+                                  grp.id,
+                                  opt.id,
+                                  'priceDelta',
+                                  parseFloat(e.target.value) || 0
+                                )
+                              }
+                              placeholder="0"
+                              className="w-full px-2 py-1 text-xs text-neutral-800 bg-white border border-neutral-200 rounded-md font-mono focus:outline-none focus:border-neutral-400"
+                            />
+                          </div>
+                          {grp.options.length > 1 && (
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveOptionFromGroup(grp.id, opt.id)}
+                              className="p-1 text-neutral-400 hover:text-red-500 transition-colors"
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
+                          )}
+                        </div>
+                      ))}
+
+                      <button
+                        type="button"
+                        onClick={() => handleAddOptionToGroup(grp.id)}
+                        className="text-[11px] font-semibold text-neutral-700 hover:text-neutral-900 flex items-center gap-1 pt-1"
+                      >
+                        <Plus className="w-3 h-3" />
+                        <span>Add Option</span>
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="p-3 bg-neutral-50/70 rounded-xl border border-dashed border-neutral-200 text-center text-xs text-neutral-400">
+                No variants configured yet. Use the quick buttons above (Size, Spice, Protein) or add Custom variants.
+              </div>
             )}
           </div>
 

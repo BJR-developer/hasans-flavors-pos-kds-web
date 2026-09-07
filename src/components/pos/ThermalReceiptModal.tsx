@@ -111,6 +111,11 @@ export function ThermalReceiptModal({ order, onClose }: ThermalReceiptModalProps
               {order.customerPhone && (
                 <div className="text-gray-600">Phone: {order.customerPhone}</div>
               )}
+              {order.specialNotes && (
+                <div className="text-gray-800 font-bold text-[9px] pt-1 border-t border-dotted border-gray-300">
+                  SPECIAL INSTRUCTIONS: {order.specialNotes}
+                </div>
+              )}
               {order.deliveryAddress && (
                 <div className="text-gray-600 text-[9px] leading-tight">
                   Addr: {order.deliveryAddress}
@@ -139,24 +144,30 @@ export function ThermalReceiptModal({ order, onClose }: ThermalReceiptModalProps
                       </span>
                     </div>
 
-                    {/* Modifiers & Portions Details */}
+                    {/* Modifiers, Custom Variants & Portions Details */}
                     <div className="pl-8 text-[9px] text-gray-500 space-y-0.5 mt-0.5">
-                      {item.portion?.priceDelta > 0 && (
-                        <div>• Portion: {item.portion.name} (+₱{item.portion.priceDelta})</div>
+                      {item.selectedVariants && item.selectedVariants.length > 0 ? (
+                        item.selectedVariants.map((v, idx) => (
+                          <div key={idx} className="font-medium text-gray-800">
+                            • {v.groupName}: {v.optionName} {v.priceDelta > 0 ? `(+₱${v.priceDelta})` : ''}
+                          </div>
+                        ))
+                      ) : (
+                        item.portion?.priceDelta > 0 && (
+                          <div>• Portion: {item.portion.name} (+₱{item.portion.priceDelta})</div>
+                        )
                       )}
-                      {item.spiceLevel && (
+                      {item.spiceLevel ? (
                         <div>
-                          • Spice: Level {item.spiceLevel} (
-                          {item.spiceLevel === 1
+                          • Spice: {item.spiceLevel === 1
                             ? 'Mild'
                             : item.spiceLevel === 2
                             ? 'Medium'
                             : item.spiceLevel === 3
-                            ? 'Spicy'
-                            : 'Fiery Special'}
-                          )
+                            ? 'Hot Spicy'
+                            : 'Very Spicy'}
                         </div>
-                      )}
+                      ) : null}
                       {item.selectedAddons?.map((addon) => (
                         <div key={addon.id}>
                           • Addon: {addon.name} (+₱{addon.price})

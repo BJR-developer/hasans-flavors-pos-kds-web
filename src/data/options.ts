@@ -17,9 +17,9 @@ export const ADDON_OPTIONS: AddonOption[] = [
 
 export const SPICE_LEVELS = [
   { level: 1, label: 'Mild', description: 'Gentle aromatic spices, child-friendly', icon: '🌱' },
-  { level: 2, label: 'Medium', description: 'Classic Pakistani heat with fragrant herbs', icon: '🌶️' },
-  { level: 3, label: 'Spicy', description: 'Authentic kick for spice lovers', icon: '🌶️🌶️' },
-  { level: 4, label: 'Fiery Hasan Special', description: 'High-heat Naga / green chilli blast', icon: '🔥🌶️' },
+  { level: 2, label: 'Medium', description: 'Classic heat with fragrant herbs', icon: '🌶️' },
+  { level: 3, label: 'Hot Spicy', description: 'Authentic kick for spice lovers', icon: '🌶️🌶️' },
+  { level: 4, label: 'Very Spicy', description: 'High-heat fiery chilli blast', icon: '🔥🌶️' },
 ];
 
 export const TABLES = [

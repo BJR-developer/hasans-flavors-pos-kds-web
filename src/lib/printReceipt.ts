@@ -23,16 +23,32 @@ export function generateThermalReceiptHtml(order: Order): string {
               .join('')
           : '';
 
+      const variants =
+        item.selectedVariants && item.selectedVariants.length > 0
+          ? item.selectedVariants
+              .map((v) => `<div class="sub-detail">• ${v.groupName}: ${v.optionName} ${v.priceDelta > 0 ? `(+₱${v.priceDelta})` : ''}</div>`)
+              .join('')
+          : '';
+
       const portion =
-        item.portion && item.portion.priceDelta > 0
+        (!variants && item.portion && item.portion.priceDelta > 0)
           ? `<div class="sub-detail">• Portion: ${item.portion.name} (+₱${item.portion.priceDelta})</div>`
           : '';
 
+      const spiceLabel =
+        item.spiceLevel === 1
+          ? 'Mild'
+          : item.spiceLevel === 2
+          ? 'Medium'
+          : item.spiceLevel === 3
+          ? 'Hot Spicy'
+          : item.spiceLevel === 4
+          ? 'Very Spicy'
+          : null;
+
       const spice =
-        item.spiceLevel && item.spiceLevel > 1
-          ? `<div class="sub-detail">• Spice: Level ${item.spiceLevel} (${
-              item.spiceLevel === 2 ? 'Medium' : item.spiceLevel === 3 ? 'Spicy' : 'Fiery Hasan'
-            })</div>`
+        spiceLabel
+          ? `<div class="sub-detail">• Spice: ${spiceLabel}</div>`
           : '';
 
       const note = item.specialNotes
@@ -46,7 +62,7 @@ export function generateThermalReceiptHtml(order: Order): string {
             <span class="desc">${item.dish.name}</span>
             <span class="price">₱${item.totalPrice.toLocaleString()}</span>
           </div>
-          ${portion || spice || addons || note ? `<div class="sub-details">${portion}${spice}${addons}${note}</div>` : ''}
+          ${variants || portion || spice || addons || note ? `<div class="sub-details">${variants}${portion}${spice}${addons}${note}</div>` : ''}
         </div>
       `;
     })
