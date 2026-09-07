@@ -7,7 +7,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import {
   UtensilsCrossed,
   ChefHat,
-  TableProperties,
+  History,
   Boxes,
   BarChart3,
   LogOut,
@@ -77,9 +77,9 @@ export function Navbar() {
         },
         {
           href: '/orders',
-          label: 'Orders',
-          icon: TableProperties,
-          badge: activeOrdersCount > 0 ? activeOrdersCount : null,
+          label: 'Order History',
+          icon: History,
+          badge: null,
         },
         {
           href: '/inventory',

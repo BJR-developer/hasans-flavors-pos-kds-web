@@ -1,10 +1,14 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   Check,
   ArrowRight,
   RotateCcw,
+  Printer,
+  Edit3,
+  XCircle,
 } from 'lucide-react';
 import { Order, OrderStatus } from '@/types';
 import { useUpdateOrderStatus, useToggleItemInKitchen } from '@/hooks/useRestaurantData';
@@ -13,9 +17,15 @@ import { playBumpChime } from '@/lib/audio';
 interface KdsTicketCardProps {
   order: Order;
   stationFilter?: string;
+  onPrint?: (order: Order) => void;
 }
 
-export function KdsTicketCard({ order, stationFilter = 'all' }: KdsTicketCardProps) {
+export function KdsTicketCard({
+  order,
+  stationFilter = 'all',
+  onPrint,
+}: KdsTicketCardProps) {
+  const router = useRouter();
   const updateStatus = useUpdateOrderStatus();
   const toggleItem = useToggleItemInKitchen();
 
@@ -35,7 +45,8 @@ export function KdsTicketCard({ order, stationFilter = 'all' }: KdsTicketCardPro
   const elapsedMinutes = Math.floor(elapsedSeconds / 60);
 
   // Minimal urgency indicator: standard vs urgent (>15m)
-  const isUrgent = order.status !== 'completed' && order.status !== 'cancelled' && elapsedMinutes >= 15;
+  const isUrgent =
+    order.status !== 'completed' && order.status !== 'cancelled' && elapsedMinutes >= 15;
 
   const displayedItems = order.items.filter((it) => {
     if (stationFilter === 'all') return true;
@@ -68,6 +79,12 @@ export function KdsTicketCard({ order, stationFilter = 'all' }: KdsTicketCardPro
     updateStatus.mutate({ orderId: order.id, status: prevStatus, tableNumber: order.tableNumber });
   };
 
+  const handleCancelOrder = () => {
+    if (window.confirm(`Are you sure you want to cancel ${order.orderNumber}? This will free the table.`)) {
+      updateStatus.mutate({ orderId: order.id, status: 'cancelled', tableNumber: order.tableNumber });
+    }
+  };
+
   const handleToggleItem = (cartItemId: string) => {
     playBumpChime();
     toggleItem.mutate({ orderId: order.id, cartItemId });
@@ -77,56 +94,64 @@ export function KdsTicketCard({ order, stationFilter = 'all' }: KdsTicketCardPro
     <div
       className={`bg-white rounded-xl border flex flex-col transition-all overflow-hidden ${
         isUrgent
-          ? 'border-[#BA1A20] shadow-xs'
-          : 'border-[#E5E5E5] hover:border-[#D4D4D4]'
+          ? 'border-red-400 shadow-2xs'
+          : 'border-neutral-200 hover:border-neutral-300'
       }`}
     >
       {/* Ticket Header */}
       <div
-        className={`px-4 py-2.5 border-b flex items-center justify-between ${
+        className={`px-3.5 py-2 border-b flex items-center justify-between gap-2 ${
           isUrgent
-            ? 'bg-[#FFF2F0] border-[#FFDAD6]'
-            : 'bg-[#FAFAFA] border-[#E5E5E5]'
+            ? 'bg-red-50/70 border-red-100'
+            : 'bg-neutral-50/80 border-neutral-100'
         }`}
       >
         <div className="flex items-center gap-1.5 flex-wrap">
-          <span className="font-mono font-black text-sm text-[#1F1F1F]">
+          <span className="font-mono font-bold text-xs text-neutral-900">
             {order.orderNumber}
           </span>
-          <span className="text-[11px] font-bold text-[#525252] px-2 py-0.5 rounded-md bg-white border border-[#E5E5E5]">
+          <span className="text-[10px] font-semibold text-neutral-600 px-1.5 py-0.5 rounded bg-white border border-neutral-200">
             {order.type === 'dine_in'
               ? order.tableNumber || 'Dine-In'
               : order.type === 'delivery'
               ? 'Delivery'
               : 'Takeout'}
           </span>
-          {/* Payment Status Indicator for Service / Kitchen Staff */}
           <span
-            className={`text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded ${
+            className={`text-[9px] font-bold uppercase px-1.5 py-0.5 rounded ${
               order.paymentStatus === 'paid'
-                ? 'bg-[#E8F5E9] text-[#2E7D32]'
-                : order.paymentStatus === 'partially_paid'
-                ? 'bg-amber-100 text-amber-900 border border-amber-300'
-                : 'bg-[#FFF8E1] text-[#B45309] border border-[#FFE082]'
+                ? 'bg-emerald-100 text-emerald-800'
+                : 'bg-amber-100 text-amber-900'
             }`}
           >
             {order.paymentStatus === 'paid' ? 'PAID' : 'UNPAID'}
           </span>
         </div>
 
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1.5 shrink-0">
           <span
-            className={`text-xs font-mono font-bold ${
-              isUrgent ? 'text-[#BA1A20]' : 'text-[#737373]'
+            className={`text-[11px] font-mono font-medium ${
+              isUrgent ? 'text-red-700 font-bold' : 'text-neutral-500'
             }`}
           >
             {elapsedMinutes}m ago
           </span>
+
+          {onPrint && (
+            <button
+              type="button"
+              onClick={() => onPrint(order)}
+              title="Print Receipt / Bill"
+              className="p-1 rounded text-neutral-400 hover:text-neutral-900 hover:bg-white transition-colors"
+            >
+              <Printer className="w-3.5 h-3.5" />
+            </button>
+          )}
         </div>
       </div>
 
       {/* Items List */}
-      <div className="p-3.5 flex-1 divide-y divide-[#F5F5F5] space-y-2 overflow-y-auto max-h-[300px]">
+      <div className="p-3.5 flex-1 divide-y divide-neutral-100 space-y-2 overflow-y-auto max-h-[260px]">
         {displayedItems.map((item) => {
           const isDone = !!item.completedInKitchen;
 
@@ -138,12 +163,12 @@ export function KdsTicketCard({ order, stationFilter = 'all' }: KdsTicketCardPro
                 isDone ? 'opacity-35' : 'opacity-100'
               }`}
             >
-              {/* Checkbox */}
+              {/* Minimal Checkbox */}
               <div
                 className={`w-4 h-4 rounded mt-0.5 flex items-center justify-center border transition-colors shrink-0 ${
                   isDone
-                    ? 'bg-[#1F1F1F] border-[#1F1F1F] text-white'
-                    : 'border-[#D4D4D4] bg-white group-hover:border-[#1F1F1F]'
+                    ? 'bg-neutral-900 border-neutral-900 text-white'
+                    : 'border-neutral-300 bg-white group-hover:border-neutral-600'
                 }`}
               >
                 {isDone && <Check className="w-3 h-3 stroke-[3]" />}
@@ -153,15 +178,15 @@ export function KdsTicketCard({ order, stationFilter = 'all' }: KdsTicketCardPro
               <div className="flex-1 min-w-0">
                 <div className="flex items-baseline gap-1.5">
                   <span
-                    className={`font-black text-xs ${
-                      isDone ? 'line-through text-[#737373]' : 'text-[#1F1F1F]'
+                    className={`font-bold text-xs ${
+                      isDone ? 'line-through text-neutral-400' : 'text-neutral-900'
                     }`}
                   >
-                    {item.quantity}x
+                    {item.quantity}×
                   </span>
                   <span
-                    className={`font-semibold text-xs leading-snug ${
-                      isDone ? 'line-through text-[#737373]' : 'text-[#1F1F1F]'
+                    className={`font-medium text-xs leading-snug ${
+                      isDone ? 'line-through text-neutral-400' : 'text-neutral-900'
                     }`}
                   >
                     {item.dish.name}
@@ -169,10 +194,10 @@ export function KdsTicketCard({ order, stationFilter = 'all' }: KdsTicketCardPro
                 </div>
 
                 {/* Modifiers */}
-                <div className="flex flex-wrap items-center gap-1 mt-0.5 text-[10px] text-[#737373]">
+                <div className="flex flex-wrap items-center gap-1 mt-0.5 text-[10px] text-neutral-500">
                   {item.portion?.priceDelta > 0 && <span>• {item.portion.name}</span>}
                   {item.spiceLevel && item.spiceLevel > 2 && (
-                    <span className="text-[#BA1A20] font-semibold">• Spicy</span>
+                    <span className="text-red-700 font-semibold">• Spicy</span>
                   )}
                   {item.selectedAddons?.map((a) => (
                     <span key={a.id}>• +{a.name}</span>
@@ -180,7 +205,7 @@ export function KdsTicketCard({ order, stationFilter = 'all' }: KdsTicketCardPro
                 </div>
 
                 {item.specialNotes && (
-                  <p className="text-[10px] text-[#B45309] mt-0.5 font-medium">
+                  <p className="text-[10px] text-amber-800 mt-0.5 font-medium">
                     Note: {item.specialNotes}
                   </p>
                 )}
@@ -190,51 +215,76 @@ export function KdsTicketCard({ order, stationFilter = 'all' }: KdsTicketCardPro
         })}
       </div>
 
-      {/* Bump Button */}
-      <div className="p-2.5 bg-[#FAFAFA] border-t border-[#E5E5E5] flex items-center gap-2">
-        {(order.status !== 'pending' && order.status !== 'sent_to_kitchen') && (
+      {/* Ticket Footer Actions */}
+      <div className="p-2.5 bg-neutral-50/60 border-t border-neutral-100 flex items-center justify-between gap-1.5">
+        <div className="flex items-center gap-1">
+          {/* Undo Status Step */}
+          {order.status !== 'pending' && order.status !== 'sent_to_kitchen' && (
+            <button
+              type="button"
+              onClick={handleBumpPrevious}
+              title="Revert Status"
+              className="p-1.5 rounded-lg border border-neutral-200 bg-white text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50 transition-colors"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+            </button>
+          )}
+
+          {/* Update Order in POS */}
           <button
             type="button"
-            onClick={handleBumpPrevious}
-            title="Undo / Back"
-            className="p-2 rounded-lg border border-[#E5E5E5] bg-white text-[#737373] hover:text-[#1F1F1F]"
+            onClick={() => router.push(`/pos?orderId=${order.id}`)}
+            title="Open in POS to add/remove items or settle bill"
+            className="flex items-center gap-1 px-2 py-1.5 rounded-lg border border-neutral-200 bg-white hover:bg-neutral-100 text-neutral-700 text-[11px] font-semibold transition-colors"
           >
-            <RotateCcw className="w-3.5 h-3.5" />
+            <Edit3 className="w-3 h-3" />
+            <span>Update Order</span>
           </button>
-        )}
 
+          {/* Cancel Order */}
+          <button
+            type="button"
+            onClick={handleCancelOrder}
+            title="Cancel this order"
+            className="p-1.5 rounded-lg text-neutral-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+          >
+            <XCircle className="w-3.5 h-3.5" />
+          </button>
+        </div>
+
+        {/* Bump Next Status Button */}
         <button
           type="button"
           onClick={handleBumpNext}
-          className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-bold text-white transition-colors ${
+          className={`flex items-center justify-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold text-white transition-colors shadow-2xs ${
             order.status === 'pending' || order.status === 'sent_to_kitchen'
-              ? 'bg-[#BA1A20] hover:bg-[#8B0000]'
+              ? 'bg-red-600 hover:bg-red-700'
               : order.status === 'preparing'
-              ? 'bg-[#1F1F1F] hover:bg-[#383838]'
+              ? 'bg-neutral-900 hover:bg-black'
               : order.status === 'ready'
               ? 'bg-blue-600 hover:bg-blue-700'
-              : 'bg-[#2E7D32] hover:bg-[#1B5E20]'
+              : 'bg-emerald-600 hover:bg-emerald-700'
           }`}
         >
           {(order.status === 'pending' || order.status === 'sent_to_kitchen') && (
             <>
-              <span>Start Cooking</span>
+              <span>Cook</span>
               <ArrowRight className="w-3 h-3" />
             </>
           )}
           {order.status === 'preparing' && (
             <>
-              <span>Mark Ready</span>
+              <span>Ready</span>
               <ArrowRight className="w-3 h-3" />
             </>
           )}
           {order.status === 'ready' && (
             <>
-              <span>Mark Served</span>
+              <span>Serve</span>
               <ArrowRight className="w-3 h-3" />
             </>
           )}
-          {order.status === 'served' && <span>Archive Order</span>}
+          {order.status === 'served' && <span>Complete</span>}
           {order.status === 'completed' && <span>Archived</span>}
         </button>
       </div>

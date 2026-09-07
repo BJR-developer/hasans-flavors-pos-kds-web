@@ -72,15 +72,14 @@ export function OrdersTable() {
   // Pre-filter data by status tabs
   const filteredData = useMemo(() => {
     return orders.filter((o) => {
-      if (statusFilter === 'unpaid') {
-        return o.paymentStatus === 'unpaid' || o.paymentStatus === 'partially_paid';
-      }
+      if (statusFilter === 'completed') return o.status === 'completed';
+      if (statusFilter === 'cancelled') return o.status === 'cancelled';
       if (statusFilter === 'open') {
         return o.status !== 'completed' && o.status !== 'cancelled';
       }
-      if (statusFilter === 'ready') return o.status === 'ready';
-      if (statusFilter === 'served') return o.status === 'served';
-      if (statusFilter === 'completed') return o.status === 'completed';
+      if (statusFilter === 'unpaid') {
+        return o.paymentStatus === 'unpaid' || o.paymentStatus === 'partially_paid';
+      }
       return true;
     });
   }, [orders, statusFilter]);
@@ -371,12 +370,24 @@ export function OrdersTable() {
 
   return (
     <div className="flex-1 flex flex-col p-4 lg:p-6 max-w-[1720px] mx-auto w-full space-y-4">
+      {/* Minimal Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-1 border-b border-neutral-200">
+        <div>
+          <h1 className="text-lg font-bold text-neutral-900 tracking-tight">
+            Order History &amp; Archive
+          </h1>
+          <p className="text-xs text-neutral-500">
+            Durable audit log of all completed, cancelled, and active dining tickets
+          </p>
+        </div>
+      </div>
+
       {/* Top Warning Banner for Unpaid Dine-in Orders */}
       {unpaidDineInOrders.length > 0 && (
-        <div className="p-3 bg-[#FFF8E1] border border-[#FFE082] rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 shadow-xs">
+        <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 shadow-2xs">
           <div className="flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 text-[#B45309] shrink-0" />
-            <span className="text-xs font-bold text-[#78350F]">
+            <AlertCircle className="w-4 h-4 text-amber-700 shrink-0" />
+            <span className="text-xs font-bold text-amber-900">
               {unpaidDineInOrders.length} Unpaid Dine-In Table{unpaidDineInOrders.length > 1 ? 's' : ''} currently open or served
             </span>
           </div>
@@ -384,8 +395,8 @@ export function OrdersTable() {
             {unpaidDineInOrders.slice(0, 6).map((o) => (
               <button
                 key={o.id}
-                onClick={() => setDetailOrder(o)}
-                className="px-2 py-1 rounded-md bg-white border border-[#FFE082] text-[11px] font-extrabold text-[#78350F] hover:bg-[#FEF3C7] transition-colors"
+                onClick={() => router.push(`/pos?orderId=${o.id}`)}
+                className="px-2 py-1 rounded-md bg-white border border-amber-300 text-[11px] font-bold text-amber-900 hover:bg-amber-100 transition-colors"
               >
                 {o.tableNumber || o.orderNumber}: ₱{o.total.toLocaleString()}
               </button>
@@ -399,10 +410,18 @@ export function OrdersTable() {
         {/* Status Filter Tabs */}
         <div className="flex items-center gap-1 overflow-x-auto no-scrollbar py-0.5">
           {[
-            { id: 'all', label: `All (${orders.length})` },
+            { id: 'all', label: `All History (${orders.length})` },
+            {
+              id: 'completed',
+              label: `Completed (${orders.filter((o) => o.status === 'completed').length})`,
+            },
+            {
+              id: 'cancelled',
+              label: `Cancelled (${orders.filter((o) => o.status === 'cancelled').length})`,
+            },
             {
               id: 'open',
-              label: `Open (${
+              label: `Active (${
                 orders.filter((o) => o.status !== 'completed' && o.status !== 'cancelled').length
               })`,
             },
@@ -413,18 +432,6 @@ export function OrdersTable() {
                   (o) => o.paymentStatus === 'unpaid' || o.paymentStatus === 'partially_paid'
                 ).length
               })`,
-            },
-            {
-              id: 'ready',
-              label: `Ready (${orders.filter((o) => o.status === 'ready').length})`,
-            },
-            {
-              id: 'served',
-              label: `Served (${orders.filter((o) => o.status === 'served').length})`,
-            },
-            {
-              id: 'completed',
-              label: `Completed (${orders.filter((o) => o.status === 'completed').length})`,
             },
           ].map((tab) => {
             const isSelected = statusFilter === tab.id;
