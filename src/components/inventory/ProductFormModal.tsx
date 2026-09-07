@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import { X, Sparkles, UploadCloud, Loader2, Trash2, CheckCircle2, Star, Plus, Layers, Zap } from 'lucide-react';
 import { Dish, Category, DishVariantGroup, DishVariantOption } from '@/types';
 import { useAddDish, useUpdateDish } from '@/hooks/useRestaurantData';
 import { SafeImage } from '@/components/common/SafeImage';
 import { supabase } from '@/lib/supabase';
+import { SelectDropdown, DropdownOption } from '@/components/common/SelectDropdown';
 
 interface ProductFormModalProps {
   isOpen: boolean;
@@ -60,7 +61,6 @@ function ProductFormContent({
   const [selectedPreviewIndex, setSelectedPreviewIndex] = useState<number>(0);
 
   const [description, setDescription] = useState(() => dishToEdit?.description || '');
-  const [spiceLevel, setSpiceLevel] = useState(() => dishToEdit?.spiceLevel || 2);
   const [preparationTime, setPreparationTime] = useState(
     () => dishToEdit?.preparationTime || '15-20 mins'
   );
@@ -68,6 +68,12 @@ function ProductFormContent({
   const [isChefSpecial, setIsChefSpecial] = useState(
     () => (dishToEdit ? dishToEdit.isChefSpecial || false : false)
   );
+
+  const categoryOptions: DropdownOption[] = useMemo(() => {
+    return categories
+      .filter((c) => c.id !== 'all')
+      .map((c) => ({ value: c.name, label: c.name }));
+  }, [categories]);
 
   // Custom Product Variants State
   const [variants, setVariants] = useState<DishVariantGroup[]>(() => {
@@ -279,6 +285,17 @@ function ProductFormContent({
       station = 'sides_drinks';
     }
 
+    // Derive spice level dynamically from variants if configured
+    let effectiveSpiceLevel = dishToEdit?.spiceLevel || 2;
+    const spiceGroup = variants.find((v) => v.name.toLowerCase().includes('spice'));
+    if (spiceGroup && spiceGroup.options.length > 0) {
+      const optName = spiceGroup.options[0].name.toLowerCase();
+      if (optName.includes('mild')) effectiveSpiceLevel = 1;
+      else if (optName.includes('medium')) effectiveSpiceLevel = 2;
+      else if (optName.includes('hot')) effectiveSpiceLevel = 3;
+      else if (optName.includes('fiery') || optName.includes('very')) effectiveSpiceLevel = 4;
+    }
+
     if (dishToEdit) {
       updateDishMutation.mutate({
         dishId: dishToEdit.id,
@@ -289,7 +306,7 @@ function ProductFormContent({
           imageUrl: primaryUrl,
           imageUrls,
           description: description.trim() || 'Delicious authentic Pakistani specialty.',
-          spiceLevel,
+          spiceLevel: effectiveSpiceLevel,
           preparationTime,
           inStock,
           isChefSpecial,
@@ -305,7 +322,7 @@ function ProductFormContent({
         imageUrl: primaryUrl,
         imageUrls,
         description: description.trim() || 'Delicious authentic Pakistani specialty.',
-        spiceLevel,
+        spiceLevel: effectiveSpiceLevel,
         isHalal: true,
         isChefSpecial,
         isPopular: false,
@@ -323,10 +340,10 @@ function ProductFormContent({
   const activePreviewUrl = imageUrls[selectedPreviewIndex] || imageUrls[0];
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-      <div className="relative bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border border-[#E5E5E5] my-8 animate-in fade-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+      <div className="relative bg-white rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden border border-[#E5E5E5] my-6 animate-in fade-in zoom-in-95 duration-200">
         {/* Modal Header */}
-        <div className="px-6 py-4 border-b border-[#E5E5E5] bg-[#FAFAFA] flex items-center justify-between">
+        <div className="px-5 sm:px-6 py-4 border-b border-[#E5E5E5] bg-[#FAFAFA] flex items-center justify-between">
           <div>
             <h3 className="text-base font-bold text-[#1F1F1F]">
               {dishToEdit ? 'Edit Menu Product' : 'Add New Menu Product'}
@@ -337,14 +354,14 @@ function ProductFormContent({
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-[#737373] hover:text-[#1F1F1F] hover:bg-white transition-colors"
+            className="p-1.5 rounded-lg text-[#737373] hover:text-[#1F1F1F] hover:bg-white transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Modal Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
+        <form onSubmit={handleSubmit} className="p-5 sm:p-6 space-y-4 max-h-[78vh] overflow-y-auto">
           {/* Dish Name */}
           <div>
             <label className="block text-xs font-bold text-[#1F1F1F] mb-1">
@@ -360,36 +377,49 @@ function ProductFormContent({
             />
           </div>
 
-          {/* Category & Price Row */}
-          <div className="grid grid-cols-2 gap-3">
+          {/* Category, Price & Prep Time in Responsive 3-Column Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
               <label className="block text-xs font-bold text-[#1F1F1F] mb-1">
-                Category
+                Category *
               </label>
-              <select
+              <SelectDropdown
                 value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                className="w-full px-3 py-2 text-xs rounded-lg border border-[#E5E5E5] bg-[#FAFAFA] text-[#1F1F1F] focus:bg-white focus:outline-none focus:border-[#1F1F1F]"
-              >
-                {categories.filter((c) => c.id !== 'all').map((c) => (
-                  <option key={c.id} value={c.name}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
+                options={categoryOptions}
+                onChange={(val) => setCategory(val)}
+                fullWidth
+              />
             </div>
 
             <div>
               <label className="block text-xs font-bold text-[#1F1F1F] mb-1">
                 Price (₱) *
               </label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-[#737373]">
+                  ₱
+                </span>
+                <input
+                  type="number"
+                  required
+                  min="1"
+                  placeholder="150"
+                  value={price}
+                  onChange={(e) => setPrice(e.target.value)}
+                  className="w-full pl-7 pr-3 py-2 text-xs font-semibold rounded-lg border border-[#E5E5E5] bg-[#FAFAFA] text-[#1F1F1F] focus:bg-white focus:outline-none focus:border-[#1F1F1F] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-[#1F1F1F] mb-1">
+                Prep Time
+              </label>
               <input
-                type="number"
-                required
-                min="1"
-                placeholder="150"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
+                type="text"
+                value={preparationTime}
+                onChange={(e) => setPreparationTime(e.target.value)}
+                placeholder="15-20 mins"
                 className="w-full px-3 py-2 text-xs rounded-lg border border-[#E5E5E5] bg-[#FAFAFA] text-[#1F1F1F] focus:bg-white focus:outline-none focus:border-[#1F1F1F]"
               />
             </div>
@@ -568,19 +598,19 @@ function ProductFormContent({
           </div>
 
           {/* Custom Product Variants Builder */}
-          <div className="pt-3 border-t border-neutral-200 space-y-3">
-            <div className="flex items-center justify-between">
+          <div className="pt-3 border-t border-[#E5E5E5] space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5">
               <div>
-                <label className="block text-xs font-bold text-neutral-900">
-                  Product Variants &amp; Sizing ({variants.length})
+                <label className="block text-xs font-bold text-[#1F1F1F]">
+                  Product Variants &amp; Options ({variants.length})
                 </label>
-                <p className="text-[11px] text-neutral-500">
-                  Define custom sizes (e.g. Regular, XXL), protein choices, or custom spice options
+                <p className="text-[11px] text-[#737373]">
+                  Define sizes, spice levels, protein choices, or custom options
                 </p>
               </div>
 
-              {/* Quick Prefill Dropdown / Buttons */}
-              <div className="flex items-center gap-1">
+              {/* Quick Prefill Buttons */}
+              <div className="flex flex-wrap items-center gap-1.5">
                 <button
                   type="button"
                   onClick={() =>
@@ -590,9 +620,9 @@ function ProductFormContent({
                       { id: `opt_${Date.now()}_3`, name: 'Family Bilao', priceDelta: 350 },
                     ])
                   }
-                  className="px-2 py-1 rounded bg-neutral-100 hover:bg-neutral-200 text-neutral-700 text-[10.5px] font-semibold transition-colors flex items-center gap-1"
+                  className="px-2.5 py-1.5 rounded-lg border border-[#E5E5E5] bg-white hover:bg-[#FAFAFA] text-[#1F1F1F] text-xs font-semibold shadow-2xs transition-colors flex items-center gap-1.5 cursor-pointer"
                 >
-                  <Zap className="w-3 h-3 text-amber-600" />
+                  <Zap className="w-3.5 h-3.5 text-amber-600" />
                   <span>+ Size</span>
                 </button>
 
@@ -606,9 +636,9 @@ function ProductFormContent({
                       { id: `opt_${Date.now()}_4`, name: 'Very Spicy', priceDelta: 0 },
                     ])
                   }
-                  className="px-2 py-1 rounded bg-neutral-100 hover:bg-neutral-200 text-neutral-700 text-[10.5px] font-semibold transition-colors flex items-center gap-1"
+                  className="px-2.5 py-1.5 rounded-lg border border-[#E5E5E5] bg-white hover:bg-[#FAFAFA] text-[#1F1F1F] text-xs font-semibold shadow-2xs transition-colors flex items-center gap-1.5 cursor-pointer"
                 >
-                  <Zap className="w-3 h-3 text-red-600" />
+                  <Zap className="w-3.5 h-3.5 text-red-600" />
                   <span>+ Spice</span>
                 </button>
 
@@ -621,19 +651,19 @@ function ProductFormContent({
                       { id: `opt_${Date.now()}_3`, name: 'Mutton / Lamb', priceDelta: 90 },
                     ])
                   }
-                  className="px-2 py-1 rounded bg-neutral-100 hover:bg-neutral-200 text-neutral-700 text-[10.5px] font-semibold transition-colors flex items-center gap-1"
+                  className="px-2.5 py-1.5 rounded-lg border border-[#E5E5E5] bg-white hover:bg-[#FAFAFA] text-[#1F1F1F] text-xs font-semibold shadow-2xs transition-colors flex items-center gap-1.5 cursor-pointer"
                 >
-                  <Zap className="w-3 h-3 text-neutral-700" />
+                  <Zap className="w-3.5 h-3.5 text-neutral-600" />
                   <span>+ Protein</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => handleAddVariantGroup('Custom Option')}
-                  className="px-2 py-1 rounded bg-neutral-900 hover:bg-black text-white text-[10.5px] font-semibold transition-colors flex items-center gap-1"
+                  className="px-2.5 py-1.5 rounded-lg bg-[#1F1F1F] hover:bg-black text-white text-xs font-semibold shadow-2xs transition-colors flex items-center gap-1.5 cursor-pointer"
                 >
-                  <Plus className="w-3 h-3" />
-                  <span>Custom</span>
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>+ Custom</span>
                 </button>
               </div>
             </div>
@@ -644,23 +674,23 @@ function ProductFormContent({
                 {variants.map((grp) => (
                   <div
                     key={grp.id}
-                    className="p-3 bg-neutral-50 rounded-xl border border-neutral-200 space-y-2.5"
+                    className="p-3 bg-[#FAFAFA] rounded-xl border border-[#E5E5E5] space-y-2.5"
                   >
                     <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-1.5 flex-1">
-                        <Layers className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
+                      <div className="flex items-center gap-1.5 flex-1 min-w-0">
+                        <Layers className="w-3.5 h-3.5 text-[#737373] shrink-0" />
                         <input
                           type="text"
                           value={grp.name}
                           onChange={(e) => handleUpdateGroupName(grp.id, e.target.value)}
-                          placeholder="Variant Group Name (e.g. Size, Crust, Spice)"
-                          className="px-2 py-1 text-xs font-bold text-neutral-900 bg-white border border-neutral-200 rounded-md flex-1 focus:outline-none focus:border-neutral-400"
+                          placeholder="Variant Group Name (e.g. Size, Spice, Protein)"
+                          className="px-2.5 py-1 text-xs font-bold text-[#1F1F1F] bg-white border border-[#E5E5E5] rounded-md flex-1 min-w-0 focus:outline-none focus:border-[#1F1F1F]"
                         />
                       </div>
                       <button
                         type="button"
                         onClick={() => handleRemoveVariantGroup(grp.id)}
-                        className="p-1 rounded text-neutral-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                        className="p-1 rounded-md text-[#A3A3A3] hover:text-[#BA1A20] hover:bg-[#FFF2F0] transition-colors shrink-0 cursor-pointer"
                         title="Remove Variant Group"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -668,49 +698,54 @@ function ProductFormContent({
                     </div>
 
                     {/* Options Table */}
-                    <div className="space-y-1.5 pl-5">
+                    <div className="space-y-2 sm:pl-5">
                       {grp.options.map((opt) => (
-                        <div key={opt.id} className="flex items-center gap-2">
+                        <div key={opt.id} className="flex flex-col sm:flex-row sm:items-center gap-2">
                           <input
                             type="text"
                             value={opt.name}
                             onChange={(e) => handleUpdateOption(grp.id, opt.id, 'name', e.target.value)}
-                            placeholder="Option label (e.g. Large, XXL, Boneless)"
-                            className="px-2 py-1 text-xs text-neutral-800 bg-white border border-neutral-200 rounded-md flex-1 focus:outline-none focus:border-neutral-400"
+                            placeholder="Option label (e.g. Regular, Mild, Chicken)"
+                            className="flex-1 min-w-0 px-3 py-1.5 text-xs text-[#1F1F1F] bg-white border border-[#E5E5E5] rounded-lg focus:outline-none focus:border-[#1F1F1F] placeholder-[#A3A3A3]"
                           />
-                          <div className="flex items-center gap-1 w-24 shrink-0">
-                            <span className="text-[10px] text-neutral-400 font-mono">+₱</span>
-                            <input
-                              type="number"
-                              value={opt.priceDelta}
-                              onChange={(e) =>
-                                handleUpdateOption(
-                                  grp.id,
-                                  opt.id,
-                                  'priceDelta',
-                                  parseFloat(e.target.value) || 0
-                                )
-                              }
-                              placeholder="0"
-                              className="w-full px-2 py-1 text-xs text-neutral-800 bg-white border border-neutral-200 rounded-md font-mono focus:outline-none focus:border-neutral-400"
-                            />
+                          <div className="flex items-center gap-2">
+                            <div className="relative flex-1 sm:w-28 shrink-0">
+                              <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[11px] font-semibold text-[#737373] pointer-events-none">
+                                +₱
+                              </span>
+                              <input
+                                type="number"
+                                value={opt.priceDelta}
+                                onChange={(e) =>
+                                  handleUpdateOption(
+                                    grp.id,
+                                    opt.id,
+                                    'priceDelta',
+                                    parseFloat(e.target.value) || 0
+                                  )
+                                }
+                                placeholder="0"
+                                className="w-full pl-7 pr-2.5 py-1.5 text-xs font-semibold text-[#1F1F1F] bg-white border border-[#E5E5E5] rounded-lg focus:outline-none focus:border-[#1F1F1F] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                              />
+                            </div>
+                            {grp.options.length > 1 && (
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveOptionFromGroup(grp.id, opt.id)}
+                                className="p-1.5 text-[#A3A3A3] hover:text-[#BA1A20] hover:bg-[#FFF2F0] rounded-lg transition-colors shrink-0 cursor-pointer"
+                                title="Remove option"
+                              >
+                                <X className="w-3.5 h-3.5" />
+                              </button>
+                            )}
                           </div>
-                          {grp.options.length > 1 && (
-                            <button
-                              type="button"
-                              onClick={() => handleRemoveOptionFromGroup(grp.id, opt.id)}
-                              className="p-1 text-neutral-400 hover:text-red-500 transition-colors"
-                            >
-                              <X className="w-3 h-3" />
-                            </button>
-                          )}
                         </div>
                       ))}
 
                       <button
                         type="button"
                         onClick={() => handleAddOptionToGroup(grp.id)}
-                        className="text-[11px] font-semibold text-neutral-700 hover:text-neutral-900 flex items-center gap-1 pt-1"
+                        className="text-[11px] font-semibold text-[#525252] hover:text-[#1F1F1F] flex items-center gap-1 pt-1 cursor-pointer"
                       >
                         <Plus className="w-3 h-3" />
                         <span>Add Option</span>
@@ -720,8 +755,8 @@ function ProductFormContent({
                 ))}
               </div>
             ) : (
-              <div className="p-3 bg-neutral-50/70 rounded-xl border border-dashed border-neutral-200 text-center text-xs text-neutral-400">
-                No variants configured yet. Use the quick buttons above (Size, Spice, Protein) or add Custom variants.
+              <div className="p-3 bg-[#FAFAFA] rounded-xl border border-dashed border-[#E5E5E5] text-center text-xs text-[#737373]">
+                No variants configured yet. Use the quick buttons above (+ Size, + Spice, + Protein) or add Custom options.
               </div>
             )}
           </div>
@@ -738,38 +773,6 @@ function ProductFormContent({
               onChange={(e) => setDescription(e.target.value)}
               className="w-full px-3 py-2 text-xs rounded-lg border border-[#E5E5E5] bg-[#FAFAFA] text-[#1F1F1F] focus:bg-white focus:outline-none focus:border-[#1F1F1F]"
             />
-          </div>
-
-          {/* Spice & Prep Time */}
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs font-bold text-[#1F1F1F] mb-1">
-                Spice Level (1 - 4)
-              </label>
-              <select
-                value={spiceLevel}
-                onChange={(e) => setSpiceLevel(parseInt(e.target.value, 10))}
-                className="w-full px-3 py-2 text-xs rounded-lg border border-[#E5E5E5] bg-[#FAFAFA] text-[#1F1F1F] focus:bg-white focus:outline-none focus:border-[#1F1F1F]"
-              >
-                <option value={1}>Level 1 - Mild</option>
-                <option value={2}>Level 2 - Medium</option>
-                <option value={3}>Level 3 - Spicy</option>
-                <option value={4}>Level 4 - Fiery Special</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-[#1F1F1F] mb-1">
-                Prep Time
-              </label>
-              <input
-                type="text"
-                value={preparationTime}
-                onChange={(e) => setPreparationTime(e.target.value)}
-                placeholder="15-20 mins"
-                className="w-full px-3 py-2 text-xs rounded-lg border border-[#E5E5E5] bg-[#FAFAFA] text-[#1F1F1F] focus:bg-white focus:outline-none focus:border-[#1F1F1F]"
-              />
-            </div>
           </div>
 
           {/* Stock & Chef Special Toggles */}

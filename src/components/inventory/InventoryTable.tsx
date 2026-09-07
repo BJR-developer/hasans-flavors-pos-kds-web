@@ -41,6 +41,7 @@ import {
 } from '@/hooks/useRestaurantData';
 import { ProductFormModal } from './ProductFormModal';
 import { SafeImage } from '@/components/common/SafeImage';
+import { SelectDropdown, DropdownOption } from '@/components/common/SelectDropdown';
 
 const STORAGE_KEY = 'hasans_inventory_prefs_v1';
 
@@ -252,6 +253,65 @@ export function InventoryTable() {
     const [id, dir] = key.split('-');
     setSorting([{ id, desc: dir === 'desc' }]);
   };
+
+  // Dropdown options
+  const categoryOptions: DropdownOption[] = useMemo(() => {
+    const opts: DropdownOption[] = [
+      {
+        value: 'all',
+        label: 'All Categories',
+        badge: categories.length > 0 ? categories.length - 1 : 0,
+      },
+    ];
+    categories.forEach((c) => {
+      if (c.id !== 'all') {
+        const count = dishes.filter((d) => d.category === c.name).length;
+        opts.push({
+          value: c.id,
+          label: c.name,
+          badge: count,
+        });
+      }
+    });
+    return opts;
+  }, [categories, dishes]);
+
+  const priceOptions: DropdownOption[] = useMemo(
+    () => [
+      { value: 'all', label: 'All Prices' },
+      { value: 'under150', label: 'Under ₱150' },
+      { value: '150to300', label: '₱150 - ₱300' },
+      { value: 'above300', label: 'Above ₱300' },
+      { value: 'custom', label: 'Custom Range...' },
+    ],
+    []
+  );
+
+  const sortOptions: DropdownOption[] = useMemo(
+    () => [
+      { value: 'name-asc', label: 'Name (A → Z)' },
+      { value: 'name-desc', label: 'Name (Z → A)' },
+      { value: 'price-asc', label: 'Price (Low → High)' },
+      { value: 'price-desc', label: 'Price (High → Low)' },
+      { value: 'category-asc', label: 'Category' },
+      { value: 'inStock-desc', label: 'Stock (Available first)' },
+      { value: 'updatedAt-desc', label: 'Last Update (Newest first)' },
+      { value: 'updatedAt-asc', label: 'Last Update (Oldest first)' },
+    ],
+    []
+  );
+
+  const pageSizeOptions: DropdownOption[] = useMemo(
+    () => [
+      { value: 12, label: '12 per page' },
+      { value: 25, label: '25 per page' },
+      { value: 50, label: '50 per page' },
+      { value: 100, label: '100 per page' },
+      { value: 250, label: '250 per page' },
+      { value: 500, label: '500 per page' },
+    ],
+    []
+  );
 
   const columns = useMemo<ColumnDef<Dish>[]>(
     () => [
@@ -596,32 +656,64 @@ export function InventoryTable() {
       )}
 
       {/* Minimalist Filter & Sort Bar */}
-      <div className="space-y-2.5">
+      <div className="space-y-3">
         {/* Row 1: Segmented Status Filter Tabs + Clear Action */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
-          {/* Status Tabs */}
-          <div className="flex items-center gap-1 overflow-x-auto no-scrollbar py-0.5 bg-[#F5F5F5] p-1 rounded-lg border border-[#E5E5E5]/60">
+          {/* Status Tabs - Tactile Selection Buttons */}
+          <div className="flex flex-wrap items-center gap-1.5 p-1 bg-[#F5F5F5] rounded-xl border border-[#E5E5E5]/80">
             {[
-              { id: 'all', label: `All Items (${dishes.length})` },
-              { id: 'instock', label: `Available (${dishes.filter((d) => d.inStock).length})` },
-              { id: 'outofstock', label: `Out of Stock (${dishes.filter((d) => !d.inStock).length})` },
-              { id: 'special', label: `Chef's Special (${dishes.filter((d) => d.isChefSpecial).length})` },
+              {
+                id: 'all',
+                label: 'All Items',
+                count: dishes.length,
+                badgeActive: 'bg-[#1F1F1F] text-white',
+                badgeInactive: 'bg-[#E5E5E5] text-[#525252]',
+              },
+              {
+                id: 'instock',
+                label: 'Available',
+                count: dishes.filter((d) => d.inStock).length,
+                badgeActive: 'bg-[#166534] text-white',
+                badgeInactive: 'bg-[#E8F5E9] text-[#2E7D32]',
+              },
+              {
+                id: 'outofstock',
+                label: 'Out of Stock',
+                count: dishes.filter((d) => !d.inStock).length,
+                badgeActive: 'bg-[#991B1B] text-white',
+                badgeInactive: 'bg-[#FFF2F0] text-[#BA1A20]',
+              },
+              {
+                id: 'special',
+                label: "Chef's Special",
+                count: dishes.filter((d) => d.isChefSpecial).length,
+                badgeActive: 'bg-[#B45309] text-white',
+                badgeInactive: 'bg-[#FEF3C7] text-[#B45309]',
+              },
             ].map((tab) => {
               const isSelected = stockFilter === tab.id;
               return (
                 <button
                   key={tab.id}
+                  type="button"
                   onClick={() => {
                     setStockFilter(tab.id as 'all' | 'instock' | 'outofstock' | 'special');
                     table.setPageIndex(0);
                   }}
-                  className={`px-3 py-1.5 rounded-md text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer select-none ${
                     isSelected
-                      ? 'bg-white text-[#1F1F1F] shadow-xs'
-                      : 'text-[#737373] hover:text-[#1F1F1F]'
+                      ? 'bg-white text-[#1F1F1F] shadow-2xs border border-[#E5E5E5]'
+                      : 'text-[#737373] hover:text-[#1F1F1F] hover:bg-white/60'
                   }`}
                 >
-                  {tab.label}
+                  <span>{tab.label}</span>
+                  <span
+                    className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
+                      isSelected ? tab.badgeActive : tab.badgeInactive
+                    }`}
+                  >
+                    {tab.count}
+                  </span>
                 </button>
               );
             })}
@@ -647,40 +739,27 @@ export function InventoryTable() {
         </div>
 
         {/* Row 2: Category Dropdown, Price Filter, Sort Dropdown & Search Input */}
-        <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
+        <div className="flex flex-wrap items-center justify-between gap-2.5 pt-0.5">
           <div className="flex flex-wrap items-center gap-2">
-            {/* Category Filter */}
-            <select
+            {/* Category Filter Dropdown */}
+            <SelectDropdown
               value={selectedCat}
-              onChange={(e) => {
-                setSelectedCat(e.target.value);
+              options={categoryOptions}
+              onChange={(val) => {
+                setSelectedCat(val);
                 table.setPageIndex(0);
               }}
-              className="px-2.5 py-1.5 rounded-lg border border-[#E5E5E5] bg-white text-xs font-medium text-[#1F1F1F] hover:border-[#D4D4D4] focus:outline-none focus:border-[#1F1F1F] transition-colors cursor-pointer"
-            >
-              <option value="all">All Categories ({categories.length > 0 ? categories.length - 1 : 0})</option>
-              {categories.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
+            />
 
-            {/* Price Filter */}
-            <select
+            {/* Price Filter Dropdown */}
+            <SelectDropdown
               value={priceFilter}
-              onChange={(e) => {
-                setPriceFilter(e.target.value as any);
+              options={priceOptions}
+              onChange={(val) => {
+                setPriceFilter(val);
                 table.setPageIndex(0);
               }}
-              className="px-2.5 py-1.5 rounded-lg border border-[#E5E5E5] bg-white text-xs font-medium text-[#1F1F1F] hover:border-[#D4D4D4] focus:outline-none focus:border-[#1F1F1F] transition-colors cursor-pointer"
-            >
-              <option value="all">All Prices</option>
-              <option value="under150">Under ₱150</option>
-              <option value="150to300">₱150 - ₱300</option>
-              <option value="above300">Above ₱300</option>
-              <option value="custom">Custom Range...</option>
-            </select>
+            />
 
             {/* Custom Price Range Input Fields */}
             {priceFilter === 'custom' && (
@@ -727,24 +806,13 @@ export function InventoryTable() {
               </div>
             )}
 
-            {/* Minimalist Sort Dropdown */}
-            <div className="flex items-center gap-1.5">
-              <span className="text-[11px] font-semibold text-[#737373] hidden sm:inline">Sort:</span>
-              <select
-                value={currentSortKey}
-                onChange={(e) => handleQuickSortChange(e.target.value)}
-                className="px-2.5 py-1.5 rounded-lg border border-[#E5E5E5] bg-white text-xs font-medium text-[#1F1F1F] hover:border-[#D4D4D4] focus:outline-none focus:border-[#1F1F1F] transition-colors cursor-pointer"
-              >
-                <option value="name-asc">Name (A → Z)</option>
-                <option value="name-desc">Name (Z → A)</option>
-                <option value="price-asc">Price (Low → High)</option>
-                <option value="price-desc">Price (High → Low)</option>
-                <option value="category-asc">Category</option>
-                <option value="inStock-desc">Stock Status (Available first)</option>
-                <option value="updatedAt-desc">Last Update (Newest first)</option>
-                <option value="updatedAt-asc">Last Update (Oldest first)</option>
-              </select>
-            </div>
+            {/* Sort Dropdown */}
+            <SelectDropdown
+              value={currentSortKey}
+              options={sortOptions}
+              labelPrefix="Sort: "
+              onChange={(val) => handleQuickSortChange(val)}
+            />
           </div>
 
           {/* Search Input with Shortcut */}
@@ -899,21 +967,15 @@ export function InventoryTable() {
             {/* Page Size Selector */}
             <div className="flex items-center gap-1.5">
               <span className="text-[11px] text-[#737373] whitespace-nowrap">Per table:</span>
-              <select
+              <SelectDropdown
                 value={table.getState().pagination.pageSize}
-                onChange={(e) => {
-                  table.setPageSize(Number(e.target.value));
+                options={pageSizeOptions}
+                onChange={(val) => {
+                  table.setPageSize(Number(val));
                   table.setPageIndex(0);
                 }}
-                className="px-2 py-1 rounded-md border border-[#E5E5E5] bg-white text-xs font-semibold text-[#1F1F1F] hover:border-[#D4D4D4] focus:outline-none focus:border-[#1F1F1F] transition-colors cursor-pointer"
-              >
-                <option value={12}>12 items</option>
-                <option value={25}>25 items</option>
-                <option value={50}>50 items</option>
-                <option value={100}>100 items</option>
-                <option value={250}>250 items</option>
-                <option value={500}>500 items</option>
-              </select>
+                align="right"
+              />
             </div>
 
             {/* Prev / Next Pagination Controls */}
