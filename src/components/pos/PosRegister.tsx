@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useState, useMemo, useEffect, useRef } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Search, X, SlidersHorizontal, AlertCircle, Keyboard } from 'lucide-react';
 import { Dish, CartItem, Order } from '@/types';
-import { useDishes, useCategories } from '@/hooks/useRestaurantData';
+import { useDishes, useCategories, useOrders } from '@/hooks/useRestaurantData';
 import { PosCartPane } from './PosCartPane';
 import { DishCustomizerModal } from './DishCustomizerModal';
 import { ThermalReceiptModal } from './ThermalReceiptModal';
@@ -13,8 +14,11 @@ import { SafeImage } from '@/components/common/SafeImage';
 import { PORTION_OPTIONS } from '@/data/options';
 
 export function PosRegister() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const { data: dishes = [] } = useDishes();
   const { data: categories = [] } = useCategories();
+  const { data: allOrders = [] } = useOrders();
 
   // Filters
   const [selectedCatId, setSelectedCatId] = useState<string>('all');
@@ -26,8 +30,27 @@ export function PosRegister() {
   const [receiptOrder, setReceiptOrder] = useState<Order | null>(null);
   const [detailOrder, setDetailOrder] = useState<Order | null>(null);
   const [isShortcutsModalOpen, setIsShortcutsModalOpen] = useState<boolean>(false);
+  const [loadedOrder, setLoadedOrder] = useState<Order | null>(null);
 
   const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // Sync loadedOrder with URL search params
+  useEffect(() => {
+    const targetId =
+      searchParams.get('orderId') ||
+      searchParams.get('settleOrder') ||
+      searchParams.get('payOrder') ||
+      searchParams.get('addToOrder') ||
+      searchParams.get('add_to_order');
+
+    if (targetId && allOrders.length > 0) {
+      const found = allOrders.find((o) => o.id === targetId);
+      if (found) {
+        setLoadedOrder(found);
+        setCartItems(found.items || []);
+      }
+    }
+  }, [searchParams, allOrders]);
 
   // Global Keyboard Shortcuts Listener
   useEffect(() => {
@@ -171,6 +194,36 @@ export function PosRegister() {
     <div className="flex-1 flex flex-col md:flex-row min-h-[calc(100vh-3.5rem)] bg-[#FAFAFA] relative">
       {/* Menu Catalog Pane */}
       <div className="flex-1 min-w-0 flex flex-col">
+        {/* Minimal Banner when Managing an Existing Order */}
+        {loadedOrder && (
+          <div className="bg-neutral-900 text-white px-4 py-2.5 flex items-center justify-between text-xs sticky top-0 z-20 border-b border-neutral-800">
+            <div className="flex items-center gap-2">
+              <span className="font-mono font-bold">{loadedOrder.orderNumber}</span>
+              <span className="text-neutral-500">•</span>
+              <span className="text-neutral-300">
+                Managing: {loadedOrder.type === 'dine_in' ? (loadedOrder.tableNumber || 'Dine-In') : loadedOrder.customerName}
+              </span>
+              <span className="text-neutral-500">•</span>
+              <span className={`px-2 py-0.5 rounded text-[10px] font-semibold uppercase ${
+                loadedOrder.paymentStatus === 'paid' ? 'bg-emerald-800 text-emerald-100' : 'bg-amber-800 text-amber-100'
+              }`}>
+                {loadedOrder.paymentStatus}
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setLoadedOrder(null);
+                setCartItems([]);
+                router.replace('/pos');
+              }}
+              className="text-[11px] text-neutral-400 hover:text-white transition-colors underline"
+            >
+              Close (New Order)
+            </button>
+          </div>
+        )}
+
         {/* Minimal Category & Search Bar */}
         <div className="px-4 sm:px-5 py-2.5 bg-white border-b border-[#E5E5E5] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shrink-0 sticky top-14 z-10">
           {/* Categories with IMAGES for Fast Visual Selection */}
@@ -366,6 +419,12 @@ export function PosRegister() {
           onClearCart={() => setCartItems([])}
           onOrderCompleted={(order) => setReceiptOrder(order)}
           onViewOrderDetails={(order) => setDetailOrder(order)}
+          loadedOrder={loadedOrder}
+          onCancelLoadedOrder={() => {
+            setLoadedOrder(null);
+            setCartItems([]);
+            router.replace('/pos');
+          }}
         />
       </aside>
 
@@ -398,16 +457,11 @@ export function PosRegister() {
         </div>
       )}
 
-      {/* Modals */}
+      {/* Modals - OrderDetailsModal first, ThermalReceiptModal after for proper layering */}
       <DishCustomizerModal
         dish={customizingDish}
         onClose={() => setCustomizingDish(null)}
         onAddToCart={handleAddCustomizedItem}
-      />
-
-      <ThermalReceiptModal
-        order={receiptOrder}
-        onClose={() => setReceiptOrder(null)}
       />
 
       <OrderDetailsModal
@@ -416,6 +470,16 @@ export function PosRegister() {
         onPrintReceipt={(order) => {
           setReceiptOrder(order);
         }}
+        onOpenInPos={(order) => {
+          setLoadedOrder(order);
+          setCartItems(order.items || []);
+          setDetailOrder(null);
+        }}
+      />
+
+      <ThermalReceiptModal
+        order={receiptOrder}
+        onClose={() => setReceiptOrder(null)}
       />
 
       <KeyboardShortcutsModal

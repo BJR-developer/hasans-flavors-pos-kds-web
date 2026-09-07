@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   useReactTable,
   getCoreRowModel,
@@ -32,6 +33,7 @@ import { ThermalReceiptModal } from '../pos/ThermalReceiptModal';
 import { OrderDetailsModal } from './OrderDetailsModal';
 
 export function OrdersTable() {
+  const router = useRouter();
   const { data: orders = [] } = useOrders();
   const updateStatusMutation = useUpdateOrderStatus();
   const updatePaymentMutation = useUpdateOrderPayment();
@@ -247,25 +249,21 @@ export function OrdersTable() {
 
           return (
             <div className="flex items-center justify-end gap-1.5">
-              {/* View / Manage Details Modal */}
-              <button
-                onClick={() => setDetailOrder(o)}
-                title="View & Settle Order"
-                className="p-1.5 rounded-lg text-[#525252] hover:text-[#1F1F1F] hover:bg-[#F5F5F5] transition-colors"
-              >
-                <Eye className="w-3.5 h-3.5" />
-              </button>
+              {/* Left: Open in POS / Manage in POS Action */}
+              {o.status !== 'completed' && o.status !== 'cancelled' ? (
+                <button
+                  onClick={() => router.push(`/pos?orderId=${o.id}`)}
+                  className={`px-2.5 py-1 rounded-md text-[11px] font-semibold transition-colors shadow-2xs ${
+                    !isFullyPaid
+                      ? 'bg-neutral-900 hover:bg-black text-white'
+                      : 'bg-neutral-100 hover:bg-neutral-200 text-neutral-800'
+                  }`}
+                >
+                  {!isFullyPaid ? 'Open in POS' : 'Manage in POS'}
+                </button>
+              ) : null}
 
-              {/* Print Slip (Bill if unpaid, Receipt if paid) */}
-              <button
-                onClick={() => setReceiptOrder(o)}
-                title={isFullyPaid ? 'Print Receipt' : 'Print Bill'}
-                className="p-1.5 rounded-lg text-[#525252] hover:text-[#1F1F1F] hover:bg-[#F5F5F5] transition-colors"
-              >
-                <Printer className="w-3.5 h-3.5" />
-              </button>
-
-              {/* Quick Status Progression Buttons */}
+              {/* Middle: Quick Status Progression Buttons */}
               {(o.status === 'pending' || o.status === 'sent_to_kitchen') && (
                 <button
                   onClick={() => updateStatusMutation.mutate({ orderId: o.id, status: 'preparing' })}
@@ -293,16 +291,6 @@ export function OrdersTable() {
                 </button>
               )}
 
-              {/* Pay Action for Unpaid */}
-              {!isFullyPaid && (
-                <button
-                  onClick={() => setDetailOrder(o)}
-                  className="px-2.5 py-1 rounded bg-[#2E7D32] hover:bg-[#1B5E20] text-[11px] font-bold text-white shadow-xs"
-                >
-                  Pay
-                </button>
-              )}
-
               {/* Close Order when Served & Paid */}
               {isFullyPaid && o.status === 'served' && (
                 <button
@@ -318,6 +306,15 @@ export function OrdersTable() {
                   Close
                 </button>
               )}
+
+              {/* Right: Print Slip (Bill if unpaid, Receipt if paid) */}
+              <button
+                onClick={() => setReceiptOrder(o)}
+                title={isFullyPaid ? 'Print Receipt' : 'Print Bill'}
+                className="p-1.5 rounded-lg text-[#525252] hover:text-[#1F1F1F] hover:bg-[#F5F5F5] transition-colors"
+              >
+                <Printer className="w-3.5 h-3.5" />
+              </button>
             </div>
           );
         },
@@ -581,18 +578,18 @@ export function OrdersTable() {
         </div>
       </div>
 
-      {/* Modals */}
-      <ThermalReceiptModal
-        order={receiptOrder}
-        onClose={() => setReceiptOrder(null)}
-      />
-
+      {/* Modals - OrderDetailsModal first, ThermalReceiptModal on top (z-[70]) */}
       <OrderDetailsModal
         order={detailOrder}
         onClose={() => setDetailOrder(null)}
         onPrintReceipt={(order) => {
           setReceiptOrder(order);
         }}
+      />
+
+      <ThermalReceiptModal
+        order={receiptOrder}
+        onClose={() => setReceiptOrder(null)}
       />
     </div>
   );

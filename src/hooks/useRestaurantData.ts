@@ -15,6 +15,7 @@ import {
   updateOrderStatusInDB,
   updateOrderPaymentInDB,
   addItemsToOrderInDB,
+  updateOrderItemsInDB,
   applyDiscountToOrderInDB,
   fetchTablesFromDB,
   updateTableStatusInDB,
@@ -234,6 +235,21 @@ export function useAddItemsToOrder() {
   return useMutation({
     mutationFn: async ({ orderId, items }: { orderId: string; items: CartItem[] }) => {
       return addItemsToOrderInDB(orderId, items);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.orders });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.dailyStats });
+    },
+  });
+}
+
+// Full Update Items for an Existing Order (add/remove/modify in POS)
+export function useUpdateOrderItems() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ orderId, items }: { orderId: string; items: CartItem[] }) => {
+      return updateOrderItemsInDB(orderId, items);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.orders });

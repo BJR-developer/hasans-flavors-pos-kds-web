@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import { PosRegister } from '@/components/pos/PosRegister';
 import { useAuthStore } from '@/lib/auth';
@@ -72,5 +72,15 @@ export default function PosPage() {
     );
   }
 
-  return <PosRegister />;
+  return (
+    <Suspense
+      fallback={
+        <div className="flex-1 flex items-center justify-center p-6 bg-[#FAFAFA] min-h-[calc(100vh-56px)]">
+          <div className="w-6 h-6 border-2 border-[#BA1A20] border-t-transparent rounded-full animate-spin" />
+        </div>
+      }
+    >
+      <PosRegister />
+    </Suspense>
+  );
 }

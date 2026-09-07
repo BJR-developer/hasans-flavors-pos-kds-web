@@ -1,7 +1,7 @@
 'use client';
 
-import React from 'react';
-import { Printer, X } from 'lucide-react';
+import React, { useEffect } from 'react';
+import { Printer, X, CornerDownLeft } from 'lucide-react';
 import { Order } from '@/types';
 import { printThermalReceipt } from '@/lib/printReceipt';
 
@@ -17,6 +17,21 @@ export function ThermalReceiptModal({ order, onClose }: ThermalReceiptModalProps
     printThermalReceipt(order);
   };
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        printThermalReceipt(order);
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        onClose();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [order, onClose]);
+
   const formattedDate = new Date(order.createdAt).toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric',
@@ -28,7 +43,7 @@ export function ThermalReceiptModal({ order, onClose }: ThermalReceiptModalProps
   });
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+    <div className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
       <div className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-[#E9E8E7] my-8 animate-in fade-in zoom-in-95 duration-200">
         {/* Modal Top Control Bar (Hidden when printing) */}
         <div className="flex items-center justify-between px-5 py-3.5 bg-[#F4F3F2] border-b border-[#E9E8E7]">
@@ -39,31 +54,13 @@ export function ThermalReceiptModal({ order, onClose }: ThermalReceiptModalProps
                 ? 'Official Sales Receipt (80mm)'
                 : 'Guest Bill / Table Check (80mm)'}
             </span>
-            <span
-              className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${
-                order.paymentStatus === 'paid'
-                  ? 'bg-green-100 text-green-800'
-                  : 'bg-amber-100 text-amber-800'
-              }`}
-            >
-              {order.paymentStatus}
-            </span>
           </div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={handlePrint}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-[#BA1A20] hover:bg-[#8B0000] text-white text-xs font-bold transition-all shadow-xs"
-            >
-              <Printer className="w-3.5 h-3.5" />
-              <span>{order.paymentStatus === 'paid' ? 'Print Receipt' : 'Print Bill'}</span>
-            </button>
-            <button
-              onClick={onClose}
-              className="p-1.5 rounded-lg text-[#8F6F6C] hover:text-[#2D2926] hover:bg-white transition-all"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
+          <button
+            onClick={onClose}
+            className="p-1.5 rounded-lg text-[#8F6F6C] hover:text-[#2D2926] hover:bg-white transition-all"
+          >
+            <X className="w-4 h-4" />
+          </button>
         </div>
 
         {/* Scrollable Receipt Preview Container */}
@@ -264,20 +261,34 @@ export function ThermalReceiptModal({ order, onClose }: ThermalReceiptModalProps
         </div>
 
         {/* Footer Actions */}
-        <div className="p-4 bg-white border-t border-[#E9E8E7] flex items-center justify-end gap-2.5">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 rounded-xl text-xs font-bold text-[#5B403D] hover:bg-[#F4F3F2] transition-all"
-          >
-            Close
-          </button>
-          <button
-            onClick={handlePrint}
-            className="flex items-center gap-2 px-5 py-2 rounded-xl bg-[#BA1A20] hover:bg-[#8B0000] text-white text-xs font-bold transition-all shadow-sm"
-          >
-            <Printer className="w-4 h-4" />
-            <span>{order.paymentStatus === 'paid' ? 'Print Receipt' : 'Print Bill'}</span>
-          </button>
+        <div className="p-4 bg-white border-t border-[#E9E8E7] flex items-center justify-between gap-2.5">
+          <div className="flex items-center gap-1.5 text-[11px] text-[#8F6F6C]">
+            <span className="hidden sm:inline">Shortcut:</span>
+            <kbd className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-[#F4F3F2] border border-[#D4D4D4] font-mono font-bold text-[10px] text-[#2D2926] shadow-2xs">
+              <span>Enter</span>
+              <CornerDownLeft className="w-2.5 h-2.5" />
+            </kbd>
+            <span className="text-[10px] text-[#8F6F6C]">to print</span>
+          </div>
+
+          <div className="flex items-center gap-2.5">
+            <button
+              onClick={onClose}
+              className="px-4 py-2 rounded-xl text-xs font-bold text-[#5B403D] hover:bg-[#F4F3F2] transition-all"
+            >
+              Close
+            </button>
+            <button
+              onClick={handlePrint}
+              className="flex items-center gap-2 px-5 py-2 rounded-xl bg-[#BA1A20] hover:bg-[#8B0000] text-white text-xs font-bold transition-all shadow-sm group"
+            >
+              <Printer className="w-4 h-4" />
+              <span>{order.paymentStatus === 'paid' ? 'Print Receipt' : 'Print Bill'}</span>
+              <kbd className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-white/20 border border-white/30 text-[10px] font-mono font-bold text-white shadow-2xs">
+                <span>↵</span>
+              </kbd>
+            </button>
+          </div>
         </div>
       </div>
     </div>

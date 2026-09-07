@@ -368,6 +368,53 @@ export const addItemsToOrderInDB = async (
   return mapOrderFromDB(data);
 };
 
+export const updateOrderItemsInDB = async (
+  orderId: string,
+  items: any[]
+): Promise<Order> => {
+  const { data: existing, error: fetchError } = await supabase
+    .from('orders')
+    .select('*')
+    .eq('id', orderId)
+    .single();
+
+  if (fetchError || !existing) throw fetchError || new Error('Order not found');
+
+  const subtotal = items.reduce((sum: number, it: any) => sum + (Number(it.totalPrice) || 0), 0);
+  const tax = Math.round(subtotal * 0.05);
+  const deliveryFee = Number(existing.delivery_fee || 0);
+  const discount = Number(existing.discount || 0);
+  const total = Math.max(0, subtotal + tax + deliveryFee - discount);
+  const amountPaid = Number(existing.amount_paid || 0);
+  const balanceDue = Math.max(0, total - amountPaid);
+
+  let paymentStatus = existing.payment_status;
+  if (amountPaid >= total && total > 0) {
+    paymentStatus = 'paid';
+  } else if (amountPaid > 0 && amountPaid < total) {
+    paymentStatus = 'partially_paid';
+  } else {
+    paymentStatus = 'unpaid';
+  }
+
+  const { data, error } = await supabase
+    .from('orders')
+    .update({
+      items,
+      subtotal,
+      tax,
+      total,
+      payment_status: paymentStatus,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', orderId)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return mapOrderFromDB(data);
+};
+
 export const applyDiscountToOrderInDB = async (
   orderId: string,
   discount: number

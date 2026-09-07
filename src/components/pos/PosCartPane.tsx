@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   Trash2,
   Plus,
@@ -11,19 +12,20 @@ import {
   Printer,
   RotateCcw,
   Send,
-  CreditCard,
-  Banknote,
-  Smartphone,
   AlertCircle,
   FileText,
-  CheckCircle2,
+  Check,
+  Save,
+  CreditCard,
+  Banknote,
 } from 'lucide-react';
 import { CartItem, OrderType, PaymentMethod, PaymentStatus, Order } from '@/types';
 import {
   useCreateOrder,
   useTableSessions,
   useOrders,
-  useAddItemsToOrder,
+  useUpdateOrderItems,
+  useUpdateOrderPayment,
 } from '@/hooks/useRestaurantData';
 
 interface PosCartPaneProps {
@@ -33,6 +35,8 @@ interface PosCartPaneProps {
   onClearCart: () => void;
   onOrderCompleted: (order: Order) => void;
   onViewOrderDetails?: (order: Order) => void;
+  loadedOrder?: Order | null;
+  onCancelLoadedOrder?: () => void;
 }
 
 export function PosCartPane({
@@ -42,9 +46,13 @@ export function PosCartPane({
   onClearCart,
   onOrderCompleted,
   onViewOrderDetails,
+  loadedOrder,
+  onCancelLoadedOrder,
 }: PosCartPaneProps) {
+  const router = useRouter();
   const createOrderMutation = useCreateOrder();
-  const addItemsMutation = useAddItemsToOrder();
+  const updateOrderItemsMutation = useUpdateOrderItems();
+  const updatePaymentMutation = useUpdateOrderPayment();
   const { data: tableSessions = [] } = useTableSessions();
   const { data: allOrders = [] } = useOrders();
 
@@ -52,15 +60,14 @@ export function PosCartPane({
   const [orderType, setOrderType] = useState<OrderType>('dine_in');
   const [selectedTable, setSelectedTable] = useState<string>('Table 1');
 
-  // Payment Timing Selection
-  // For dine-in: default is 'pay_later' (Unpaid)
-  // For takeout: default is 'pay_now' (Paid) with option 'pay_on_pickup'
-  // For delivery: default is 'pay_later' (Cash on delivery) with option 'pay_now'
+  // Payment Selection (Cash or Card)
   const [paymentTiming, setPaymentTiming] = useState<'pay_later' | 'pay_now'>('pay_later');
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('cash');
+  const [settleMethod, setSettleMethod] = useState<PaymentMethod>('cash');
 
-  // Cash calculation
+  // Cash calculations
   const [cashTendered, setCashTendered] = useState<string>('');
+  const [isPayDrawerOpen, setIsPayDrawerOpen] = useState<boolean>(false);
 
   // Dynamically populated tables from Supabase dining_tables
   const liveTables = useMemo(() => {
@@ -76,9 +83,9 @@ export function PosCartPane({
     return Array.from({ length: 12 }, (_, i) => `Table ${i + 1}`);
   }, [tableSessions]);
 
-  // Find if selected table has an active order
+  // Find if selected table has an active order (for new orders)
   const activeTableOrder = useMemo(() => {
-    if (orderType !== 'dine_in') return null;
+    if (loadedOrder || orderType !== 'dine_in') return null;
     return allOrders.find(
       (o) =>
         o.type === 'dine_in' &&
@@ -86,18 +93,30 @@ export function PosCartPane({
         o.status !== 'completed' &&
         o.status !== 'cancelled'
     );
-  }, [allOrders, orderType, selectedTable]);
+  }, [allOrders, orderType, selectedTable, loadedOrder]);
 
-  // Math
+  // Math for current items in the ticket
   const subtotal = useMemo(
     () => items.reduce((sum, item) => sum + item.totalPrice, 0),
     [items]
   );
   const tax = useMemo(() => Math.round(subtotal * 0.05), [subtotal]);
-  const deliveryFee = orderType === 'delivery' ? 65 : 0;
+  const deliveryFee = (!loadedOrder && orderType === 'delivery') ? 65 : (loadedOrder?.deliveryFee || 0);
   const total = useMemo(() => subtotal + tax + deliveryFee, [subtotal, tax, deliveryFee]);
 
-  const tenderedNum = parseFloat(cashTendered.replace(/,/g, '')) || 0;
+  // Check if items changed compared to loaded order
+  const hasItemsChanged = useMemo(() => {
+    if (!loadedOrder) return false;
+    const origItems = loadedOrder.items || [];
+    if (origItems.length !== items.length) return true;
+    for (const it of items) {
+      const match = origItems.find((o) => o.cartItemId === it.cartItemId || o.dish.id === it.dish.id);
+      if (!match || match.quantity !== it.quantity) return true;
+    }
+    return false;
+  }, [loadedOrder, items]);
+
+  const tenderedNum = parseFloat(cashTendered.replace(/,/g, '')) || total;
   const changeDue = Math.max(0, tenderedNum - total);
 
   // Switch channel handler
@@ -108,12 +127,12 @@ export function PosCartPane({
     } else if (type === 'takeout') {
       setPaymentTiming('pay_now');
     } else if (type === 'delivery') {
-      setPaymentTiming('pay_later'); // Cash on delivery
+      setPaymentTiming('pay_later');
     }
   };
 
-  // Submit New Order (Pay Later or Pay Now)
-  const handleSubmitOrder = async () => {
+  // Submit Brand New Order
+  const handleSubmitNewOrder = async () => {
     if (items.length === 0) return;
 
     const isPayNow = paymentTiming === 'pay_now';
@@ -138,17 +157,11 @@ export function PosCartPane({
         total,
         amountPaid: isPayNow ? total : 0,
         balanceDue: isPayNow ? 0 : total,
-        status: 'pending', // Sent to Kitchen
+        status: 'pending',
         paymentMethod,
         paymentStatus: finalPaymentStatus,
-        cashTendered:
-          isPayNow && paymentMethod === 'cash'
-            ? tenderedNum > 0
-              ? tenderedNum
-              : total
-            : undefined,
-        changeDue:
-          isPayNow && paymentMethod === 'cash' ? (tenderedNum > 0 ? changeDue : 0) : undefined,
+        cashTendered: isPayNow && paymentMethod === 'cash' ? (tenderedNum > 0 ? tenderedNum : total) : undefined,
+        changeDue: isPayNow && paymentMethod === 'cash' ? (tenderedNum > 0 ? changeDue : 0) : undefined,
         estimatedMinutes: orderType === 'delivery' ? 35 : 20,
       };
 
@@ -161,197 +174,237 @@ export function PosCartPane({
     }
   };
 
-  // Append items to existing active table order
-  const handleAppendToActiveOrder = async () => {
-    if (!activeTableOrder || items.length === 0) return;
-
+  // Update loaded order items and return to /orders page
+  const handleSaveLoadedOrderChanges = async () => {
+    if (!loadedOrder) return;
     try {
-      const updated = await addItemsMutation.mutateAsync({
-        orderId: activeTableOrder.id,
+      const updated = await updateOrderItemsMutation.mutateAsync({
+        orderId: loadedOrder.id,
         items,
       });
-      onClearCart();
       onOrderCompleted(updated);
+      onClearCart();
+      onCancelLoadedOrder?.();
+      router.push('/orders');
     } catch (err) {
-      console.error('Failed to append items to active table order', err);
+      console.error('Failed to save order changes', err);
+    }
+  };
+
+  // Settle & Complete loaded order (Cash or Card)
+  const handleSettleLoadedOrder = async () => {
+    if (!loadedOrder) return;
+
+    try {
+      // 1. If items were changed, update them in DB first
+      if (hasItemsChanged) {
+        await updateOrderItemsMutation.mutateAsync({
+          orderId: loadedOrder.id,
+          items,
+        });
+      }
+
+      // 2. Mark as paid & completed
+      await updatePaymentMutation.mutateAsync({
+        orderId: loadedOrder.id,
+        paymentStatus: 'paid',
+        paymentMethod: settleMethod,
+        amountPaid: total,
+        cashTendered: settleMethod === 'cash' ? tenderedNum : total,
+        changeDue: settleMethod === 'cash' ? changeDue : 0,
+        closeOrder: true,
+      });
+
+      const updatedOrder: Order = {
+        ...loadedOrder,
+        items,
+        subtotal,
+        tax,
+        total,
+        paymentStatus: 'paid',
+        paymentMethod: settleMethod,
+        amountPaid: total,
+        balanceDue: 0,
+        status: 'completed',
+        cashTendered: settleMethod === 'cash' ? tenderedNum : total,
+        changeDue: settleMethod === 'cash' ? changeDue : 0,
+      };
+
+      onOrderCompleted(updatedOrder);
+      onClearCart();
+      onCancelLoadedOrder?.();
+      router.push('/orders');
+    } catch (err) {
+      console.error('Failed to settle order', err);
     }
   };
 
   return (
     <div className="w-full h-full flex flex-col bg-white overflow-hidden">
-      {/* 1. Ticket Header & Channel Switcher */}
+      {/* 1. Ticket Header */}
       <div className="p-4 border-b border-[#E5E5E5] bg-white space-y-3 shrink-0">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-xs font-bold text-[#1F1F1F] tracking-tight">
               Order Ticket
             </span>
-            {items.length > 0 && (
+            {loadedOrder ? (
+              <span className="text-[11px] font-semibold bg-neutral-900 text-white px-2 py-0.5 rounded-md">
+                Active Order
+              </span>
+            ) : items.length > 0 ? (
               <span className="text-[11px] font-semibold bg-[#F5F5F5] text-[#525252] px-2 py-0.5 rounded-md">
                 {items.reduce((s, i) => s + i.quantity, 0)} items
               </span>
-            )}
+            ) : null}
           </div>
-          {items.length > 0 && (
+
+          {loadedOrder ? (
             <button
-              onClick={onClearCart}
-              className="text-[11px] font-medium text-[#737373] hover:text-[#BA1A20] flex items-center gap-1 transition-colors"
+              type="button"
+              onClick={onCancelLoadedOrder}
+              className="text-[11px] font-medium text-neutral-500 hover:text-neutral-900 transition-colors"
             >
-              <RotateCcw className="w-3 h-3" />
-              <span>Clear</span>
+              New Ticket
             </button>
+          ) : (
+            items.length > 0 && (
+              <button
+                type="button"
+                onClick={onClearCart}
+                className="text-[11px] font-medium text-[#737373] hover:text-[#BA1A20] flex items-center gap-1 transition-colors"
+              >
+                <RotateCcw className="w-3 h-3" />
+                <span>Clear</span>
+              </button>
+            )
           )}
         </div>
 
-        {/* 3 Clean Channel Buttons */}
-        <div className="grid grid-cols-3 gap-1 bg-[#F5F5F5] p-1 rounded-lg">
-          <button
-            type="button"
-            onClick={() => handleChannelChange('dine_in')}
-            className={`flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-semibold transition-all ${
-              orderType === 'dine_in'
-                ? 'bg-white text-[#1F1F1F] shadow-xs'
-                : 'text-[#737373] hover:text-[#1F1F1F]'
-            }`}
-          >
-            <Utensils className="w-3.5 h-3.5" />
-            <span>Dine-In</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleChannelChange('takeout')}
-            className={`flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-semibold transition-all ${
-              orderType === 'takeout'
-                ? 'bg-white text-[#1F1F1F] shadow-xs'
-                : 'text-[#737373] hover:text-[#1F1F1F]'
-            }`}
-          >
-            <ShoppingBag className="w-3.5 h-3.5" />
-            <span>Takeout</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleChannelChange('delivery')}
-            className={`flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-semibold transition-all ${
-              orderType === 'delivery'
-                ? 'bg-white text-[#1F1F1F] shadow-xs'
-                : 'text-[#737373] hover:text-[#1F1F1F]'
-            }`}
-          >
-            <Bike className="w-3.5 h-3.5" />
-            <span>Delivery</span>
-          </button>
-        </div>
-
-        {/* Quick Table Chips (for Dine-In) */}
-        {orderType === 'dine_in' && (
-          <div>
-            <div className="flex items-center justify-between text-[11px] font-semibold text-[#737373] mb-1">
-              <span>Select Table</span>
-              {activeTableOrder && (
-                <span className="text-[#B45309] font-bold flex items-center gap-1">
-                  <AlertCircle className="w-3 h-3" /> Has Active Order
-                </span>
-              )}
+        {/* Loaded Order Banner vs New Order Channel Selector */}
+        {loadedOrder ? (
+          <div className="p-3 bg-neutral-50 rounded-xl border border-neutral-200 text-xs space-y-1">
+            <div className="flex items-center justify-between">
+              <span className="font-mono font-bold text-neutral-900">
+                {loadedOrder.orderNumber}
+              </span>
+              <span
+                className={`text-[10px] font-semibold uppercase px-2 py-0.5 rounded-md ${
+                  loadedOrder.paymentStatus === 'paid'
+                    ? 'bg-emerald-100 text-emerald-800'
+                    : 'bg-amber-100 text-amber-800'
+                }`}
+              >
+                {loadedOrder.paymentStatus}
+              </span>
             </div>
-            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
-              {liveTables.slice(0, 12).map((t) => {
-                const short = t.replace('Table ', 'T');
-                const isSelected = selectedTable === t;
-                const isOccupied = tableSessions.some(
-                  (ts) => ts.tableNumber === t && ts.status !== 'available'
-                );
-
-                return (
-                  <button
-                    key={t}
-                    type="button"
-                    onClick={() => setSelectedTable(t)}
-                    className={`relative px-2.5 py-1 rounded-md text-[11px] font-bold shrink-0 transition-colors ${
-                      isSelected
-                        ? 'bg-[#1F1F1F] text-white'
-                        : isOccupied
-                        ? 'bg-[#FFF8E1] text-[#B45309] border border-[#FFE082]'
-                        : 'bg-[#F5F5F5] text-[#525252] hover:bg-[#E5E5E5]'
-                    }`}
-                  >
-                    {short}
-                    {isOccupied && (
-                      <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#B45309] ml-1" />
-                    )}
-                  </button>
-                );
-              })}
+            <div className="flex justify-between text-[11px] text-neutral-500">
+              <span>Customer:</span>
+              <span className="font-medium text-neutral-700">
+                {loadedOrder.type === 'dine_in'
+                  ? loadedOrder.tableNumber || 'Dine-In'
+                  : loadedOrder.customerName}
+              </span>
             </div>
           </div>
-        )}
-
-        {/* Active Order Notice for Occupied Table */}
-        {activeTableOrder && (
-          <div className="p-2.5 bg-[#FFF8E1] border border-[#FFE082] rounded-lg text-xs space-y-1.5">
-            <div className="flex items-center justify-between">
-              <span className="font-bold text-[#78350F] flex items-center gap-1">
-                <FileText className="w-3.5 h-3.5" /> {activeTableOrder.orderNumber}
-              </span>
-              <div className="flex items-center gap-1">
-                <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-white text-[#78350F] uppercase">
-                  {activeTableOrder.status}
-                </span>
-                <span
-                  className={`text-[10px] font-bold px-1.5 py-0.2 rounded uppercase ${
-                    activeTableOrder.paymentStatus === 'paid'
-                      ? 'bg-green-100 text-green-800'
-                      : 'bg-amber-200 text-amber-900'
-                  }`}
-                >
-                  {activeTableOrder.paymentStatus}
-                </span>
-              </div>
-            </div>
-            <div className="flex items-center justify-between text-[11px] text-[#92400E]">
-              <span>Existing Bill Total:</span>
-              <span className="font-extrabold text-[#78350F]">
-                ₱{activeTableOrder.total.toLocaleString()}
-              </span>
-            </div>
-            <div className="flex items-center gap-1.5 pt-1">
-              {items.length > 0 ? (
-                <button
-                  type="button"
-                  onClick={handleAppendToActiveOrder}
-                  disabled={addItemsMutation.isPending}
-                  className="flex-1 py-1.5 px-2 rounded-md bg-[#B45309] hover:bg-[#92400E] text-white text-[11px] font-bold transition-colors flex items-center justify-center gap-1"
-                >
-                  <Plus className="w-3 h-3" />
-                  <span>
-                    {addItemsMutation.isPending
-                      ? 'Adding...'
-                      : `Add to Active Bill (+₱${total.toLocaleString()})`}
-                  </span>
-                </button>
-              ) : null}
+        ) : (
+          <>
+            {/* 3 Channel Buttons */}
+            <div className="grid grid-cols-3 gap-1 bg-[#F5F5F5] p-1 rounded-lg">
               <button
                 type="button"
-                onClick={() => onViewOrderDetails?.(activeTableOrder)}
-                className="py-1 px-2.5 rounded-md border border-[#D97706] bg-white text-[#92400E] hover:bg-[#FEF3C7] text-[11px] font-bold transition-colors"
+                onClick={() => handleChannelChange('dine_in')}
+                className={`flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-semibold transition-all ${
+                  orderType === 'dine_in'
+                    ? 'bg-white text-[#1F1F1F] shadow-xs'
+                    : 'text-[#737373] hover:text-[#1F1F1F]'
+                }`}
               >
-                View / Pay Bill
+                <Utensils className="w-3.5 h-3.5" />
+                <span>Dine-In</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleChannelChange('takeout')}
+                className={`flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-semibold transition-all ${
+                  orderType === 'takeout'
+                    ? 'bg-white text-[#1F1F1F] shadow-xs'
+                    : 'text-[#737373] hover:text-[#1F1F1F]'
+                }`}
+              >
+                <ShoppingBag className="w-3.5 h-3.5" />
+                <span>Takeout</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleChannelChange('delivery')}
+                className={`flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-semibold transition-all ${
+                  orderType === 'delivery'
+                    ? 'bg-white text-[#1F1F1F] shadow-xs'
+                    : 'text-[#737373] hover:text-[#1F1F1F]'
+                }`}
+              >
+                <Bike className="w-3.5 h-3.5" />
+                <span>Delivery</span>
               </button>
             </div>
-          </div>
+
+            {/* Table Chips for Dine-In */}
+            {orderType === 'dine_in' && (
+              <div>
+                <div className="flex items-center justify-between text-[11px] font-semibold text-[#737373] mb-1">
+                  <span>Select Table</span>
+                  {activeTableOrder && (
+                    <span className="text-[#B45309] font-bold flex items-center gap-1">
+                      <AlertCircle className="w-3 h-3" /> Has Active Order
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+                  {liveTables.slice(0, 12).map((t) => {
+                    const short = t.replace('Table ', 'T');
+                    const isSelected = selectedTable === t;
+                    const isOccupied = tableSessions.some(
+                      (ts) => ts.tableNumber === t && ts.status !== 'available'
+                    );
+
+                    return (
+                      <button
+                        key={t}
+                        type="button"
+                        onClick={() => setSelectedTable(t)}
+                        className={`relative px-2.5 py-1 rounded-md text-[11px] font-bold shrink-0 transition-colors ${
+                          isSelected
+                            ? 'bg-[#1F1F1F] text-white'
+                            : isOccupied
+                            ? 'bg-[#FFF8E1] text-[#B45309] border border-[#FFE082]'
+                            : 'bg-[#F5F5F5] text-[#525252] hover:bg-[#E5E5E5]'
+                        }`}
+                      >
+                        {short}
+                        {isOccupied && (
+                          <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#B45309] ml-1" />
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </>
         )}
       </div>
 
-      {/* 2. Fast Items List */}
+      {/* 2. Items List (Live Stepper & Trash for ALL items) */}
       <div className="flex-1 overflow-y-auto p-4 space-y-2.5 min-h-0">
         {items.length === 0 ? (
           <div className="h-full min-h-[160px] flex flex-col items-center justify-center text-center p-6 text-[#A3A3A3]">
             <Utensils className="w-7 h-7 stroke-1 text-[#D4D4D4] mb-2" />
-            <p className="text-xs font-semibold text-[#525252]">No items selected</p>
+            <p className="text-xs font-semibold text-[#525252]">No items in ticket</p>
             <p className="text-[11px] text-[#A3A3A3] mt-0.5">
-              Tap any dish on the left to add to ticket.
+              Tap any dish from the menu to add.
             </p>
           </div>
         ) : (
@@ -366,25 +419,21 @@ export function PosCartPane({
                   <h5 className="text-xs font-bold text-[#1F1F1F] truncate">
                     {item.dish.name}
                   </h5>
-                  <span className="text-xs font-black text-[#1F1F1F] shrink-0">
+                  <span className="text-xs font-mono font-bold text-[#1F1F1F] shrink-0">
                     ₱{item.totalPrice.toLocaleString()}
                   </span>
                 </div>
 
-                {/* Subtitle details */}
                 <div className="flex items-center gap-1.5 text-[10px] text-[#737373] mt-0.5">
                   <span>₱{item.unitPrice.toLocaleString()}</span>
                   {item.portion?.priceDelta > 0 && <span>• {item.portion.name}</span>}
-                  {item.spiceLevel && item.spiceLevel > 2 && (
-                    <span className="text-[#BA1A20] font-semibold">• Spicy</span>
-                  )}
-                  {item.selectedAddons?.length > 0 && (
-                    <span>• +{item.selectedAddons.length} addons</span>
+                  {item.spiceLevel && (
+                    <span className="text-neutral-500">• Lv.{item.spiceLevel}</span>
                   )}
                 </div>
               </div>
 
-              {/* Stepper */}
+              {/* Live Stepper & Remove */}
               <div className="flex items-center gap-1 shrink-0 ml-2">
                 <div className="flex items-center bg-white border border-[#E5E5E5] rounded-md">
                   <button
@@ -419,166 +468,307 @@ export function PosCartPane({
         )}
       </div>
 
-      {/* 3. Sticky Bottom Action & Checkout Area */}
+      {/* 3. Sticky Bottom Action Area */}
       <div className="p-4 border-t border-[#E5E5E5] bg-white space-y-3 shrink-0 sticky bottom-0 z-10 shadow-xs">
-        {/* Total Breakdown */}
+        {/* Dynamic Financials */}
         <div className="space-y-1 text-xs">
           <div className="flex justify-between text-[#737373]">
             <span>Subtotal</span>
-            <span>₱{subtotal.toLocaleString()}</span>
+            <span className="font-mono">₱{subtotal.toLocaleString()}</span>
           </div>
           <div className="flex justify-between text-[#737373]">
             <span>Tax (5% VAT)</span>
-            <span>₱{tax.toLocaleString()}</span>
+            <span className="font-mono">₱{tax.toLocaleString()}</span>
           </div>
           {deliveryFee > 0 && (
             <div className="flex justify-between text-[#737373]">
               <span>Delivery Fee</span>
-              <span>₱{deliveryFee}</span>
+              <span className="font-mono">₱{deliveryFee}</span>
             </div>
           )}
           <div className="flex justify-between items-baseline pt-1.5 border-t border-[#E5E5E5]">
             <span className="font-bold text-xs text-[#1F1F1F]">Total Due</span>
-            <span className="text-xl font-black text-[#BA1A20]">
+            <span className="text-xl font-black text-neutral-900 font-mono">
               ₱{total.toLocaleString()}
             </span>
           </div>
         </div>
 
-        {/* Payment Timing Options (Pay Later vs Pay Now) */}
-        <div className="bg-[#F5F5F5] p-1 rounded-lg flex items-center text-xs font-semibold">
-          <button
-            type="button"
-            onClick={() => setPaymentTiming('pay_later')}
-            className={`flex-1 py-1.5 rounded-md flex items-center justify-center gap-1 transition-all ${
-              paymentTiming === 'pay_later'
-                ? 'bg-white text-[#1F1F1F] shadow-xs'
-                : 'text-[#737373] hover:text-[#1F1F1F]'
-            }`}
-          >
-            <span>
-              {orderType === 'dine_in'
-                ? 'Pay Later (Standard)'
-                : orderType === 'delivery'
-                ? 'Cash on Delivery'
-                : 'Pay on Pickup'}
-            </span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setPaymentTiming('pay_now')}
-            className={`flex-1 py-1.5 rounded-md flex items-center justify-center gap-1 transition-all ${
-              paymentTiming === 'pay_now'
-                ? 'bg-white text-[#1F1F1F] shadow-xs'
-                : 'text-[#737373] hover:text-[#1F1F1F]'
-            }`}
-          >
-            <span>Pay Now (Prepaid)</span>
-          </button>
-        </div>
-
-        {/* If Pay Now is selected: show payment method & cash quick-amounts */}
-        {paymentTiming === 'pay_now' && (
-          <div className="space-y-2 pt-1">
-            {/* Payment Method Selector */}
-            <div className="grid grid-cols-3 gap-1">
-              {[
-                { id: 'cash', label: 'Cash', icon: Banknote },
-                { id: 'gcash', label: 'GCash', icon: Smartphone },
-                { id: 'card', label: 'Card', icon: CreditCard },
-              ].map((pm) => {
-                const Icon = pm.icon;
-                const isSelected = paymentMethod === pm.id;
-                return (
+        {/* Existing Loaded Order Controls */}
+        {loadedOrder ? (
+          <div className="space-y-2">
+            {/* If Pay Drawer is open */}
+            {isPayDrawerOpen ? (
+              <div className="p-3 bg-neutral-50 rounded-xl border border-neutral-200 space-y-2.5 animate-in fade-in duration-100">
+                {/* Method selector: Cash or Card */}
+                <div className="grid grid-cols-2 gap-1.5">
                   <button
-                    key={pm.id}
                     type="button"
-                    onClick={() => setPaymentMethod(pm.id as PaymentMethod)}
-                    className={`flex items-center justify-center gap-1 py-1.5 rounded-md text-xs font-bold border transition-colors ${
-                      isSelected
-                        ? 'bg-[#1F1F1F] text-white border-[#1F1F1F]'
-                        : 'bg-white text-[#525252] border-[#E5E5E5] hover:bg-[#F5F5F5]'
+                    onClick={() => setSettleMethod('cash')}
+                    className={`flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-xs font-semibold transition-all border ${
+                      settleMethod === 'cash'
+                        ? 'bg-neutral-900 text-white border-neutral-900 shadow-2xs'
+                        : 'bg-white text-neutral-600 border-neutral-200 hover:bg-neutral-100'
                     }`}
                   >
-                    <Icon className="w-3 h-3" />
-                    <span>{pm.label}</span>
+                    <Banknote className="w-3.5 h-3.5" />
+                    <span>Cash</span>
                   </button>
-                );
-              })}
-            </div>
-
-            {/* Quick Cash Presets (for cash payments) */}
-            {paymentMethod === 'cash' && (
-              <div className="space-y-1.5">
-                <div className="flex items-center gap-1">
                   <button
                     type="button"
-                    onClick={() => setCashTendered(total.toString())}
-                    disabled={items.length === 0}
-                    className="flex-1 py-1 text-xs font-semibold rounded-md border border-[#E5E5E5] bg-[#FAFAFA] text-[#525252] hover:bg-[#F5F5F5] disabled:opacity-40"
+                    onClick={() => setSettleMethod('card')}
+                    className={`flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-xs font-semibold transition-all border ${
+                      settleMethod === 'card'
+                        ? 'bg-neutral-900 text-white border-neutral-900 shadow-2xs'
+                        : 'bg-white text-neutral-600 border-neutral-200 hover:bg-neutral-100'
+                    }`}
                   >
-                    Exact
+                    <CreditCard className="w-3.5 h-3.5" />
+                    <span>Card</span>
                   </button>
-                  {[100, 500, 1000].map((amt) => (
-                    <button
-                      key={amt}
-                      type="button"
-                      onClick={() => setCashTendered(amt.toString())}
-                      disabled={items.length === 0}
-                      className={`flex-1 py-1 text-xs font-semibold rounded-md border border-[#E5E5E5] transition-colors disabled:opacity-40 ${
-                        tenderedNum === amt
-                          ? 'bg-[#1F1F1F] text-white border-[#1F1F1F]'
-                          : 'bg-[#FAFAFA] text-[#525252] hover:bg-[#F5F5F5]'
-                      }`}
-                    >
-                      ₱{amt}
-                    </button>
-                  ))}
                 </div>
 
-                {tenderedNum > total && (
-                  <div className="flex justify-between text-xs font-bold text-[#2E7D32] bg-[#E8F5E9] px-2.5 py-1 rounded-md">
-                    <span>Change Due:</span>
-                    <span>₱{changeDue.toLocaleString()}</span>
+                {settleMethod === 'cash' ? (
+                  <>
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-semibold text-neutral-700">Cash Tendered</span>
+                      {changeDue > 0 && (
+                        <span className="text-emerald-700 font-bold font-mono">
+                          Change: ₱{changeDue.toLocaleString()}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Fast Cash Presets */}
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => setCashTendered(total.toString())}
+                        className="flex-1 py-1 text-xs font-semibold rounded-md border border-[#E5E5E5] bg-white text-[#525252] hover:bg-[#F5F5F5]"
+                      >
+                        Exact
+                      </button>
+                      {[100, 500, 1000].map((amt) => (
+                        <button
+                          key={amt}
+                          type="button"
+                          onClick={() => setCashTendered(amt.toString())}
+                          className={`flex-1 py-1 text-xs font-semibold rounded-md border border-[#E5E5E5] transition-colors ${
+                            tenderedNum === amt
+                              ? 'bg-[#1F1F1F] text-white border-[#1F1F1F]'
+                              : 'bg-white text-[#525252] hover:bg-[#F5F5F5]'
+                          }`}
+                        >
+                          ₱{amt}
+                        </button>
+                      ))}
+                    </div>
+
+                    <input
+                      type="number"
+                      value={cashTendered}
+                      onChange={(e) => setCashTendered(e.target.value)}
+                      placeholder={`Custom cash (₱${total.toLocaleString()})`}
+                      className="w-full px-3 py-1.5 bg-white border border-neutral-200 rounded-lg text-xs font-mono text-neutral-900 focus:outline-none focus:border-neutral-400"
+                    />
+                  </>
+                ) : (
+                  <div className="p-2.5 bg-white rounded-lg border border-neutral-200 text-center space-y-1">
+                    <span className="text-xs font-medium text-neutral-600 block">
+                      Swipe or tap card on POS terminal
+                    </span>
+                    <span className="font-mono font-bold text-sm text-neutral-900 block">
+                      Charge: ₱{total.toLocaleString()}
+                    </span>
+                  </div>
+                )}
+
+                <div className="flex items-center gap-1.5 pt-1">
+                  <button
+                    type="button"
+                    onClick={() => setIsPayDrawerOpen(false)}
+                    className="flex-1 py-2 rounded-lg border border-neutral-200 text-xs font-medium text-neutral-600 hover:bg-neutral-100 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleSettleLoadedOrder}
+                    disabled={updatePaymentMutation.isPending}
+                    className="flex-1 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition-colors flex items-center justify-center gap-1.5 shadow-2xs"
+                  >
+                    <Check className="w-3.5 h-3.5" />
+                    <span>Confirm &amp; Print</span>
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                {/* Update Order (if items were edited) */}
+                {hasItemsChanged && (
+                  <button
+                    type="button"
+                    onClick={handleSaveLoadedOrderChanges}
+                    disabled={updateOrderItemsMutation.isPending}
+                    className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl border border-neutral-300 hover:bg-neutral-50 text-neutral-800 text-xs font-semibold transition-colors"
+                  >
+                    <Save className="w-3.5 h-3.5" />
+                    <span>{updateOrderItemsMutation.isPending ? 'Updating...' : 'Update Order'}</span>
+                  </button>
+                )}
+
+                {/* Settle Bill Button */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCashTendered(total.toString());
+                    setIsPayDrawerOpen(true);
+                  }}
+                  className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-neutral-900 hover:bg-black text-white text-xs font-semibold transition-colors shadow-2xs"
+                >
+                  <Printer className="w-3.5 h-3.5" />
+                  <span>Pay &amp; Close (₱{total.toLocaleString()})</span>
+                </button>
+              </div>
+            )}
+          </div>
+        ) : (
+          /* Brand New Order Timing & Actions */
+          <div className="space-y-2">
+            <div className="bg-[#F5F5F5] p-1 rounded-lg flex items-center text-xs font-semibold">
+              <button
+                type="button"
+                onClick={() => setPaymentTiming('pay_later')}
+                className={`flex-1 py-1.5 rounded-md flex items-center justify-center gap-1 transition-all ${
+                  paymentTiming === 'pay_later'
+                    ? 'bg-white text-[#1F1F1F] shadow-xs'
+                    : 'text-[#737373] hover:text-[#1F1F1F]'
+                }`}
+              >
+                <span>
+                  {orderType === 'dine_in'
+                    ? 'Pay Later (Standard)'
+                    : orderType === 'delivery'
+                    ? 'Cash on Delivery'
+                    : 'Pay on Pickup'}
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setPaymentTiming('pay_now')}
+                className={`flex-1 py-1.5 rounded-md flex items-center justify-center gap-1 transition-all ${
+                  paymentTiming === 'pay_now'
+                    ? 'bg-white text-[#1F1F1F] shadow-xs'
+                    : 'text-[#737373] hover:text-[#1F1F1F]'
+                }`}
+              >
+                <span>Pay Now</span>
+              </button>
+            </div>
+
+            {paymentTiming === 'pay_now' && (
+              <div className="space-y-2 pt-1">
+                {/* Method selector for Pay Now: Cash or Card */}
+                <div className="grid grid-cols-2 gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => setPaymentMethod('cash')}
+                    className={`flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-xs font-semibold transition-all border ${
+                      paymentMethod === 'cash'
+                        ? 'bg-neutral-900 text-white border-neutral-900 shadow-2xs'
+                        : 'bg-white text-neutral-600 border-neutral-200 hover:bg-neutral-100'
+                    }`}
+                  >
+                    <Banknote className="w-3.5 h-3.5" />
+                    <span>Cash</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPaymentMethod('card')}
+                    className={`flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-xs font-semibold transition-all border ${
+                      paymentMethod === 'card'
+                        ? 'bg-neutral-900 text-white border-neutral-900 shadow-2xs'
+                        : 'bg-white text-neutral-600 border-neutral-200 hover:bg-neutral-100'
+                    }`}
+                  >
+                    <CreditCard className="w-3.5 h-3.5" />
+                    <span>Card</span>
+                  </button>
+                </div>
+
+                {paymentMethod === 'cash' && (
+                  <div className="space-y-1.5">
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => setCashTendered(total.toString())}
+                        disabled={items.length === 0}
+                        className="flex-1 py-1 text-xs font-semibold rounded-md border border-[#E5E5E5] bg-[#FAFAFA] text-[#525252] hover:bg-[#F5F5F5] disabled:opacity-40"
+                      >
+                        Exact
+                      </button>
+                      {[100, 500, 1000].map((amt) => (
+                        <button
+                          key={amt}
+                          type="button"
+                          onClick={() => setCashTendered(amt.toString())}
+                          disabled={items.length === 0}
+                          className={`flex-1 py-1 text-xs font-semibold rounded-md border border-[#E5E5E5] transition-colors disabled:opacity-40 ${
+                            tenderedNum === amt
+                              ? 'bg-[#1F1F1F] text-white border-[#1F1F1F]'
+                              : 'bg-[#FAFAFA] text-[#525252] hover:bg-[#F5F5F5]'
+                          }`}
+                        >
+                          ₱{amt}
+                        </button>
+                      ))}
+                    </div>
+
+                    {tenderedNum > total && (
+                      <div className="flex justify-between text-xs font-bold text-[#2E7D32] bg-[#E8F5E9] px-2.5 py-1 rounded-md font-mono">
+                        <span>Change Due:</span>
+                        <span>₱{changeDue.toLocaleString()}</span>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
             )}
+
+            {paymentTiming === 'pay_later' ? (
+              <button
+                type="button"
+                onClick={handleSubmitNewOrder}
+                disabled={items.length === 0 || createOrderMutation.isPending}
+                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-[#BA1A20] hover:bg-[#8B0000] text-white text-xs font-bold transition-colors disabled:opacity-40 disabled:cursor-not-allowed shadow-xs"
+              >
+                <Send className="w-3.5 h-3.5" />
+                <span>
+                  {createOrderMutation.isPending
+                    ? 'Sending Order...'
+                    : orderType === 'dine_in'
+                    ? `Send to Kitchen (${selectedTable} • Pay Later)`
+                    : `Place Order (Pay Later • ₱${total.toLocaleString()})`}
+                </span>
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={handleSubmitNewOrder}
+                disabled={items.length === 0 || createOrderMutation.isPending}
+                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-[#2E7D32] hover:bg-[#1B5E20] text-white text-xs font-bold transition-colors disabled:opacity-40 disabled:cursor-not-allowed shadow-xs"
+              >
+                <Printer className="w-3.5 h-3.5" />
+                <span>
+                  {createOrderMutation.isPending
+                    ? 'Processing Payment...'
+                    : `Charge & Send • ₱${total.toLocaleString()}`}
+                </span>
+              </button>
+            )}
           </div>
         )}
 
-        {/* Primary Action Button */}
-        {paymentTiming === 'pay_later' ? (
-          <button
-            type="button"
-            onClick={handleSubmitOrder}
-            disabled={items.length === 0 || createOrderMutation.isPending}
-            className="w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-[#BA1A20] hover:bg-[#8B0000] text-white text-xs font-bold transition-colors disabled:opacity-40 disabled:cursor-not-allowed shadow-xs"
-          >
-            <Send className="w-3.5 h-3.5" />
-            <span>
-              {createOrderMutation.isPending
-                ? 'Sending Order...'
-                : orderType === 'dine_in'
-                ? `Send to Kitchen (${selectedTable} • Pay Later)`
-                : `Place Order (Pay Later • ₱${total.toLocaleString()})`}
-            </span>
-          </button>
-        ) : (
-          <button
-            type="button"
-            onClick={handleSubmitOrder}
-            disabled={items.length === 0 || createOrderMutation.isPending}
-            className="w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-[#2E7D32] hover:bg-[#1B5E20] text-white text-xs font-bold transition-colors disabled:opacity-40 disabled:cursor-not-allowed shadow-xs"
-          >
-            <Printer className="w-3.5 h-3.5" />
-            <span>
-              {createOrderMutation.isPending
-                ? 'Processing Payment...'
-                : `Charge & Send • ₱${total.toLocaleString()}`}
-            </span>
-          </button>
-        )}
       </div>
     </div>
   );
