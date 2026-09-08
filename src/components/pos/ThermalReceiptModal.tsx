@@ -13,6 +13,16 @@ interface ThermalReceiptModalProps {
 export function ThermalReceiptModal({ order, onClose }: ThermalReceiptModalProps) {
   if (!order) return null;
 
+  return <ThermalReceiptModalContent order={order} onClose={onClose} />;
+}
+
+function ThermalReceiptModalContent({
+  order,
+  onClose,
+}: {
+  order: Order;
+  onClose: () => void;
+}) {
   const handlePrint = () => {
     printThermalReceipt(order);
   };

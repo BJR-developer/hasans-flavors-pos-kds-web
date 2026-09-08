@@ -594,10 +594,12 @@ export function OrdersTable() {
         }}
       />
 
-      <ThermalReceiptModal
-        order={receiptOrder}
-        onClose={() => setReceiptOrder(null)}
-      />
+      {receiptOrder && (
+        <ThermalReceiptModal
+          order={receiptOrder}
+          onClose={() => setReceiptOrder(null)}
+        />
+      )}
     </div>
   );
 }

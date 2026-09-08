@@ -477,10 +477,12 @@ export function PosRegister() {
         }}
       />
 
-      <ThermalReceiptModal
-        order={receiptOrder}
-        onClose={() => setReceiptOrder(null)}
-      />
+      {receiptOrder && (
+        <ThermalReceiptModal
+          order={receiptOrder}
+          onClose={() => setReceiptOrder(null)}
+        />
+      )}
 
       <KeyboardShortcutsModal
         isOpen={isShortcutsModalOpen}

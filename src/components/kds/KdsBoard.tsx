@@ -276,10 +276,12 @@ export function KdsBoard() {
       </div>
 
       {/* Thermal Receipt Modal (z-[70] for clean topmost layer) */}
-      <ThermalReceiptModal
-        order={receiptOrder}
-        onClose={() => setReceiptOrder(null)}
-      />
+      {receiptOrder && (
+        <ThermalReceiptModal
+          order={receiptOrder}
+          onClose={() => setReceiptOrder(null)}
+        />
+      )}
     </div>
   );
 }
