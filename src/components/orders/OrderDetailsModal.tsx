@@ -207,7 +207,10 @@ export function OrderDetailsModal({
                           )
                         )}
 
-                        {item.spiceLevel && getSpiceLabel(item.spiceLevel) && (
+                        {item.spiceLevel &&
+                          item.spiceLevel > 0 &&
+                          !item.selectedVariants?.some((v) => v.groupName.toLowerCase().includes('spice')) &&
+                          getSpiceLabel(item.spiceLevel) && (
                           <span className={`px-1.5 py-0.2 rounded font-bold ${
                             item.spiceLevel >= 4
                               ? 'bg-red-100 text-red-700'

@@ -167,7 +167,9 @@ function ThermalReceiptModalContent({
                           <div>• Portion: {item.portion.name} (+₱{item.portion.priceDelta})</div>
                         )
                       )}
-                      {item.spiceLevel ? (
+                      {item.spiceLevel &&
+                      item.spiceLevel > 0 &&
+                      !item.selectedVariants?.some((v) => v.groupName.toLowerCase().includes('spice')) ? (
                         <div>
                           • Spice: {item.spiceLevel === 1
                             ? 'Mild'

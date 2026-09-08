@@ -285,8 +285,8 @@ function ProductFormContent({
       station = 'sides_drinks';
     }
 
-    // Derive spice level dynamically from variants if configured
-    let effectiveSpiceLevel = dishToEdit?.spiceLevel || 2;
+    // Derive spice level dynamically from variants ONLY if a spice variant is configured - never default to 2
+    let effectiveSpiceLevel = 0;
     const spiceGroup = variants.find((v) => v.name.toLowerCase().includes('spice'));
     if (spiceGroup && spiceGroup.options.length > 0) {
       const optName = spiceGroup.options[0].name.toLowerCase();
@@ -294,6 +294,7 @@ function ProductFormContent({
       else if (optName.includes('medium')) effectiveSpiceLevel = 2;
       else if (optName.includes('hot')) effectiveSpiceLevel = 3;
       else if (optName.includes('fiery') || optName.includes('very')) effectiveSpiceLevel = 4;
+      else effectiveSpiceLevel = 1;
     }
 
     if (dishToEdit) {

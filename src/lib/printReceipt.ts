@@ -36,14 +36,18 @@ export function generateThermalReceiptHtml(order: Order): string {
           : '';
 
       const spiceLabel =
-        item.spiceLevel === 1
-          ? 'Mild'
-          : item.spiceLevel === 2
-          ? 'Medium'
-          : item.spiceLevel === 3
-          ? 'Hot Spicy'
-          : item.spiceLevel === 4
-          ? 'Very Spicy'
+        item.spiceLevel &&
+        item.spiceLevel > 0 &&
+        !item.selectedVariants?.some((v) => v.groupName.toLowerCase().includes('spice'))
+          ? item.spiceLevel === 1
+            ? 'Mild'
+            : item.spiceLevel === 2
+            ? 'Medium'
+            : item.spiceLevel === 3
+            ? 'Hot Spicy'
+            : item.spiceLevel === 4
+            ? 'Very Spicy'
+            : null
           : null;
 
       const spice =

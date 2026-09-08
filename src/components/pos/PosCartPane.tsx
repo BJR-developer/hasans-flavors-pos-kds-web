@@ -462,7 +462,10 @@ export function PosCartPane({
                       {item.portion?.priceDelta > 0 && <span>• {item.portion.name}</span>}
                     </>
                   )}
-                  {item.spiceLevel && getSpiceLabel(item.spiceLevel) && (
+                  {item.spiceLevel &&
+                    item.spiceLevel > 0 &&
+                    !item.selectedVariants?.some((v) => v.groupName.toLowerCase().includes('spice')) &&
+                    getSpiceLabel(item.spiceLevel) && (
                     <span className={`px-1 py-0.2 rounded font-semibold ${
                       item.spiceLevel >= 4
                         ? 'bg-red-100 text-red-700'

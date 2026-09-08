@@ -117,9 +117,15 @@ export function PosRegister() {
     });
   }, [dishes, selectedCatId, searchQuery, categories]);
 
-  // Fast 1-tap add directly to cart
+  // Fast 1-tap add directly to cart (or open customizer if variants exist)
   const handleFastAdd = (dish: Dish) => {
     if (!dish.inStock) return;
+
+    // If product has custom variants configured, open modal to let cashier choose
+    if (dish.variants && dish.variants.length > 0) {
+      setCustomizingDish(dish);
+      return;
+    }
 
     let station: 'tandoor' | 'biryani_curry' | 'sides_drinks' | 'general' = 'general';
     const cat = (dish.category || '').toLowerCase();
@@ -154,7 +160,7 @@ export function PosRegister() {
         dish,
         quantity: 1,
         portion: PORTION_OPTIONS[0],
-        spiceLevel: dish.spiceLevel || 2,
+        spiceLevel: dish.spiceLevel || 0,
         selectedAddons: [],
         unitPrice: dish.price,
         totalPrice: dish.price,

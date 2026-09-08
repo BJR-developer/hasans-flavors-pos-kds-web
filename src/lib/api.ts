@@ -110,6 +110,7 @@ export const updateDishInDB = async (id: string, updates: Partial<Dish>): Promis
   if (updates.inStock !== undefined) dbPayload.in_stock = updates.inStock;
   if (updates.isChefSpecial !== undefined) dbPayload.is_chef_special = updates.isChefSpecial;
   if (updates.isPopular !== undefined) dbPayload.is_popular = updates.isPopular;
+  if (updates.spiceLevel !== undefined) dbPayload.spice_level = updates.spiceLevel;
   if (updates.variants !== undefined) dbPayload.variants = updates.variants;
 
   const { data, error } = await supabase
