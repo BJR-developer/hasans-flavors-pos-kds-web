@@ -13,6 +13,16 @@ import { OrderDetailsModal } from '../orders/OrderDetailsModal';
 import { SafeImage } from '@/components/common/SafeImage';
 import { PORTION_OPTIONS } from '@/data/options';
 
+const CATEGORY_MATCH_MAP: Record<string, string> = {
+  biryani: 'biryani|rice',
+  curries: 'curry|karahi|haleem|nihari',
+  bbq: 'kabab|bbq|tikka',
+  rolls: 'roll|burger|wrap|bite',
+  drinks: 'drink|beverage|cola|coke|sprite|royal|water|lassi|chai|tea|soda|lemonade',
+  breads: 'roti|naan|paratha|chapati',
+  combos: 'bilao|combo|platter',
+};
+
 export function PosRegister() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -93,14 +103,44 @@ export function PosRegister() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isShortcutsModalOpen, customizingDish, receiptOrder]);
 
+  // Compute live dish counts and eliminate duplicate "all" from DB categories
+  const categoriesWithCounts = useMemo(() => {
+    return categories
+      .filter((c) => c.id !== 'all' && c.name.toLowerCase() !== 'all dishes')
+      .map((cat) => {
+        const matchPattern = cat.match || CATEGORY_MATCH_MAP[cat.id];
+        let count = 0;
+        if (matchPattern) {
+          const regex = new RegExp(matchPattern, 'i');
+          count = dishes.filter((d) => regex.test(d.name) || regex.test(d.category)).length;
+        } else {
+          count = dishes.filter(
+            (d) => d.category && d.category.toLowerCase() === cat.name.toLowerCase()
+          ).length;
+        }
+        return {
+          ...cat,
+          match: matchPattern,
+          count,
+        };
+      });
+  }, [categories, dishes]);
+
   // Filtered dishes
   const filteredDishes = useMemo(() => {
     return dishes.filter((dish) => {
       if (selectedCatId !== 'all') {
-        const cat = categories.find((c) => c.id === selectedCatId);
-        if (cat && cat.match) {
-          const regex = new RegExp(cat.match, 'i');
-          if (!regex.test(dish.name) && !regex.test(dish.category)) {
+        const cat = categoriesWithCounts.find((c) => c.id === selectedCatId);
+        if (cat) {
+          if (cat.match) {
+            const regex = new RegExp(cat.match, 'i');
+            if (!regex.test(dish.name) && !regex.test(dish.category)) {
+              return false;
+            }
+          } else if (
+            dish.category &&
+            dish.category.toLowerCase() !== cat.name.toLowerCase()
+          ) {
             return false;
           }
         }
@@ -115,7 +155,7 @@ export function PosRegister() {
 
       return true;
     });
-  }, [dishes, selectedCatId, searchQuery, categories]);
+  }, [dishes, selectedCatId, searchQuery, categoriesWithCounts]);
 
   // Fast 1-tap add directly to cart (or open customizer if variants exist)
   const handleFastAdd = (dish: Dish) => {
@@ -253,7 +293,7 @@ export function PosRegister() {
             </button>
 
             {/* Individual Categories with Photo Thumbnails */}
-            {categories.map((cat) => {
+            {categoriesWithCounts.map((cat) => {
               const isSelected = selectedCatId === cat.id;
               return (
                 <button
