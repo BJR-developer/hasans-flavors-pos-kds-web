@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Check,
@@ -10,22 +10,33 @@ import {
   Edit3,
   XCircle,
   ArrowRightLeft,
+  GripVertical,
+  Sparkles,
 } from 'lucide-react';
 import { Order, OrderStatus } from '@/types';
 import { useUpdateOrderStatus, useToggleItemInKitchen } from '@/hooks/useRestaurantData';
 import { playBumpChime } from '@/lib/audio';
 import { ChangeTableModal } from '../tables/ChangeTableModal';
+import { getOrderColorTheme } from '@/lib/orderColors';
 
 interface KdsTicketCardProps {
   order: Order;
   stationFilter?: string;
   onPrint?: (order: Order) => void;
+  onStatusChange?: (orderId: string, nextStatus: OrderStatus, tableNumber?: string, direction?: 'forward' | 'backward') => void;
+  onDragStart?: (e: React.DragEvent, order: Order) => void;
+  onDragEnd?: (e: React.DragEvent) => void;
+  isJustMoved?: boolean;
 }
 
 export function KdsTicketCard({
   order,
   stationFilter = 'all',
   onPrint,
+  onStatusChange,
+  onDragStart,
+  onDragEnd,
+  isJustMoved = false,
 }: KdsTicketCardProps) {
   const router = useRouter();
   const updateStatus = useUpdateOrderStatus();
@@ -33,6 +44,12 @@ export function KdsTicketCard({
 
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [isChangeTableOpen, setIsChangeTableOpen] = useState(false);
+  const [animatingDirection, setAnimatingDirection] = useState<'forward' | 'backward' | null>(null);
+
+  // Derive distinct, high-contrast visual theme for this order
+  const colorTheme = useMemo(() => {
+    return getOrderColorTheme(order.id || order.orderNumber);
+  }, [order.id, order.orderNumber]);
 
   useEffect(() => {
     const calculate = () => {
@@ -77,6 +94,7 @@ export function KdsTicketCard({
   }
 
   const handleBumpNext = () => {
+    if (animatingDirection) return;
     playBumpChime();
     let nextStatus: OrderStatus = 'preparing';
     if (order.status === 'pending' || order.status === 'sent_to_kitchen') nextStatus = 'preparing';
@@ -84,10 +102,20 @@ export function KdsTicketCard({
     else if (order.status === 'ready') nextStatus = 'served';
     else if (order.status === 'served') nextStatus = 'completed';
 
-    updateStatus.mutate({ orderId: order.id, status: nextStatus, tableNumber: order.tableNumber });
+    // Trigger visual slide-out animation so the user's eyes smoothly see the card move
+    setAnimatingDirection('forward');
+    setTimeout(() => {
+      if (onStatusChange) {
+        onStatusChange(order.id, nextStatus, order.tableNumber, 'forward');
+      } else {
+        updateStatus.mutate({ orderId: order.id, status: nextStatus, tableNumber: order.tableNumber });
+      }
+      setAnimatingDirection(null);
+    }, 240);
   };
 
   const handleBumpPrevious = () => {
+    if (animatingDirection) return;
     playBumpChime();
     let prevStatus: OrderStatus = 'pending';
     if (order.status === 'completed') prevStatus = 'served';
@@ -95,7 +123,16 @@ export function KdsTicketCard({
     else if (order.status === 'ready') prevStatus = 'preparing';
     else if (order.status === 'preparing') prevStatus = 'pending';
 
-    updateStatus.mutate({ orderId: order.id, status: prevStatus, tableNumber: order.tableNumber });
+    // Trigger visual slide-back animation
+    setAnimatingDirection('backward');
+    setTimeout(() => {
+      if (onStatusChange) {
+        onStatusChange(order.id, prevStatus, order.tableNumber, 'backward');
+      } else {
+        updateStatus.mutate({ orderId: order.id, status: prevStatus, tableNumber: order.tableNumber });
+      }
+      setAnimatingDirection(null);
+    }, 240);
   };
 
   const handleCancelOrder = () => {
@@ -111,57 +148,85 @@ export function KdsTicketCard({
 
   return (
     <div
-      className={`bg-white rounded-xl border flex flex-col transition-all overflow-hidden ${
-        isUrgent
+      draggable={!animatingDirection}
+      onDragStart={(e) => onDragStart?.(e, order)}
+      onDragEnd={onDragEnd}
+      className={`bg-white rounded-xl border flex flex-col overflow-hidden transition-all duration-200 cursor-grab active:cursor-grabbing select-none ${
+        isJustMoved
+          ? 'ring-2 ring-emerald-500 shadow-md animate-in fade-in slide-in-from-left-4 duration-300'
+          : isUrgent
           ? 'border-red-400 shadow-2xs'
-          : 'border-neutral-200 hover:border-neutral-300'
+          : 'border-neutral-200 hover:border-neutral-300 hover:shadow-2xs'
+      } ${
+        animatingDirection === 'forward'
+          ? 'translate-x-12 opacity-20 scale-95 transition-all duration-240 ease-out'
+          : animatingDirection === 'backward'
+          ? '-translate-x-12 opacity-20 scale-95 transition-all duration-240 ease-out'
+          : ''
       }`}
     >
-      {/* Ticket Header */}
-      <div
-        className={`px-3.5 py-2 border-b flex items-center justify-between gap-2 ${
-          isUrgent
-            ? 'bg-red-50/70 border-red-100'
-            : 'bg-neutral-50/80 border-neutral-100'
-        }`}
-      >
-        <div className="flex items-center gap-1.5 flex-wrap">
-          <span className="font-mono font-bold text-xs text-neutral-900">
-            {order.orderNumber}
+      {/* Visual Just-Moved Beacon */}
+      {isJustMoved && (
+        <div className="bg-emerald-600 text-white text-[10px] font-bold px-2 py-0.5 flex items-center justify-between animate-pulse">
+          <span className="flex items-center gap-1">
+            <Sparkles className="w-3 h-3" /> Moved to this column
           </span>
+          <span className="text-[9px] font-mono uppercase">Live</span>
+        </div>
+      )}
+
+      {/* Ticket Header with Dynamic High-Contrast Color Theme */}
+      <div
+        className={`px-3.5 py-2.5 border-b flex items-center justify-between gap-2 transition-colors ${
+          colorTheme.headerBg
+        } ${colorTheme.headerText}`}
+      >
+        <div className="flex items-center gap-2 flex-wrap min-w-0">
+          <div className="flex items-center gap-1">
+            <GripVertical className="w-3 h-3 opacity-60 shrink-0" />
+            <span className="font-mono font-black text-sm tracking-tight">
+              {order.orderNumber}
+            </span>
+          </div>
+
           {order.type === 'dine_in' ? (
             <button
               type="button"
               onClick={() => setIsChangeTableOpen(true)}
-              className="flex items-center gap-1 text-[10px] font-bold text-neutral-800 px-1.5 py-0.5 rounded bg-white border border-neutral-300 hover:border-neutral-900 hover:bg-neutral-50 transition-all cursor-pointer shadow-2xs"
+              className={`flex items-center gap-1 text-[10.5px] font-extrabold px-2 py-0.5 rounded-md transition-all cursor-pointer shadow-2xs ${
+                colorTheme.badgeBg
+              }`}
               title="Click to move to another available table"
             >
               <span>{order.tableNumber || 'Dine-In'}</span>
-              <ArrowRightLeft className="w-2.5 h-2.5 text-neutral-400" />
+              <ArrowRightLeft className="w-2.5 h-2.5 opacity-75" />
             </button>
           ) : (
-            <span className="text-[10px] font-semibold text-neutral-600 px-1.5 py-0.5 rounded bg-white border border-neutral-200">
+            <span
+              className={`text-[10.5px] font-bold px-2 py-0.5 rounded-md ${
+                colorTheme.badgeBg
+              }`}
+            >
               {order.type === 'delivery' ? 'Delivery' : 'Takeout'}
             </span>
           )}
+
           <span
-            className={`text-[9px] font-bold uppercase px-1.5 py-0.5 rounded ${
+            className={`text-[9.5px] font-extrabold uppercase px-1.5 py-0.5 rounded ${
               order.paymentStatus === 'paid'
-                ? 'bg-emerald-100 text-emerald-800'
-                : 'bg-amber-100 text-amber-900'
+                ? 'bg-emerald-950/70 text-emerald-200 border border-emerald-400/40'
+                : 'bg-black/25 text-inherit border border-current/20'
             }`}
           >
-            {order.paymentStatus === 'paid' ? 'PAID' : 'UNPAID'}
+            {order.paymentStatus === 'paid' ? '★ PAID' : 'UNPAID'}
           </span>
         </div>
 
         <div className="flex items-center gap-1.5 shrink-0">
           <span
-            className={`text-[11px] font-mono font-medium ${
-              isUrgent ? 'text-red-700 font-bold' : 'text-neutral-500'
-            }`}
+            className={`text-[11px] font-mono font-bold ${colorTheme.subText}`}
           >
-            {elapsedMinutes}m ago
+            {elapsedMinutes}m
           </span>
 
           {onPrint && (
@@ -169,7 +234,7 @@ export function KdsTicketCard({
               type="button"
               onClick={() => onPrint(order)}
               title="Print Receipt / Bill"
-              className="p-1 rounded text-neutral-400 hover:text-neutral-900 hover:bg-white transition-colors"
+              className="p-1 rounded hover:bg-black/15 transition-colors cursor-pointer"
             >
               <Printer className="w-3.5 h-3.5" />
             </button>

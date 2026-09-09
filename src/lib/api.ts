@@ -384,22 +384,58 @@ export const updateOrderStatusInDB = async (
   status: Order['status'],
   tableNumber?: string
 ): Promise<void> => {
+  const updatePayload: any = { status, updated_at: new Date().toISOString() };
+
+  // When an order is completed, mark it paid in full and settle payment so revenue reflects on dashboard
+  if (status === 'completed') {
+    try {
+      const { data: ord } = await supabase
+        .from('orders')
+        .select('total, amount_paid, payment_status, payment_method, payment_history')
+        .eq('id', orderId)
+        .single();
+
+      if (ord) {
+        const orderTotal = Number(ord.total || 0);
+        updatePayload.payment_status = 'paid';
+        updatePayload.amount_paid = orderTotal;
+
+        const history = Array.isArray(ord.payment_history) ? [...ord.payment_history] : [];
+        if (history.length === 0 || ord.payment_status !== 'paid') {
+          history.push({
+            id: `pay_${Date.now()}`,
+            amount: orderTotal,
+            method: ord.payment_method || 'cash',
+            timestamp: new Date().toISOString(),
+            note: 'Settled upon order completion',
+          });
+        }
+        updatePayload.payment_history = history;
+      }
+    } catch (err) {
+      console.warn('Error querying order details for completion payment settlement:', err);
+    }
+  }
+
   const { error } = await supabase
     .from('orders')
-    .update({ status, updated_at: new Date().toISOString() })
+    .update(updatePayload)
     .eq('id', orderId);
 
   if (error) throw error;
 
-  // If order is completed or cancelled and tableNumber is given (or fetched), release table if paid
+  // If order is completed or cancelled, release dining table immediately
   if (status === 'completed' || status === 'cancelled') {
     try {
-      const { data: ord } = await supabase.from('orders').select('table_number, payment_status, type').eq('id', orderId).single();
-      if (ord && ord.type === 'dine_in' && ord.table_number) {
-        // If cancelled or paid, table is freed
-        if (status === 'cancelled' || ord.payment_status === 'paid') {
-          await updateTableStatusInDB(ord.table_number, 'available', undefined);
-        }
+      const { data: ord } = await supabase
+        .from('orders')
+        .select('table_number, type')
+        .eq('id', orderId)
+        .single();
+
+      const tbl = tableNumber || ord?.table_number;
+      if (tbl && (ord?.type === 'dine_in' || tableNumber)) {
+        await updateTableStatusInDB(tbl, 'available', undefined);
       }
     } catch (e) {
       console.warn('Error releasing table on order status update:', e);

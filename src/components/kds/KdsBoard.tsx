@@ -1,25 +1,75 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import {
   Columns3,
   LayoutGrid,
   Search,
   X,
   Clock,
+  ArrowDown,
+  Sparkles,
 } from 'lucide-react';
-import { useOrders } from '@/hooks/useRestaurantData';
+import { useOrders, useUpdateOrderStatus } from '@/hooks/useRestaurantData';
 import { KdsTicketCard } from './KdsTicketCard';
 import { ThermalReceiptModal } from '../pos/ThermalReceiptModal';
-import { Order } from '@/types';
+import { Order, OrderStatus } from '@/types';
+import { playBumpChime } from '@/lib/audio';
 
 export function KdsBoard() {
   const { data: orders = [] } = useOrders();
+  const updateStatusMutation = useUpdateOrderStatus();
 
   const [stationFilter, setStationFilter] = useState<string>('all');
   const [viewMode, setViewMode] = useState<'columns' | 'grid'>('columns');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [receiptOrder, setReceiptOrder] = useState<Order | null>(null);
+
+  // Drag-and-Drop & Visual Transition Animation State
+  const [draggingOrderId, setDraggingOrderId] = useState<string | null>(null);
+  const [dragOverColumn, setDragOverColumn] = useState<OrderStatus | null>(null);
+  const [justMovedIds, setJustMovedIds] = useState<Record<string, boolean>>({});
+
+  // Trigger smooth highlight beacon when an order arrives in a new column
+  const markOrderAsJustMoved = useCallback((orderId: string) => {
+    setJustMovedIds((prev) => ({ ...prev, [orderId]: true }));
+    setTimeout(() => {
+      setJustMovedIds((prev) => {
+        const next = { ...prev };
+        delete next[orderId];
+        return next;
+      });
+    }, 2500);
+  }, []);
+
+  // Handle animated button bumps
+  const handleStatusChange = useCallback(
+    (orderId: string, nextStatus: OrderStatus, tableNumber?: string) => {
+      markOrderAsJustMoved(orderId);
+      updateStatusMutation.mutate({ orderId, status: nextStatus, tableNumber });
+    },
+    [markOrderAsJustMoved, updateStatusMutation]
+  );
+
+  // Handle Drag-and-Drop between Kanban columns
+  const handleDropToColumn = useCallback(
+    (targetStatus: OrderStatus) => {
+      if (!draggingOrderId) return;
+      const order = orders.find((o) => o.id === draggingOrderId);
+      if (order && order.status !== targetStatus) {
+        playBumpChime();
+        markOrderAsJustMoved(order.id);
+        updateStatusMutation.mutate({
+          orderId: order.id,
+          status: targetStatus,
+          tableNumber: order.tableNumber,
+        });
+      }
+      setDraggingOrderId(null);
+      setDragOverColumn(null);
+    },
+    [draggingOrderId, orders, markOrderAsJustMoved, updateStatusMutation]
+  );
 
   // Scope: Last 24 hours only
   const recent24hOrders = useMemo(() => {
@@ -161,12 +211,35 @@ export function KdsBoard() {
       <div className="flex-1 overflow-x-auto overflow-y-hidden p-3 sm:p-4 lg:p-5">
         {viewMode === 'columns' ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 h-full min-w-[960px]">
-            {/* 1. Received */}
-            <div className="flex flex-col bg-neutral-200/60 rounded-xl p-3 overflow-hidden border border-neutral-300/70">
+            {/* 1. Received Column */}
+            <div
+              onDragOver={(e) => {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+                setDragOverColumn('pending');
+              }}
+              onDragLeave={() => {
+                if (dragOverColumn === 'pending') setDragOverColumn(null);
+              }}
+              onDrop={(e) => {
+                e.preventDefault();
+                handleDropToColumn('pending');
+              }}
+              className={`flex flex-col rounded-xl p-3 overflow-hidden transition-all duration-200 ${
+                dragOverColumn === 'pending'
+                  ? 'border-2 border-dashed border-neutral-900 bg-amber-50/80 shadow-md ring-2 ring-neutral-900/10'
+                  : 'bg-neutral-200/60 border border-neutral-300/70'
+              }`}
+            >
               <div className="flex items-center justify-between pb-2 mb-2 border-b border-neutral-300/70">
                 <span className="text-xs font-bold text-neutral-900 uppercase tracking-wide">
                   Received ({pendingOrders.length})
                 </span>
+                {dragOverColumn === 'pending' && (
+                  <span className="text-[10px] font-bold text-amber-800 animate-pulse flex items-center gap-1">
+                    <ArrowDown className="w-3 h-3" /> Drop here
+                  </span>
+                )}
               </div>
               <div className="flex-1 overflow-y-auto space-y-3 pr-0.5">
                 {pendingOrders.length === 0 ? (
@@ -178,18 +251,51 @@ export function KdsBoard() {
                       order={order}
                       stationFilter={stationFilter}
                       onPrint={(o) => setReceiptOrder(o)}
+                      onStatusChange={handleStatusChange}
+                      onDragStart={(e, o) => {
+                        setDraggingOrderId(o.id);
+                        e.dataTransfer.setData('text/plain', o.id);
+                      }}
+                      onDragEnd={() => {
+                        setDraggingOrderId(null);
+                        setDragOverColumn(null);
+                      }}
+                      isJustMoved={!!justMovedIds[order.id]}
                     />
                   ))
                 )}
               </div>
             </div>
 
-            {/* 2. Cooking */}
-            <div className="flex flex-col bg-neutral-200/60 rounded-xl p-3 overflow-hidden border border-neutral-300/70">
+            {/* 2. Cooking Column */}
+            <div
+              onDragOver={(e) => {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+                setDragOverColumn('preparing');
+              }}
+              onDragLeave={() => {
+                if (dragOverColumn === 'preparing') setDragOverColumn(null);
+              }}
+              onDrop={(e) => {
+                e.preventDefault();
+                handleDropToColumn('preparing');
+              }}
+              className={`flex flex-col rounded-xl p-3 overflow-hidden transition-all duration-200 ${
+                dragOverColumn === 'preparing'
+                  ? 'border-2 border-dashed border-neutral-900 bg-neutral-100/90 shadow-md ring-2 ring-neutral-900/10'
+                  : 'bg-neutral-200/60 border border-neutral-300/70'
+              }`}
+            >
               <div className="flex items-center justify-between pb-2 mb-2 border-b border-neutral-300/70">
                 <span className="text-xs font-bold text-neutral-900 uppercase tracking-wide">
                   Cooking ({preparingOrders.length})
                 </span>
+                {dragOverColumn === 'preparing' && (
+                  <span className="text-[10px] font-bold text-neutral-800 animate-pulse flex items-center gap-1">
+                    <ArrowDown className="w-3 h-3" /> Drop here
+                  </span>
+                )}
               </div>
               <div className="flex-1 overflow-y-auto space-y-3 pr-0.5">
                 {preparingOrders.length === 0 ? (
@@ -201,18 +307,51 @@ export function KdsBoard() {
                       order={order}
                       stationFilter={stationFilter}
                       onPrint={(o) => setReceiptOrder(o)}
+                      onStatusChange={handleStatusChange}
+                      onDragStart={(e, o) => {
+                        setDraggingOrderId(o.id);
+                        e.dataTransfer.setData('text/plain', o.id);
+                      }}
+                      onDragEnd={() => {
+                        setDraggingOrderId(null);
+                        setDragOverColumn(null);
+                      }}
+                      isJustMoved={!!justMovedIds[order.id]}
                     />
                   ))
                 )}
               </div>
             </div>
 
-            {/* 3. Ready */}
-            <div className="flex flex-col bg-neutral-200/60 rounded-xl p-3 overflow-hidden border border-neutral-300/70">
+            {/* 3. Ready Column */}
+            <div
+              onDragOver={(e) => {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+                setDragOverColumn('ready');
+              }}
+              onDragLeave={() => {
+                if (dragOverColumn === 'ready') setDragOverColumn(null);
+              }}
+              onDrop={(e) => {
+                e.preventDefault();
+                handleDropToColumn('ready');
+              }}
+              className={`flex flex-col rounded-xl p-3 overflow-hidden transition-all duration-200 ${
+                dragOverColumn === 'ready'
+                  ? 'border-2 border-dashed border-blue-600 bg-blue-50/80 shadow-md ring-2 ring-blue-500/10'
+                  : 'bg-neutral-200/60 border border-neutral-300/70'
+              }`}
+            >
               <div className="flex items-center justify-between pb-2 mb-2 border-b border-neutral-300/70">
                 <span className="text-xs font-bold text-neutral-900 uppercase tracking-wide">
                   Ready ({readyOrders.length})
                 </span>
+                {dragOverColumn === 'ready' && (
+                  <span className="text-[10px] font-bold text-blue-700 animate-pulse flex items-center gap-1">
+                    <ArrowDown className="w-3 h-3" /> Drop here
+                  </span>
+                )}
               </div>
               <div className="flex-1 overflow-y-auto space-y-3 pr-0.5">
                 {readyOrders.length === 0 ? (
@@ -224,18 +363,51 @@ export function KdsBoard() {
                       order={order}
                       stationFilter={stationFilter}
                       onPrint={(o) => setReceiptOrder(o)}
+                      onStatusChange={handleStatusChange}
+                      onDragStart={(e, o) => {
+                        setDraggingOrderId(o.id);
+                        e.dataTransfer.setData('text/plain', o.id);
+                      }}
+                      onDragEnd={() => {
+                        setDraggingOrderId(null);
+                        setDragOverColumn(null);
+                      }}
+                      isJustMoved={!!justMovedIds[order.id]}
                     />
                   ))
                 )}
               </div>
             </div>
 
-            {/* 4. Served */}
-            <div className="flex flex-col bg-neutral-200/60 rounded-xl p-3 overflow-hidden border border-neutral-300/70">
+            {/* 4. Served Column */}
+            <div
+              onDragOver={(e) => {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+                setDragOverColumn('served');
+              }}
+              onDragLeave={() => {
+                if (dragOverColumn === 'served') setDragOverColumn(null);
+              }}
+              onDrop={(e) => {
+                e.preventDefault();
+                handleDropToColumn('served');
+              }}
+              className={`flex flex-col rounded-xl p-3 overflow-hidden transition-all duration-200 ${
+                dragOverColumn === 'served'
+                  ? 'border-2 border-dashed border-emerald-600 bg-emerald-50/80 shadow-md ring-2 ring-emerald-500/10'
+                  : 'bg-neutral-200/60 border border-neutral-300/70'
+              }`}
+            >
               <div className="flex items-center justify-between pb-2 mb-2 border-b border-neutral-300/70">
                 <span className="text-xs font-bold text-neutral-900 uppercase tracking-wide">
                   Served ({servedOrders.length})
                 </span>
+                {dragOverColumn === 'served' && (
+                  <span className="text-[10px] font-bold text-emerald-700 animate-pulse flex items-center gap-1">
+                    <ArrowDown className="w-3 h-3" /> Drop here
+                  </span>
+                )}
               </div>
               <div className="flex-1 overflow-y-auto space-y-3 pr-0.5">
                 {servedOrders.length === 0 ? (
@@ -247,6 +419,16 @@ export function KdsBoard() {
                       order={order}
                       stationFilter={stationFilter}
                       onPrint={(o) => setReceiptOrder(o)}
+                      onStatusChange={handleStatusChange}
+                      onDragStart={(e, o) => {
+                        setDraggingOrderId(o.id);
+                        e.dataTransfer.setData('text/plain', o.id);
+                      }}
+                      onDragEnd={() => {
+                        setDraggingOrderId(null);
+                        setDragOverColumn(null);
+                      }}
+                      isJustMoved={!!justMovedIds[order.id]}
                     />
                   ))
                 )}
@@ -267,6 +449,16 @@ export function KdsBoard() {
                     order={order}
                     stationFilter={stationFilter}
                     onPrint={(o) => setReceiptOrder(o)}
+                    onStatusChange={handleStatusChange}
+                    onDragStart={(e, o) => {
+                      setDraggingOrderId(o.id);
+                      e.dataTransfer.setData('text/plain', o.id);
+                    }}
+                    onDragEnd={() => {
+                      setDraggingOrderId(null);
+                      setDragOverColumn(null);
+                    }}
+                    isJustMoved={!!justMovedIds[order.id]}
                   />
                 ))}
               </div>

@@ -84,10 +84,6 @@ export function OrderDetailsModal({
 
   // Instant optimistic status progression
   const handleStatusChange = (status: OrderStatus) => {
-    if (status === 'completed' && !isFullyPaid) {
-      alert(`Please settle the unpaid balance of ₱${balanceDue.toLocaleString()} in POS before closing.`);
-      return;
-    }
     setOptimisticStatus(status);
     updateStatusMutation.mutate(
       { orderId: currentOrder.id, status, tableNumber: currentOrder.tableNumber },
