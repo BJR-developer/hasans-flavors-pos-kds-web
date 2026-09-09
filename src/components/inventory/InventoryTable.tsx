@@ -211,14 +211,12 @@ export function InventoryTable() {
 
   const filteredData = useMemo(() => {
     return dishes.filter((dish) => {
-      // Category filter
+      // Category filter - 100% dynamic relational comparison directly from database
       if (selectedCat !== 'all') {
         const cat = categories.find((c) => c.id === selectedCat);
-        if (cat && cat.match) {
-          const reg = new RegExp(cat.match, 'i');
-          if (!reg.test(dish.name) && !reg.test(dish.category)) {
-            return false;
-          }
+        if (cat) {
+          const matchByName = dish.category && dish.category.toLowerCase() === cat.name.toLowerCase();
+          if (!matchByName) return false;
         }
       }
 
