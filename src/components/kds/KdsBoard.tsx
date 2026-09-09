@@ -12,9 +12,11 @@ import {
 } from 'lucide-react';
 import { useOrders, useUpdateOrderStatus } from '@/hooks/useRestaurantData';
 import { KdsTicketCard } from './KdsTicketCard';
+import { FlyingTicketOverlay, FlyingCardInfo } from './FlyingTicketOverlay';
 import { ThermalReceiptModal } from '../pos/ThermalReceiptModal';
 import { Order, OrderStatus } from '@/types';
 import { playBumpChime } from '@/lib/audio';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export function KdsBoard() {
   const { data: orders = [] } = useOrders();
@@ -29,6 +31,7 @@ export function KdsBoard() {
   const [draggingOrderId, setDraggingOrderId] = useState<string | null>(null);
   const [dragOverColumn, setDragOverColumn] = useState<OrderStatus | null>(null);
   const [justMovedIds, setJustMovedIds] = useState<Record<string, boolean>>({});
+  const [activeFlight, setActiveFlight] = useState<FlyingCardInfo | null>(null);
 
   // Trigger smooth highlight beacon when an order arrives in a new column
   const markOrderAsJustMoved = useCallback((orderId: string) => {
@@ -42,7 +45,85 @@ export function KdsBoard() {
     }, 2500);
   }, []);
 
-  // Handle animated button bumps
+  // Handle animated button bumps with smooth visible flight across columns
+  const handleTriggerFly = useCallback(
+    (order: Order, nextStatus: OrderStatus, direction: 'forward' | 'backward') => {
+      const cardEl = document.getElementById(`kds-ticket-${order.id}`);
+      let targetEl: HTMLElement | null = null;
+
+      if (nextStatus === 'pending' || nextStatus === 'sent_to_kitchen') {
+        targetEl = document.getElementById('kds-col-pending');
+      } else if (nextStatus === 'preparing') {
+        targetEl = document.getElementById('kds-col-preparing');
+      } else if (nextStatus === 'ready') {
+        targetEl = document.getElementById('kds-col-ready');
+      } else if (nextStatus === 'served') {
+        targetEl = document.getElementById('kds-col-served');
+      }
+
+      if (cardEl) {
+        const startRect = cardEl.getBoundingClientRect();
+        let targetRect = {
+          left: startRect.left + (direction === 'forward' ? 320 : -320),
+          top: startRect.top,
+          width: startRect.width,
+          height: startRect.height,
+        };
+
+        if (targetEl) {
+          const colRect = targetEl.getBoundingClientRect();
+          targetRect = {
+            left: colRect.left + 12,
+            top: colRect.top + 48,
+            width: startRect.width,
+            height: startRect.height,
+          };
+        } else if (nextStatus === 'completed') {
+          // Fly out towards upper right settled archive
+          targetRect = {
+            left: window.innerWidth + 80,
+            top: startRect.top - 80,
+            width: startRect.width,
+            height: startRect.height,
+          };
+        }
+
+        setActiveFlight({
+          order,
+          startRect: {
+            left: startRect.left,
+            top: startRect.top,
+            width: startRect.width,
+            height: startRect.height,
+          },
+          targetRect,
+          nextStatus,
+          direction,
+        });
+        return;
+      }
+
+      // Fallback if no DOM element found
+      markOrderAsJustMoved(order.id);
+      updateStatusMutation.mutate({ orderId: order.id, status: nextStatus, tableNumber: order.tableNumber });
+    },
+    [markOrderAsJustMoved, updateStatusMutation]
+  );
+
+  const handleFlightAnimationComplete = useCallback(() => {
+    if (!activeFlight) return;
+    const { order, nextStatus } = activeFlight;
+    playBumpChime();
+    markOrderAsJustMoved(order.id);
+    updateStatusMutation.mutate({
+      orderId: order.id,
+      status: nextStatus,
+      tableNumber: order.tableNumber,
+    });
+    setActiveFlight(null);
+  }, [activeFlight, markOrderAsJustMoved, updateStatusMutation]);
+
+  // Handle direct status change
   const handleStatusChange = useCallback(
     (orderId: string, nextStatus: OrderStatus, tableNumber?: string) => {
       markOrderAsJustMoved(orderId);
@@ -213,6 +294,7 @@ export function KdsBoard() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 h-full min-w-[960px]">
             {/* 1. Received Column */}
             <div
+              id="kds-col-pending"
               onDragOver={(e) => {
                 e.preventDefault();
                 e.dataTransfer.dropEffect = 'move';
@@ -226,8 +308,8 @@ export function KdsBoard() {
                 handleDropToColumn('pending');
               }}
               className={`flex flex-col rounded-xl p-3 overflow-hidden transition-all duration-200 ${
-                dragOverColumn === 'pending'
-                  ? 'border-2 border-dashed border-neutral-900 bg-amber-50/80 shadow-md ring-2 ring-neutral-900/10'
+                dragOverColumn === 'pending' || activeFlight?.nextStatus === 'pending'
+                  ? 'border-2 border-dashed border-amber-500 bg-amber-50/80 shadow-md ring-2 ring-amber-500/20'
                   : 'bg-neutral-200/60 border border-neutral-300/70'
               }`}
             >
@@ -240,35 +322,53 @@ export function KdsBoard() {
                     <ArrowDown className="w-3 h-3" /> Drop here
                   </span>
                 )}
+                {activeFlight?.nextStatus === 'pending' && (
+                  <span className="text-[10px] font-bold text-amber-800 animate-pulse flex items-center gap-1">
+                    <Sparkles className="w-3 h-3" /> Incoming...
+                  </span>
+                )}
               </div>
               <div className="flex-1 overflow-y-auto space-y-3 pr-0.5">
                 {pendingOrders.length === 0 ? (
                   <p className="text-xs text-neutral-400 text-center py-8 font-medium">Queue empty</p>
                 ) : (
-                  pendingOrders.map((order) => (
-                    <KdsTicketCard
-                      key={order.id}
-                      order={order}
-                      stationFilter={stationFilter}
-                      onPrint={(o) => setReceiptOrder(o)}
-                      onStatusChange={handleStatusChange}
-                      onDragStart={(e, o) => {
-                        setDraggingOrderId(o.id);
-                        e.dataTransfer.setData('text/plain', o.id);
-                      }}
-                      onDragEnd={() => {
-                        setDraggingOrderId(null);
-                        setDragOverColumn(null);
-                      }}
-                      isJustMoved={!!justMovedIds[order.id]}
-                    />
-                  ))
+                  <AnimatePresence mode="popLayout">
+                    {pendingOrders.map((order) => (
+                      <motion.div
+                        key={order.id}
+                        layout
+                        initial={{ opacity: 0, y: 15, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
+                        transition={{ type: 'spring', stiffness: 350, damping: 28 }}
+                      >
+                        <KdsTicketCard
+                          order={order}
+                          stationFilter={stationFilter}
+                          onPrint={(o) => setReceiptOrder(o)}
+                          onStatusChange={handleStatusChange}
+                          onTriggerFly={handleTriggerFly}
+                          isFlyingOrigin={activeFlight?.order.id === order.id}
+                          onDragStart={(e, o) => {
+                            setDraggingOrderId(o.id);
+                            e.dataTransfer.setData('text/plain', o.id);
+                          }}
+                          onDragEnd={() => {
+                            setDraggingOrderId(null);
+                            setDragOverColumn(null);
+                          }}
+                          isJustMoved={!!justMovedIds[order.id]}
+                        />
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
                 )}
               </div>
             </div>
 
             {/* 2. Cooking Column */}
             <div
+              id="kds-col-preparing"
               onDragOver={(e) => {
                 e.preventDefault();
                 e.dataTransfer.dropEffect = 'move';
@@ -282,8 +382,8 @@ export function KdsBoard() {
                 handleDropToColumn('preparing');
               }}
               className={`flex flex-col rounded-xl p-3 overflow-hidden transition-all duration-200 ${
-                dragOverColumn === 'preparing'
-                  ? 'border-2 border-dashed border-neutral-900 bg-neutral-100/90 shadow-md ring-2 ring-neutral-900/10'
+                dragOverColumn === 'preparing' || activeFlight?.nextStatus === 'preparing'
+                  ? 'border-2 border-dashed border-neutral-900 bg-neutral-100/90 shadow-md ring-2 ring-neutral-900/20'
                   : 'bg-neutral-200/60 border border-neutral-300/70'
               }`}
             >
@@ -296,35 +396,53 @@ export function KdsBoard() {
                     <ArrowDown className="w-3 h-3" /> Drop here
                   </span>
                 )}
+                {activeFlight?.nextStatus === 'preparing' && (
+                  <span className="text-[10px] font-bold text-neutral-900 animate-pulse flex items-center gap-1">
+                    <Sparkles className="w-3 h-3 text-amber-500" /> Incoming...
+                  </span>
+                )}
               </div>
               <div className="flex-1 overflow-y-auto space-y-3 pr-0.5">
                 {preparingOrders.length === 0 ? (
                   <p className="text-xs text-neutral-400 text-center py-8 font-medium">No items cooking</p>
                 ) : (
-                  preparingOrders.map((order) => (
-                    <KdsTicketCard
-                      key={order.id}
-                      order={order}
-                      stationFilter={stationFilter}
-                      onPrint={(o) => setReceiptOrder(o)}
-                      onStatusChange={handleStatusChange}
-                      onDragStart={(e, o) => {
-                        setDraggingOrderId(o.id);
-                        e.dataTransfer.setData('text/plain', o.id);
-                      }}
-                      onDragEnd={() => {
-                        setDraggingOrderId(null);
-                        setDragOverColumn(null);
-                      }}
-                      isJustMoved={!!justMovedIds[order.id]}
-                    />
-                  ))
+                  <AnimatePresence mode="popLayout">
+                    {preparingOrders.map((order) => (
+                      <motion.div
+                        key={order.id}
+                        layout
+                        initial={{ opacity: 0, y: 15, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
+                        transition={{ type: 'spring', stiffness: 350, damping: 28 }}
+                      >
+                        <KdsTicketCard
+                          order={order}
+                          stationFilter={stationFilter}
+                          onPrint={(o) => setReceiptOrder(o)}
+                          onStatusChange={handleStatusChange}
+                          onTriggerFly={handleTriggerFly}
+                          isFlyingOrigin={activeFlight?.order.id === order.id}
+                          onDragStart={(e, o) => {
+                            setDraggingOrderId(o.id);
+                            e.dataTransfer.setData('text/plain', o.id);
+                          }}
+                          onDragEnd={() => {
+                            setDraggingOrderId(null);
+                            setDragOverColumn(null);
+                          }}
+                          isJustMoved={!!justMovedIds[order.id]}
+                        />
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
                 )}
               </div>
             </div>
 
             {/* 3. Ready Column */}
             <div
+              id="kds-col-ready"
               onDragOver={(e) => {
                 e.preventDefault();
                 e.dataTransfer.dropEffect = 'move';
@@ -338,8 +456,8 @@ export function KdsBoard() {
                 handleDropToColumn('ready');
               }}
               className={`flex flex-col rounded-xl p-3 overflow-hidden transition-all duration-200 ${
-                dragOverColumn === 'ready'
-                  ? 'border-2 border-dashed border-blue-600 bg-blue-50/80 shadow-md ring-2 ring-blue-500/10'
+                dragOverColumn === 'ready' || activeFlight?.nextStatus === 'ready'
+                  ? 'border-2 border-dashed border-blue-600 bg-blue-50/80 shadow-md ring-2 ring-blue-500/20'
                   : 'bg-neutral-200/60 border border-neutral-300/70'
               }`}
             >
@@ -352,35 +470,53 @@ export function KdsBoard() {
                     <ArrowDown className="w-3 h-3" /> Drop here
                   </span>
                 )}
+                {activeFlight?.nextStatus === 'ready' && (
+                  <span className="text-[10px] font-bold text-blue-800 animate-pulse flex items-center gap-1">
+                    <Sparkles className="w-3 h-3 text-blue-600" /> Incoming...
+                  </span>
+                )}
               </div>
               <div className="flex-1 overflow-y-auto space-y-3 pr-0.5">
                 {readyOrders.length === 0 ? (
                   <p className="text-xs text-neutral-400 text-center py-8 font-medium">No orders ready</p>
                 ) : (
-                  readyOrders.map((order) => (
-                    <KdsTicketCard
-                      key={order.id}
-                      order={order}
-                      stationFilter={stationFilter}
-                      onPrint={(o) => setReceiptOrder(o)}
-                      onStatusChange={handleStatusChange}
-                      onDragStart={(e, o) => {
-                        setDraggingOrderId(o.id);
-                        e.dataTransfer.setData('text/plain', o.id);
-                      }}
-                      onDragEnd={() => {
-                        setDraggingOrderId(null);
-                        setDragOverColumn(null);
-                      }}
-                      isJustMoved={!!justMovedIds[order.id]}
-                    />
-                  ))
+                  <AnimatePresence mode="popLayout">
+                    {readyOrders.map((order) => (
+                      <motion.div
+                        key={order.id}
+                        layout
+                        initial={{ opacity: 0, y: 15, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
+                        transition={{ type: 'spring', stiffness: 350, damping: 28 }}
+                      >
+                        <KdsTicketCard
+                          order={order}
+                          stationFilter={stationFilter}
+                          onPrint={(o) => setReceiptOrder(o)}
+                          onStatusChange={handleStatusChange}
+                          onTriggerFly={handleTriggerFly}
+                          isFlyingOrigin={activeFlight?.order.id === order.id}
+                          onDragStart={(e, o) => {
+                            setDraggingOrderId(o.id);
+                            e.dataTransfer.setData('text/plain', o.id);
+                          }}
+                          onDragEnd={() => {
+                            setDraggingOrderId(null);
+                            setDragOverColumn(null);
+                          }}
+                          isJustMoved={!!justMovedIds[order.id]}
+                        />
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
                 )}
               </div>
             </div>
 
             {/* 4. Served Column */}
             <div
+              id="kds-col-served"
               onDragOver={(e) => {
                 e.preventDefault();
                 e.dataTransfer.dropEffect = 'move';
@@ -394,8 +530,8 @@ export function KdsBoard() {
                 handleDropToColumn('served');
               }}
               className={`flex flex-col rounded-xl p-3 overflow-hidden transition-all duration-200 ${
-                dragOverColumn === 'served'
-                  ? 'border-2 border-dashed border-emerald-600 bg-emerald-50/80 shadow-md ring-2 ring-emerald-500/10'
+                dragOverColumn === 'served' || activeFlight?.nextStatus === 'served'
+                  ? 'border-2 border-dashed border-emerald-600 bg-emerald-50/80 shadow-md ring-2 ring-emerald-500/20'
                   : 'bg-neutral-200/60 border border-neutral-300/70'
               }`}
             >
@@ -408,29 +544,46 @@ export function KdsBoard() {
                     <ArrowDown className="w-3 h-3" /> Drop here
                   </span>
                 )}
+                {activeFlight?.nextStatus === 'served' && (
+                  <span className="text-[10px] font-bold text-emerald-800 animate-pulse flex items-center gap-1">
+                    <Sparkles className="w-3 h-3 text-emerald-600" /> Incoming...
+                  </span>
+                )}
               </div>
               <div className="flex-1 overflow-y-auto space-y-3 pr-0.5">
                 {servedOrders.length === 0 ? (
                   <p className="text-xs text-neutral-400 text-center py-8 font-medium">No served orders</p>
                 ) : (
-                  servedOrders.map((order) => (
-                    <KdsTicketCard
-                      key={order.id}
-                      order={order}
-                      stationFilter={stationFilter}
-                      onPrint={(o) => setReceiptOrder(o)}
-                      onStatusChange={handleStatusChange}
-                      onDragStart={(e, o) => {
-                        setDraggingOrderId(o.id);
-                        e.dataTransfer.setData('text/plain', o.id);
-                      }}
-                      onDragEnd={() => {
-                        setDraggingOrderId(null);
-                        setDragOverColumn(null);
-                      }}
-                      isJustMoved={!!justMovedIds[order.id]}
-                    />
-                  ))
+                  <AnimatePresence mode="popLayout">
+                    {servedOrders.map((order) => (
+                      <motion.div
+                        key={order.id}
+                        layout
+                        initial={{ opacity: 0, y: 15, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
+                        transition={{ type: 'spring', stiffness: 350, damping: 28 }}
+                      >
+                        <KdsTicketCard
+                          order={order}
+                          stationFilter={stationFilter}
+                          onPrint={(o) => setReceiptOrder(o)}
+                          onStatusChange={handleStatusChange}
+                          onTriggerFly={handleTriggerFly}
+                          isFlyingOrigin={activeFlight?.order.id === order.id}
+                          onDragStart={(e, o) => {
+                            setDraggingOrderId(o.id);
+                            e.dataTransfer.setData('text/plain', o.id);
+                          }}
+                          onDragEnd={() => {
+                            setDraggingOrderId(null);
+                            setDragOverColumn(null);
+                          }}
+                          isJustMoved={!!justMovedIds[order.id]}
+                        />
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
                 )}
               </div>
             </div>
@@ -450,6 +603,7 @@ export function KdsBoard() {
                     stationFilter={stationFilter}
                     onPrint={(o) => setReceiptOrder(o)}
                     onStatusChange={handleStatusChange}
+                    onTriggerFly={handleTriggerFly}
                     onDragStart={(e, o) => {
                       setDraggingOrderId(o.id);
                       e.dataTransfer.setData('text/plain', o.id);
@@ -466,6 +620,12 @@ export function KdsBoard() {
           </div>
         )}
       </div>
+
+      {/* Floating Ticket Flight Animation Overlay */}
+      <FlyingTicketOverlay
+        flight={activeFlight}
+        onAnimationComplete={handleFlightAnimationComplete}
+      />
 
       {/* Thermal Receipt Modal (z-[70] for clean topmost layer) */}
       {receiptOrder && (

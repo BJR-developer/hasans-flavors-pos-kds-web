@@ -24,9 +24,11 @@ interface KdsTicketCardProps {
   stationFilter?: string;
   onPrint?: (order: Order) => void;
   onStatusChange?: (orderId: string, nextStatus: OrderStatus, tableNumber?: string, direction?: 'forward' | 'backward') => void;
+  onTriggerFly?: (order: Order, nextStatus: OrderStatus, direction: 'forward' | 'backward') => void;
   onDragStart?: (e: React.DragEvent, order: Order) => void;
   onDragEnd?: (e: React.DragEvent) => void;
   isJustMoved?: boolean;
+  isFlyingOrigin?: boolean;
 }
 
 export function KdsTicketCard({
@@ -34,9 +36,11 @@ export function KdsTicketCard({
   stationFilter = 'all',
   onPrint,
   onStatusChange,
+  onTriggerFly,
   onDragStart,
   onDragEnd,
   isJustMoved = false,
+  isFlyingOrigin = false,
 }: KdsTicketCardProps) {
   const router = useRouter();
   const updateStatus = useUpdateOrderStatus();
@@ -94,7 +98,7 @@ export function KdsTicketCard({
   }
 
   const handleBumpNext = () => {
-    if (animatingDirection) return;
+    if (animatingDirection || isFlyingOrigin) return;
     playBumpChime();
     let nextStatus: OrderStatus = 'preparing';
     if (order.status === 'pending' || order.status === 'sent_to_kitchen') nextStatus = 'preparing';
@@ -102,20 +106,20 @@ export function KdsTicketCard({
     else if (order.status === 'ready') nextStatus = 'served';
     else if (order.status === 'served') nextStatus = 'completed';
 
-    // Trigger visual slide-out animation so the user's eyes smoothly see the card move
-    setAnimatingDirection('forward');
-    setTimeout(() => {
-      if (onStatusChange) {
-        onStatusChange(order.id, nextStatus, order.tableNumber, 'forward');
-      } else {
-        updateStatus.mutate({ orderId: order.id, status: nextStatus, tableNumber: order.tableNumber });
-      }
-      setAnimatingDirection(null);
-    }, 240);
+    if (onTriggerFly) {
+      onTriggerFly(order, nextStatus, 'forward');
+      return;
+    }
+
+    if (onStatusChange) {
+      onStatusChange(order.id, nextStatus, order.tableNumber, 'forward');
+    } else {
+      updateStatus.mutate({ orderId: order.id, status: nextStatus, tableNumber: order.tableNumber });
+    }
   };
 
   const handleBumpPrevious = () => {
-    if (animatingDirection) return;
+    if (animatingDirection || isFlyingOrigin) return;
     playBumpChime();
     let prevStatus: OrderStatus = 'pending';
     if (order.status === 'completed') prevStatus = 'served';
@@ -123,16 +127,16 @@ export function KdsTicketCard({
     else if (order.status === 'ready') prevStatus = 'preparing';
     else if (order.status === 'preparing') prevStatus = 'pending';
 
-    // Trigger visual slide-back animation
-    setAnimatingDirection('backward');
-    setTimeout(() => {
-      if (onStatusChange) {
-        onStatusChange(order.id, prevStatus, order.tableNumber, 'backward');
-      } else {
-        updateStatus.mutate({ orderId: order.id, status: prevStatus, tableNumber: order.tableNumber });
-      }
-      setAnimatingDirection(null);
-    }, 240);
+    if (onTriggerFly) {
+      onTriggerFly(order, prevStatus, 'backward');
+      return;
+    }
+
+    if (onStatusChange) {
+      onStatusChange(order.id, prevStatus, order.tableNumber, 'backward');
+    } else {
+      updateStatus.mutate({ orderId: order.id, status: prevStatus, tableNumber: order.tableNumber });
+    }
   };
 
   const handleCancelOrder = () => {
@@ -148,21 +152,18 @@ export function KdsTicketCard({
 
   return (
     <div
-      draggable={!animatingDirection}
+      id={`kds-ticket-${order.id}`}
+      draggable={!animatingDirection && !isFlyingOrigin}
       onDragStart={(e) => onDragStart?.(e, order)}
       onDragEnd={onDragEnd}
       className={`bg-white rounded-xl border flex flex-col overflow-hidden transition-all duration-200 cursor-grab active:cursor-grabbing select-none ${
-        isJustMoved
+        isFlyingOrigin
+          ? 'opacity-20 scale-95 pointer-events-none'
+          : isJustMoved
           ? 'ring-2 ring-emerald-500 shadow-md animate-in fade-in slide-in-from-left-4 duration-300'
           : isUrgent
           ? 'border-red-400 shadow-2xs'
           : 'border-neutral-200 hover:border-neutral-300 hover:shadow-2xs'
-      } ${
-        animatingDirection === 'forward'
-          ? 'translate-x-12 opacity-20 scale-95 transition-all duration-240 ease-out'
-          : animatingDirection === 'backward'
-          ? '-translate-x-12 opacity-20 scale-95 transition-all duration-240 ease-out'
-          : ''
       }`}
     >
       {/* Visual Just-Moved Beacon */}
