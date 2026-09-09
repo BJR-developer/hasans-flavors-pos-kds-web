@@ -10,7 +10,6 @@ import {
   TrendingUp,
   Calendar,
   ShoppingBag,
-  Bike,
 } from 'lucide-react';
 import { useOrders, useTableSessions } from '@/hooks/useRestaurantData';
 
@@ -130,18 +129,15 @@ export function AnalyticsOverview() {
   const avgTicket = totalOrdersCount > 0 ? Math.round(totalRevenue / totalOrdersCount) : 0;
   const activeTablesCount = tables.filter((t) => t.status !== 'available').length;
 
-  // Channel breakdown
+  // Channel breakdown (Dine-In & Takeout)
   const dineInOrders = filteredOrders.filter((o) => o.type === 'dine_in');
-  const deliveryOrders = filteredOrders.filter((o) => o.type === 'delivery');
   const takeoutOrders = filteredOrders.filter((o) => o.type === 'takeout');
 
   const dineInRevenue = dineInOrders.reduce((sum, o) => sum + o.total, 0);
-  const deliveryRevenue = deliveryOrders.reduce((sum, o) => sum + o.total, 0);
   const takeoutRevenue = takeoutOrders.reduce((sum, o) => sum + o.total, 0);
 
-  // Payment Breakdown
+  // Payment Breakdown (Cash & Card)
   const cashCount = filteredOrders.filter((o) => o.paymentMethod === 'cash').length;
-  const gcashCount = filteredOrders.filter((o) => o.paymentMethod === 'gcash').length;
   const cardCount = filteredOrders.filter((o) => o.paymentMethod === 'card').length;
 
   // Top Selling Items in Range
@@ -357,10 +353,10 @@ export function AnalyticsOverview() {
             Sales Channel Breakdown ({rangeLabel})
           </h3>
 
-          <div className="space-y-3 text-xs">
+          <div className="space-y-4 text-xs">
             {/* Dine-In */}
             <div>
-              <div className="flex items-center justify-between font-semibold text-[#1F1F1F] mb-1">
+              <div className="flex items-center justify-between font-semibold text-[#1F1F1F] mb-1.5">
                 <span className="flex items-center gap-1.5">
                   <Utensils className="w-3.5 h-3.5 text-[#BA1A20]" /> Dine-In ({dineInOrders.length})
                 </span>
@@ -378,7 +374,7 @@ export function AnalyticsOverview() {
 
             {/* Takeout */}
             <div>
-              <div className="flex items-center justify-between font-semibold text-[#1F1F1F] mb-1">
+              <div className="flex items-center justify-between font-semibold text-[#1F1F1F] mb-1.5">
                 <span className="flex items-center gap-1.5">
                   <ShoppingBag className="w-3.5 h-3.5 text-[#B45309]" /> Takeout ({takeoutOrders.length})
                 </span>
@@ -393,24 +389,6 @@ export function AnalyticsOverview() {
                 />
               </div>
             </div>
-
-            {/* Delivery */}
-            <div>
-              <div className="flex items-center justify-between font-semibold text-[#1F1F1F] mb-1">
-                <span className="flex items-center gap-1.5">
-                  <Bike className="w-3.5 h-3.5 text-[#2E7D32]" /> Delivery ({deliveryOrders.length})
-                </span>
-                <span className="font-bold">₱{deliveryRevenue.toLocaleString()}</span>
-              </div>
-              <div className="w-full h-2 bg-[#F5F5F5] rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-[#2E7D32] rounded-full transition-all"
-                  style={{
-                    width: `${totalRevenue > 0 ? Math.round((deliveryRevenue / totalRevenue) * 100) : 0}%`,
-                  }}
-                />
-              </div>
-            </div>
           </div>
         </div>
 
@@ -420,27 +398,19 @@ export function AnalyticsOverview() {
             Tender Share ({rangeLabel})
           </h3>
 
-          <div className="grid grid-cols-3 gap-2">
-            <div className="p-3 rounded-lg bg-[#FAFAFA] border border-[#E5E5E5] text-center">
+          <div className="grid grid-cols-2 gap-2.5">
+            <div className="p-3.5 rounded-xl bg-[#FAFAFA] border border-[#E5E5E5] text-center">
               <span className="text-[10px] font-bold text-[#737373] uppercase">Cash</span>
-              <p className="text-lg font-black text-[#1F1F1F] mt-1">{cashCount}</p>
-              <p className="text-[10px] text-[#737373]">
+              <p className="text-xl font-black text-[#1F1F1F] mt-1">{cashCount}</p>
+              <p className="text-[10px] text-[#737373] mt-0.5">
                 {totalOrdersCount > 0 ? Math.round((cashCount / totalOrdersCount) * 100) : 0}% share
               </p>
             </div>
 
-            <div className="p-3 rounded-lg bg-[#FAFAFA] border border-[#E5E5E5] text-center">
-              <span className="text-[10px] font-bold text-[#737373] uppercase">GCash</span>
-              <p className="text-lg font-black text-[#1565C0] mt-1">{gcashCount}</p>
-              <p className="text-[10px] text-[#737373]">
-                {totalOrdersCount > 0 ? Math.round((gcashCount / totalOrdersCount) * 100) : 0}% share
-              </p>
-            </div>
-
-            <div className="p-3 rounded-lg bg-[#FAFAFA] border border-[#E5E5E5] text-center">
+            <div className="p-3.5 rounded-xl bg-[#FAFAFA] border border-[#E5E5E5] text-center">
               <span className="text-[10px] font-bold text-[#737373] uppercase">Card</span>
-              <p className="text-lg font-black text-[#5B403D] mt-1">{cardCount}</p>
-              <p className="text-[10px] text-[#737373]">
+              <p className="text-xl font-black text-[#BA1A20] mt-1">{cardCount}</p>
+              <p className="text-[10px] text-[#737373] mt-0.5">
                 {totalOrdersCount > 0 ? Math.round((cardCount / totalOrdersCount) * 100) : 0}% share
               </p>
             </div>
