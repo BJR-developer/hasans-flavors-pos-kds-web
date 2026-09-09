@@ -7,6 +7,7 @@ import { useAddDish, useUpdateDish } from '@/hooks/useRestaurantData';
 import { SafeImage } from '@/components/common/SafeImage';
 import { supabase } from '@/lib/supabase';
 import { SelectDropdown, DropdownOption } from '@/components/common/SelectDropdown';
+import { CategoryFormModal } from './CategoryFormModal';
 
 interface ProductFormModalProps {
   isOpen: boolean;
@@ -68,6 +69,7 @@ function ProductFormContent({
   const [isChefSpecial, setIsChefSpecial] = useState(
     () => (dishToEdit ? dishToEdit.isChefSpecial || false : false)
   );
+  const [isAddCategoryModalOpen, setIsAddCategoryModalOpen] = useState(false);
 
   const categoryOptions: DropdownOption[] = useMemo(() => {
     return categories
@@ -381,14 +383,29 @@ function ProductFormContent({
           {/* Category, Price & Prep Time in Responsive 3-Column Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
-              <label className="block text-xs font-bold text-[#1F1F1F] mb-1">
-                Category *
-              </label>
+              <div className="flex items-center justify-between mb-1">
+                <label className="block text-xs font-bold text-[#1F1F1F]">
+                  Category *
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setIsAddCategoryModalOpen(true)}
+                  className="text-[11px] font-semibold text-[#BA1A20] hover:text-[#8B0000] flex items-center gap-0.5 cursor-pointer"
+                  title="Create a new menu category"
+                >
+                  <Plus className="w-3 h-3" />
+                  <span>New</span>
+                </button>
+              </div>
               <SelectDropdown
                 value={category}
                 options={categoryOptions}
                 onChange={(val) => setCategory(val)}
                 fullWidth
+                actionItem={{
+                  label: '+ Add New Category...',
+                  onClick: () => setIsAddCategoryModalOpen(true),
+                }}
               />
             </div>
 
@@ -819,6 +836,17 @@ function ProductFormContent({
             </button>
           </div>
         </form>
+
+        {/* Quick Add Category Modal */}
+        {isAddCategoryModalOpen && (
+          <CategoryFormModal
+            isOpen={isAddCategoryModalOpen}
+            onClose={() => setIsAddCategoryModalOpen(false)}
+            onCreated={(newCatName) => {
+              setCategory(newCatName);
+            }}
+          />
+        )}
       </div>
     </div>
   );

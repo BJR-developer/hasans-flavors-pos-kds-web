@@ -1,5 +1,5 @@
 import { supabase } from './supabase';
-import { Dish, Order, TableSession } from '@/types';
+import { Dish, Order, TableSession, Category } from '@/types';
 
 // Map database snake_case row to TypeScript Dish
 export const mapDishFromDB = (row: any): Dish => ({
@@ -185,6 +185,127 @@ export const updateDishesStockInDB = async (ids: string[], inStock: boolean): Pr
     .update({ in_stock: inStock, updated_at: new Date().toISOString() })
     .in('id', ids);
   if (error) throw error;
+};
+
+// CATEGORIES API
+export const createCategoryInDB = async ({
+  name,
+  imageUrl,
+  icon = 'restaurant-outline',
+}: {
+  name: string;
+  imageUrl?: string;
+  icon?: string;
+}): Promise<Category> => {
+  const cleanName = name.trim();
+  const slug = cleanName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+  const id = `cat_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+
+  const { data: existing } = await supabase
+    .from('categories')
+    .select('sort_order')
+    .order('sort_order', { ascending: false })
+    .limit(1);
+
+  const nextSort = (existing?.[0]?.sort_order ?? 0) + 1;
+
+  const dbPayload = {
+    id,
+    name: cleanName,
+    slug,
+    icon,
+    image_url:
+      imageUrl ||
+      'https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=400&q=80',
+    sort_order: nextSort,
+    created_at: new Date().toISOString(),
+  };
+
+  const { data, error } = await supabase
+    .from('categories')
+    .insert(dbPayload)
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error creating category in DB:', error);
+    throw error;
+  }
+
+  return {
+    id: data.id,
+    name: data.name,
+    slug: data.slug,
+    icon: data.icon || 'restaurant',
+    count: 0,
+    imageUrl: data.image_url,
+  };
+};
+
+export const updateCategoryInDB = async (
+  id: string,
+  updates: { name?: string; imageUrl?: string; icon?: string }
+): Promise<Category> => {
+  const dbPayload: any = {};
+  if (updates.name !== undefined) {
+    dbPayload.name = updates.name.trim();
+    dbPayload.slug = updates.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+  }
+  if (updates.imageUrl !== undefined) {
+    dbPayload.image_url = updates.imageUrl;
+  }
+  if (updates.icon !== undefined) {
+    dbPayload.icon = updates.icon;
+  }
+
+  const { data, error } = await supabase
+    .from('categories')
+    .update(dbPayload)
+    .eq('id', id)
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error updating category in DB:', error);
+    throw error;
+  }
+
+  return {
+    id: data.id,
+    name: data.name,
+    slug: data.slug,
+    icon: data.icon || 'restaurant',
+    count: 0,
+    imageUrl: data.image_url,
+  };
+};
+
+export const deleteCategoryInDB = async (id: string, name: string): Promise<void> => {
+  if (id === 'all') {
+    throw new Error('Cannot delete the primary All Dishes category.');
+  }
+
+  // Check if any dishes currently use this category
+  const { data: activeDishes } = await supabase
+    .from('dishes')
+    .select('id')
+    .eq('category_name', name);
+
+  if (activeDishes && activeDishes.length > 0) {
+    throw new Error(
+      `Cannot delete "${name}" because ${activeDishes.length} dish(es) are assigned to it. Reassign or delete those dishes first.`
+    );
+  }
+
+  const { error } = await supabase
+    .from('categories')
+    .delete()
+    .eq('id', id);
+
+  if (error) {
+    console.error('Error deleting category in DB:', error);
+    throw error;
+  }
 };
 
 // 2. ORDERS API

@@ -24,6 +24,9 @@ import {
   updateTableInDB,
   deleteTableFromDB,
   releaseTableInDB,
+  createCategoryInDB,
+  updateCategoryInDB,
+  deleteCategoryInDB,
 } from '@/lib/api';
 import { Category, Dish, Order, OrderStatus, PaymentMethod, PaymentStatus, TableSession, CartItem } from '@/types';
 
@@ -447,6 +450,63 @@ export function useReleaseTable() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.tables });
+    },
+  });
+}
+
+// Create New Category
+export function useCreateCategory() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      name,
+      imageUrl,
+      icon,
+    }: {
+      name: string;
+      imageUrl?: string;
+      icon?: string;
+    }) => {
+      return createCategoryInDB({ name, imageUrl, icon });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.categories });
+    },
+  });
+}
+
+// Update Existing Category
+export function useUpdateCategory() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      id,
+      updates,
+    }: {
+      id: string;
+      updates: { name?: string; imageUrl?: string; icon?: string };
+    }) => {
+      return updateCategoryInDB(id, updates);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.categories });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.dishes });
+    },
+  });
+}
+
+// Delete Category
+export function useDeleteCategory() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, name }: { id: string; name: string }) => {
+      return deleteCategoryInDB(id, name);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.categories });
     },
   });
 }

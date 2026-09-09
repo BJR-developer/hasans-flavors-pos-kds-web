@@ -1,13 +1,19 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { ChevronDown, Check } from 'lucide-react';
+import { ChevronDown, Check, Plus } from 'lucide-react';
 
 export interface DropdownOption {
   value: string | number;
   label: string;
   badge?: string | number;
   sublabel?: string;
+}
+
+export interface DropdownActionItem {
+  label: string;
+  icon?: React.ReactNode;
+  onClick: () => void;
 }
 
 interface SelectDropdownProps {
@@ -22,6 +28,7 @@ interface SelectDropdownProps {
   menuClassName?: string;
   align?: 'left' | 'right';
   fullWidth?: boolean;
+  actionItem?: DropdownActionItem;
 }
 
 export function SelectDropdown({
@@ -36,6 +43,7 @@ export function SelectDropdown({
   menuClassName = '',
   align = 'left',
   fullWidth = false,
+  actionItem,
 }: SelectDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -159,6 +167,22 @@ export function SelectDropdown({
               </button>
             );
           })}
+
+          {actionItem && (
+            <div className="pt-1 mt-1 border-t border-[#E5E5E5]">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsOpen(false);
+                  actionItem.onClick();
+                }}
+                className="w-full flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold text-[#BA1A20] hover:bg-[#FFF2F0] rounded-lg text-left transition-colors cursor-pointer"
+              >
+                {actionItem.icon || <Plus className="w-3.5 h-3.5" />}
+                <span>{actionItem.label}</span>
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>
