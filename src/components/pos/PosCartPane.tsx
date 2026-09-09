@@ -17,6 +17,7 @@ import {
   Save,
   CreditCard,
   Banknote,
+  ArrowRightLeft,
 } from 'lucide-react';
 import { CartItem, OrderType, PaymentMethod, PaymentStatus, Order } from '@/types';
 import {
@@ -26,6 +27,7 @@ import {
   useUpdateOrderItems,
   useUpdateOrderPayment,
 } from '@/hooks/useRestaurantData';
+import { ChangeTableModal } from '../tables/ChangeTableModal';
 
 interface PosCartPaneProps {
   items: CartItem[];
@@ -67,6 +69,7 @@ export function PosCartPane({
   // Cash calculations
   const [cashTendered, setCashTendered] = useState<string>('');
   const [isPayDrawerOpen, setIsPayDrawerOpen] = useState<boolean>(false);
+  const [isChangeTableOpen, setIsChangeTableOpen] = useState<boolean>(false);
 
   // Dynamically populated tables from Supabase dining_tables
   const liveTables = useMemo(() => {
@@ -317,7 +320,7 @@ export function PosCartPane({
 
         {/* Loaded Order Banner vs New Order Channel Selector */}
         {loadedOrder ? (
-          <div className="p-3 bg-neutral-50 rounded-xl border border-neutral-200 text-xs space-y-1">
+          <div className="p-3 bg-neutral-50 rounded-xl border border-neutral-200 text-xs space-y-1.5">
             <div className="flex items-center justify-between">
               <span className="font-mono font-bold text-neutral-900">
                 {loadedOrder.orderNumber}
@@ -332,14 +335,30 @@ export function PosCartPane({
                 {loadedOrder.paymentStatus}
               </span>
             </div>
-            <div className="flex justify-between text-[11px] text-neutral-500">
-              <span>Customer:</span>
-              <span className="font-medium text-neutral-700">
-                {loadedOrder.type === 'dine_in'
-                  ? loadedOrder.tableNumber || 'Dine-In'
-                  : loadedOrder.customerName}
-              </span>
-            </div>
+
+            {loadedOrder.type === 'dine_in' ? (
+              <div className="flex items-center justify-between text-[11px] pt-0.5">
+                <span className="text-neutral-500">Dining Table:</span>
+                <button
+                  type="button"
+                  onClick={() => setIsChangeTableOpen(true)}
+                  className="inline-flex items-center gap-1 font-bold text-neutral-900 bg-white border border-neutral-300 hover:border-neutral-900 hover:bg-neutral-50 px-2 py-0.5 rounded-md transition-all cursor-pointer shadow-2xs"
+                  title="Click to move to another available table"
+                >
+                  <span>{loadedOrder.tableNumber || 'Dine-In'}</span>
+                  <ArrowRightLeft className="w-2.5 h-2.5 text-neutral-400" />
+                  <span className="text-[10px] text-neutral-500 font-normal underline ml-0.5">Change</span>
+                </button>
+              </div>
+            ) : (
+              <div className="flex justify-between text-[11px] text-neutral-500">
+                <span>Customer:</span>
+                <span className="font-medium text-neutral-700">
+                  {loadedOrder.customerName || 'Takeout Customer'}
+                </span>
+              </div>
+            )}
+
             {loadedOrder.specialNotes && (
               <div className="pt-1 border-t border-neutral-200 text-[10.5px] text-amber-900 font-medium">
                 <span className="font-bold text-amber-800">Instruction: </span>
@@ -822,6 +841,20 @@ export function PosCartPane({
         )}
 
       </div>
+
+      {/* Change Dining Table Modal */}
+      {isChangeTableOpen && loadedOrder && (
+        <ChangeTableModal
+          isOpen={isChangeTableOpen}
+          onClose={() => setIsChangeTableOpen(false)}
+          order={loadedOrder}
+          onTableChanged={(newTable) => {
+            if (loadedOrder) {
+              loadedOrder.tableNumber = newTable;
+            }
+          }}
+        />
+      )}
     </div>
   );
 }

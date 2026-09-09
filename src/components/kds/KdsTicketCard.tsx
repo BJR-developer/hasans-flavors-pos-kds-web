@@ -9,10 +9,12 @@ import {
   Printer,
   Edit3,
   XCircle,
+  ArrowRightLeft,
 } from 'lucide-react';
 import { Order, OrderStatus } from '@/types';
 import { useUpdateOrderStatus, useToggleItemInKitchen } from '@/hooks/useRestaurantData';
 import { playBumpChime } from '@/lib/audio';
+import { ChangeTableModal } from '../tables/ChangeTableModal';
 
 interface KdsTicketCardProps {
   order: Order;
@@ -30,6 +32,7 @@ export function KdsTicketCard({
   const toggleItem = useToggleItemInKitchen();
 
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  const [isChangeTableOpen, setIsChangeTableOpen] = useState(false);
 
   useEffect(() => {
     const calculate = () => {
@@ -126,13 +129,21 @@ export function KdsTicketCard({
           <span className="font-mono font-bold text-xs text-neutral-900">
             {order.orderNumber}
           </span>
-          <span className="text-[10px] font-semibold text-neutral-600 px-1.5 py-0.5 rounded bg-white border border-neutral-200">
-            {order.type === 'dine_in'
-              ? order.tableNumber || 'Dine-In'
-              : order.type === 'delivery'
-              ? 'Delivery'
-              : 'Takeout'}
-          </span>
+          {order.type === 'dine_in' ? (
+            <button
+              type="button"
+              onClick={() => setIsChangeTableOpen(true)}
+              className="flex items-center gap-1 text-[10px] font-bold text-neutral-800 px-1.5 py-0.5 rounded bg-white border border-neutral-300 hover:border-neutral-900 hover:bg-neutral-50 transition-all cursor-pointer shadow-2xs"
+              title="Click to move to another available table"
+            >
+              <span>{order.tableNumber || 'Dine-In'}</span>
+              <ArrowRightLeft className="w-2.5 h-2.5 text-neutral-400" />
+            </button>
+          ) : (
+            <span className="text-[10px] font-semibold text-neutral-600 px-1.5 py-0.5 rounded bg-white border border-neutral-200">
+              {order.type === 'delivery' ? 'Delivery' : 'Takeout'}
+            </span>
+          )}
           <span
             className={`text-[9px] font-bold uppercase px-1.5 py-0.5 rounded ${
               order.paymentStatus === 'paid'
@@ -290,6 +301,19 @@ export function KdsTicketCard({
             <span>Update Order</span>
           </button>
 
+          {/* Change Table action for Dine-In tickets */}
+          {order.type === 'dine_in' && (
+            <button
+              type="button"
+              onClick={() => setIsChangeTableOpen(true)}
+              title="Move or reassign table"
+              className="flex items-center gap-1 px-2 py-1.5 rounded-lg border border-neutral-200 bg-white hover:bg-neutral-100 text-neutral-700 text-[11px] font-semibold transition-colors cursor-pointer"
+            >
+              <ArrowRightLeft className="w-3 h-3" />
+              <span>Table</span>
+            </button>
+          )}
+
           {/* Cancel Order with explicit text */}
           <button
             type="button"
@@ -337,6 +361,15 @@ export function KdsTicketCard({
           {order.status === 'completed' && <span>Archived</span>}
         </button>
       </div>
+
+      {/* Change Dining Table Modal */}
+      {isChangeTableOpen && (
+        <ChangeTableModal
+          isOpen={isChangeTableOpen}
+          onClose={() => setIsChangeTableOpen(false)}
+          order={order}
+        />
+      )}
     </div>
   );
 }

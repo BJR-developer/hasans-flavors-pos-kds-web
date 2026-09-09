@@ -495,3 +495,51 @@ export const updateTableStatusInDB = async (
 
   if (error) throw error;
 };
+
+export const transferOrderTableInDB = async (
+  orderId: string,
+  fromTable: string | undefined,
+  toTable: string
+): Promise<Order> => {
+  // 1. Update the order with the new table number
+  const { data: updatedOrderData, error: orderError } = await supabase
+    .from('orders')
+    .update({
+      table_number: toTable,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', orderId)
+    .select()
+    .single();
+
+  if (orderError) {
+    console.error('Error updating order table in DB:', orderError);
+    throw orderError;
+  }
+
+  // 2. Mark the new destination table as occupied
+  await updateTableStatusInDB(toTable, 'occupied', orderId).catch((err) => {
+    console.warn('Failed to update destination table status:', err);
+  });
+
+  // 3. If moving from a previous table, check if any other active order is still using it
+  if (fromTable && fromTable !== toTable) {
+    try {
+      const { data: activeOrdersOnOldTable } = await supabase
+        .from('orders')
+        .select('id')
+        .eq('table_number', fromTable)
+        .neq('id', orderId)
+        .in('status', ['pending', 'sent_to_kitchen', 'preparing', 'ready', 'served']);
+
+      if (!activeOrdersOnOldTable || activeOrdersOnOldTable.length === 0) {
+        await updateTableStatusInDB(fromTable, 'available', undefined);
+      }
+    } catch (err) {
+      console.warn('Failed to free previous table status:', err);
+    }
+  }
+
+  return mapOrderFromDB(updatedOrderData);
+};
+

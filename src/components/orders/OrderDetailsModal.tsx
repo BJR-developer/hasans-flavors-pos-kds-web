@@ -7,12 +7,14 @@ import {
   Printer,
   Plus,
   ArrowRight,
+  ArrowRightLeft,
 } from 'lucide-react';
 import { Order, OrderStatus } from '@/types';
 import {
   useUpdateOrderStatus,
   useOrders,
 } from '@/hooks/useRestaurantData';
+import { ChangeTableModal } from '../tables/ChangeTableModal';
 
 interface OrderDetailsModalProps {
   order: Order | null;
@@ -36,6 +38,7 @@ export function OrderDetailsModal({
 
   // Local optimistic status for instantaneous UI response on click
   const [optimisticStatus, setOptimisticStatus] = useState<OrderStatus | null>(null);
+  const [isChangeTableOpen, setIsChangeTableOpen] = useState(false);
 
   useEffect(() => {
     setOptimisticStatus(null);
@@ -118,13 +121,21 @@ export function OrderDetailsModal({
               <h3 className="font-mono font-bold text-base text-neutral-900 tracking-tight">
                 {currentOrder.orderNumber}
               </h3>
-              <span className="text-[11px] font-medium text-neutral-500">
-                {currentOrder.type === 'dine_in'
-                  ? currentOrder.tableNumber || 'Dine-In'
-                  : currentOrder.type === 'delivery'
-                  ? 'Delivery'
-                  : 'Takeout'}
-              </span>
+              {currentOrder.type === 'dine_in' ? (
+                <button
+                  type="button"
+                  onClick={() => setIsChangeTableOpen(true)}
+                  className="inline-flex items-center gap-1 text-[11px] font-bold text-neutral-800 bg-neutral-100 hover:bg-neutral-200 border border-neutral-200 px-2 py-0.5 rounded-md transition-colors cursor-pointer"
+                  title="Click to change / move table"
+                >
+                  <span>{currentOrder.tableNumber || 'Dine-In'}</span>
+                  <ArrowRightLeft className="w-2.5 h-2.5 text-neutral-500" />
+                </button>
+              ) : (
+                <span className="text-[11px] font-medium text-neutral-500">
+                  {currentOrder.type === 'delivery' ? 'Delivery' : 'Takeout'}
+                </span>
+              )}
               <span className="text-neutral-300">•</span>
               <span className={`text-[11px] font-semibold ${isFullyPaid ? 'text-emerald-700' : 'text-neutral-900'}`}>
                 {isFullyPaid ? 'Paid' : 'Unpaid'}
@@ -343,6 +354,15 @@ export function OrderDetailsModal({
         </div>
 
       </div>
+
+      {/* Change Dining Table Modal */}
+      {isChangeTableOpen && (
+        <ChangeTableModal
+          isOpen={isChangeTableOpen}
+          onClose={() => setIsChangeTableOpen(false)}
+          order={currentOrder}
+        />
+      )}
     </div>
   );
 }

@@ -19,6 +19,7 @@ import {
   applyDiscountToOrderInDB,
   fetchTablesFromDB,
   updateTableStatusInDB,
+  transferOrderTableInDB,
 } from '@/lib/api';
 import { Category, Dish, Order, OrderStatus, PaymentMethod, PaymentStatus, TableSession, CartItem } from '@/types';
 
@@ -351,6 +352,29 @@ export function useUpdateDishPrice() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.dishes });
+    },
+  });
+}
+
+// Transfer / Change Table for an Active Order
+export function useTransferOrderTable() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      orderId,
+      fromTable,
+      toTable,
+    }: {
+      orderId: string;
+      fromTable?: string;
+      toTable: string;
+    }) => {
+      return transferOrderTableInDB(orderId, fromTable, toTable);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.orders });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.tables });
     },
   });
 }
