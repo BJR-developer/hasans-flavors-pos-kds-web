@@ -66,7 +66,7 @@ export const mapOrderFromDB = (row: any): Order => {
     specialNotes: row.notes || undefined,
     items: Array.isArray(row.items) ? row.items : [],
     createdAt: row.created_at,
-    estimatedMinutes: 20,
+    estimatedMinutes: Number(row.estimated_minutes || 20),
   };
 };
 

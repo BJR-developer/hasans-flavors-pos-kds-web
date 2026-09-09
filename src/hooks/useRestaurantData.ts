@@ -339,6 +339,27 @@ export function useToggleItemInKitchen() {
   });
 }
 
+// Update Estimated Cooking / Delivery Minutes for an Order
+export function useUpdateOrderEstimatedMinutes() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ orderId, estimatedMinutes }: { orderId: string; estimatedMinutes: number }) => {
+      const { error } = await supabase
+        .from('orders')
+        .update({
+          estimated_minutes: estimatedMinutes,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', orderId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.orders });
+    },
+  });
+}
+
 // Toggle Dish Stock (Available / Out of Stock)
 export function useToggleDishStock() {
   const queryClient = useQueryClient();

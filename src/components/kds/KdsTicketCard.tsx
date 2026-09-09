@@ -12,9 +12,14 @@ import {
   ArrowRightLeft,
   GripVertical,
   Sparkles,
+  Clock,
 } from 'lucide-react';
 import { Order, OrderStatus } from '@/types';
-import { useUpdateOrderStatus, useToggleItemInKitchen } from '@/hooks/useRestaurantData';
+import {
+  useUpdateOrderStatus,
+  useToggleItemInKitchen,
+  useUpdateOrderEstimatedMinutes,
+} from '@/hooks/useRestaurantData';
 import { playBumpChime } from '@/lib/audio';
 import { ChangeTableModal } from '../tables/ChangeTableModal';
 import { getOrderColorTheme } from '@/lib/orderColors';
@@ -45,6 +50,7 @@ export function KdsTicketCard({
   const router = useRouter();
   const updateStatus = useUpdateOrderStatus();
   const toggleItem = useToggleItemInKitchen();
+  const updateEstimatedMinutes = useUpdateOrderEstimatedMinutes();
 
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [isChangeTableOpen, setIsChangeTableOpen] = useState(false);
@@ -215,6 +221,58 @@ export function KdsTicketCard({
           >
             {elapsedMinutes}m
           </span>
+
+          {/* Quick Staff ETA Control (Live syncs to mobile app) */}
+          <div
+            className="flex items-center gap-1 bg-black/20 hover:bg-black/30 px-1.5 py-0.5 rounded text-[10.5px] font-bold transition-colors cursor-pointer"
+            title="Click to adjust estimated arrival time for mobile app"
+            onClick={(e) => {
+              e.stopPropagation();
+              const nextVal = window.prompt(
+                'Update estimated cooking/delivery time (minutes):',
+                String(order.estimatedMinutes || 20)
+              );
+              if (nextVal !== null) {
+                const parsed = parseInt(nextVal.trim(), 10);
+                if (!isNaN(parsed) && parsed > 0 && parsed <= 180) {
+                  updateEstimatedMinutes.mutate({ orderId: order.id, estimatedMinutes: parsed });
+                }
+              }
+            }}
+          >
+            <Clock className="w-3 h-3 opacity-80 shrink-0" />
+            <span>ETA: {order.estimatedMinutes || 20}m</span>
+            <div className="flex items-center gap-0.5 ml-0.5">
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const cur = order.estimatedMinutes || 20;
+                  if (cur > 5) {
+                    updateEstimatedMinutes.mutate({ orderId: order.id, estimatedMinutes: cur - 5 });
+                  }
+                }}
+                title="Decrease ETA by 5m"
+                className="w-3.5 h-3.5 rounded bg-black/30 hover:bg-black/50 flex items-center justify-center text-[10px] font-bold"
+              >
+                -
+              </button>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const cur = order.estimatedMinutes || 20;
+                  if (cur < 120) {
+                    updateEstimatedMinutes.mutate({ orderId: order.id, estimatedMinutes: cur + 5 });
+                  }
+                }}
+                title="Increase ETA by 5m"
+                className="w-3.5 h-3.5 rounded bg-black/30 hover:bg-black/50 flex items-center justify-center text-[10px] font-bold"
+              >
+                +
+              </button>
+            </div>
+          </div>
 
           {onPrint && (
             <button
