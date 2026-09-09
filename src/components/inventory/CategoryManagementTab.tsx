@@ -77,39 +77,6 @@ export function CategoryManagementTab() {
 
   return (
     <div className="space-y-6">
-      {/* Metric Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-        <div className="bg-white rounded-xl p-4 border border-[#E5E5E5] shadow-2xs">
-          <span className="text-[11px] font-bold uppercase tracking-wider text-[#737373] block mb-1">
-            Menu Categories
-          </span>
-          <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-black text-[#1F1F1F] font-mono">{totalCategories}</span>
-            <span className="text-xs font-semibold text-[#737373]">active sections</span>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl p-4 border border-[#E5E5E5] shadow-2xs">
-          <span className="text-[11px] font-bold uppercase tracking-wider text-[#166534] block mb-1">
-            Total Menu Items
-          </span>
-          <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-black text-[#166534] font-mono">{totalDishes}</span>
-            <span className="text-xs font-semibold text-[#737373]">catalog dishes</span>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl p-4 border border-[#E5E5E5] shadow-2xs col-span-2 lg:col-span-1">
-          <span className="text-[11px] font-bold uppercase tracking-wider text-[#737373] block mb-1">
-            Unassigned Items
-          </span>
-          <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-black text-[#1F1F1F] font-mono">{uncategorizedDishes}</span>
-            <span className="text-xs font-semibold text-[#737373]">without valid section</span>
-          </div>
-        </div>
-      </div>
-
       {/* Action & Filter Bar */}
       <div className="bg-white p-3 sm:p-4 rounded-xl border border-[#E5E5E5] shadow-2xs flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
         {/* Search */}
