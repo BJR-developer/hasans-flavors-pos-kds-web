@@ -542,13 +542,15 @@ export function useCreateAddon() {
     mutationFn: async ({
       name,
       price,
+      imageUrl,
       inStock,
     }: {
       name: string;
       price: number;
+      imageUrl?: string;
       inStock?: boolean;
     }) => {
-      return createAddonInDB({ name, price, inStock });
+      return createAddonInDB({ name, price, imageUrl, inStock });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.addons });
@@ -566,7 +568,7 @@ export function useUpdateAddon() {
       updates,
     }: {
       id: string;
-      updates: { name?: string; price?: number; inStock?: boolean };
+      updates: { name?: string; price?: number; imageUrl?: string; inStock?: boolean };
     }) => {
       return updateAddonInDB(id, updates);
     },

@@ -20,6 +20,7 @@ import {
   useToggleAddonStock,
 } from '@/hooks/useRestaurantData';
 import { AddonFormModal } from './AddonFormModal';
+import { SafeImage } from '@/components/common/SafeImage';
 
 export function AddonManagementTab() {
   const { data: addons = [], isLoading } = useAddons();
@@ -155,25 +156,44 @@ export function AddonManagementTab() {
             return (
               <div
                 key={addon.id}
-                className="bg-white rounded-xl border border-[#E5E5E5] hover:border-[#D4D4D4] p-4 flex flex-col justify-between shadow-2xs transition-all"
+                className="bg-white rounded-xl border border-[#E5E5E5] hover:border-[#D4D4D4] p-3.5 flex flex-col justify-between shadow-2xs transition-all group"
               >
                 <div>
-                  <div className="flex items-start justify-between gap-2 mb-2">
-                    <h4 className="text-sm font-bold text-[#1F1F1F] leading-snug">
-                      {addon.name}
-                    </h4>
+                  <div className="flex items-start gap-3 mb-2">
+                    {/* Image Thumbnail */}
+                    {addon.imageUrl ? (
+                      <div className="relative w-14 h-14 rounded-lg overflow-hidden bg-neutral-100 shrink-0 border border-[#E5E5E5]">
+                        <SafeImage
+                          src={addon.imageUrl}
+                          alt={addon.name}
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-200"
+                          sizes="60px"
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-14 h-14 rounded-lg bg-[#FAFAFA] border border-[#E5E5E5] flex items-center justify-center text-xs font-bold text-neutral-400 shrink-0">
+                        +Add
+                      </div>
+                    )}
 
-                    <span className="font-mono font-bold text-sm text-[#1F1F1F] shrink-0">
-                      +₱{addon.price.toLocaleString()}
-                    </span>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-start justify-between gap-1">
+                        <h4 className="text-xs font-bold text-[#1F1F1F] leading-snug line-clamp-2">
+                          {addon.name}
+                        </h4>
+                        <span className="font-mono font-bold text-xs text-[#166534] shrink-0">
+                          +₱{addon.price.toLocaleString()}
+                        </span>
+                      </div>
+                      <p className="text-[10px] text-[#737373] mt-1 line-clamp-1">
+                        Sides &amp; add-ons selection
+                      </p>
+                    </div>
                   </div>
-
-                  <p className="text-[11px] text-[#737373]">
-                    Displayed in POS item customizer and mobile dish checkout
-                  </p>
                 </div>
 
-                <div className="pt-3 mt-3 border-t border-[#F5F5F5] flex items-center justify-between gap-2">
+                <div className="pt-2.5 mt-2 border-t border-[#F5F5F5] flex items-center justify-between gap-2">
                   {/* Stock Toggle Button */}
                   <button
                     type="button"

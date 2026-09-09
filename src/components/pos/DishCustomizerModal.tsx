@@ -327,13 +327,24 @@ function DishCustomizerModalContent({
                       key={addon.id}
                       type="button"
                       onClick={() => toggleAddon(addon)}
-                      className={`flex items-center justify-between p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
+                      className={`flex items-center justify-between p-2 rounded-xl border text-left transition-all cursor-pointer ${
                         isSelected
                           ? 'border-[#2E7D32] bg-[#E8F5E9] text-[#2E7D32] shadow-xs'
                           : 'border-[#E9E8E7] bg-white text-[#5B403D] hover:bg-[#F4F3F2]'
                       }`}
                     >
-                      <div className="pr-2 min-w-0">
+                      <div className="flex items-center gap-2 min-w-0 pr-1 flex-1">
+                        {addon.imageUrl ? (
+                          <div className="relative w-8 h-8 rounded-lg overflow-hidden bg-neutral-100 shrink-0 border border-black/5">
+                            <SafeImage
+                              src={addon.imageUrl}
+                              alt={addon.name}
+                              fill
+                              className="object-cover"
+                              sizes="32px"
+                            />
+                          </div>
+                        ) : null}
                         <p className="text-xs font-bold leading-tight truncate">{addon.name}</p>
                       </div>
                       <span className="text-xs font-extrabold whitespace-nowrap shrink-0">

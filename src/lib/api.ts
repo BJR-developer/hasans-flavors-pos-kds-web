@@ -760,6 +760,7 @@ export const mapAddonFromDB = (row: any): AddonOption => ({
   id: row.id,
   name: row.name,
   price: Number(row.price || 0),
+  imageUrl: row.image_url || undefined,
   inStock: row.in_stock ?? true,
   createdAt: row.created_at,
   updatedAt: row.updated_at,
@@ -781,10 +782,12 @@ export const fetchAddonsFromDB = async (): Promise<AddonOption[]> => {
 export const createAddonInDB = async ({
   name,
   price,
+  imageUrl,
   inStock = true,
 }: {
   name: string;
   price: number;
+  imageUrl?: string;
   inStock?: boolean;
 }): Promise<AddonOption> => {
   const id = `addon_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
@@ -796,6 +799,7 @@ export const createAddonInDB = async ({
       id,
       name: cleanName,
       price: Number(price) || 0,
+      image_url: imageUrl || null,
       in_stock: inStock,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
@@ -812,11 +816,12 @@ export const createAddonInDB = async ({
 
 export const updateAddonInDB = async (
   id: string,
-  updates: { name?: string; price?: number; inStock?: boolean }
+  updates: { name?: string; price?: number; imageUrl?: string; inStock?: boolean }
 ): Promise<AddonOption> => {
   const dbPayload: any = { updated_at: new Date().toISOString() };
   if (updates.name !== undefined) dbPayload.name = updates.name.trim();
   if (updates.price !== undefined) dbPayload.price = Number(updates.price) || 0;
+  if (updates.imageUrl !== undefined) dbPayload.image_url = updates.imageUrl;
   if (updates.inStock !== undefined) dbPayload.in_stock = updates.inStock;
 
   const { data, error } = await supabase
