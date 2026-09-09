@@ -20,6 +20,10 @@ import {
   fetchTablesFromDB,
   updateTableStatusInDB,
   transferOrderTableInDB,
+  createTableInDB,
+  updateTableInDB,
+  deleteTableFromDB,
+  releaseTableInDB,
 } from '@/lib/api';
 import { Category, Dish, Order, OrderStatus, PaymentMethod, PaymentStatus, TableSession, CartItem } from '@/types';
 
@@ -374,6 +378,74 @@ export function useTransferOrderTable() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.orders });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.tables });
+    },
+  });
+}
+
+// Add New Dining Table
+export function useCreateTable() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      tableNumber,
+      capacity,
+    }: {
+      tableNumber: string;
+      capacity?: number;
+    }) => {
+      return createTableInDB({ tableNumber, capacity });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.tables });
+    },
+  });
+}
+
+// Update Existing Dining Table
+export function useUpdateTable() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      id,
+      updates,
+    }: {
+      id: string;
+      updates: { tableNumber?: string; capacity?: number };
+    }) => {
+      return updateTableInDB(id, updates);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.tables });
+    },
+  });
+}
+
+// Delete Dining Table
+export function useDeleteTable() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, tableNumber }: { id: string; tableNumber: string }) => {
+      return deleteTableFromDB(id, tableNumber);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.tables });
+    },
+  });
+}
+
+// Release Dining Table (Reset to Available)
+export function useReleaseTable() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (tableNumber: string) => {
+      return releaseTableInDB(tableNumber);
+    },
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.tables });
     },
   });

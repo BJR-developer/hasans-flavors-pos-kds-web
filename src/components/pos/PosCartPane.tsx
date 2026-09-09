@@ -73,16 +73,13 @@ export function PosCartPane({
 
   // Dynamically populated tables from Supabase dining_tables
   const liveTables = useMemo(() => {
-    if (tableSessions.length > 0) {
-      return [...tableSessions]
-        .sort((a, b) => {
-          const numA = parseInt(a.tableNumber.replace(/\D/g, ''), 10) || 0;
-          const numB = parseInt(b.tableNumber.replace(/\D/g, ''), 10) || 0;
-          return numA - numB;
-        })
-        .map((t) => t.tableNumber);
-    }
-    return Array.from({ length: 12 }, (_, i) => `Table ${i + 1}`);
+    return [...tableSessions]
+      .sort((a, b) => {
+        const numA = parseInt(a.tableNumber.replace(/\D/g, ''), 10) || 0;
+        const numB = parseInt(b.tableNumber.replace(/\D/g, ''), 10) || 0;
+        return numA - numB;
+      })
+      .map((t) => t.tableNumber);
   }, [tableSessions]);
 
   // Only tables that are genuinely available (not occupied, no open active orders)
@@ -417,19 +414,28 @@ export function PosCartPane({
                     {availableTables.map((t) => {
                       const short = t.replace('Table ', 'T');
                       const isSelected = selectedTable === t;
+                      const session = tableSessions.find((ts) => ts.tableNumber === t);
+                      const cap = session?.capacity || session?.guestCount || 4;
 
                       return (
                         <button
                           key={t}
                           type="button"
                           onClick={() => setSelectedTable(t)}
-                          className={`px-2.5 py-1 rounded-md text-[11px] font-bold shrink-0 transition-colors ${
+                          className={`px-2.5 py-1 rounded-md text-[11px] font-bold shrink-0 transition-colors flex items-center gap-1 cursor-pointer select-none ${
                             isSelected
                               ? 'bg-[#1F1F1F] text-white shadow-2xs'
                               : 'bg-[#F5F5F5] text-[#525252] hover:bg-[#E5E5E5]'
                           }`}
                         >
-                          {short}
+                          <span>{short}</span>
+                          <span
+                            className={`text-[9px] font-normal ${
+                              isSelected ? 'text-white/70' : 'text-neutral-400'
+                            }`}
+                          >
+                            ({cap}p)
+                          </span>
                         </button>
                       );
                     })}

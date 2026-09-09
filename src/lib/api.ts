@@ -72,10 +72,14 @@ export const mapOrderFromDB = (row: any): Order => {
 
 // Map database row to TableSession
 export const mapTableFromDB = (row: any): TableSession => ({
+  id: row.id,
   tableNumber: row.table_number,
-  guestCount: row.guest_count || 4,
+  capacity: Number(row.capacity || row.guest_count || 4),
+  guestCount: Number(row.guest_count || row.capacity || 4),
   status: row.status,
   activeOrderId: row.current_order_id || undefined,
+  joinedAt: row.created_at,
+  updatedAt: row.updated_at,
 });
 
 // 1. DISHES API
@@ -541,5 +545,92 @@ export const transferOrderTableInDB = async (
   }
 
   return mapOrderFromDB(updatedOrderData);
+};
+
+export const createTableInDB = async ({
+  tableNumber,
+  capacity = 4,
+}: {
+  tableNumber: string;
+  capacity?: number;
+}): Promise<TableSession> => {
+  const cleanName = tableNumber.trim();
+  const id = `tbl_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+  const cap = Number(capacity) || 4;
+
+  const { data, error } = await supabase
+    .from('dining_tables')
+    .insert({
+      id,
+      table_number: cleanName,
+      capacity: cap,
+      guest_count: cap,
+      status: 'available',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    })
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error creating table in DB:', error);
+    throw error;
+  }
+  return mapTableFromDB(data);
+};
+
+export const updateTableInDB = async (
+  id: string,
+  updates: { tableNumber?: string; capacity?: number }
+): Promise<TableSession> => {
+  const dbPayload: any = { updated_at: new Date().toISOString() };
+  if (updates.tableNumber !== undefined) {
+    dbPayload.table_number = updates.tableNumber.trim();
+  }
+  if (updates.capacity !== undefined) {
+    const cap = Number(updates.capacity) || 4;
+    dbPayload.capacity = cap;
+    dbPayload.guest_count = cap;
+  }
+
+  const { data, error } = await supabase
+    .from('dining_tables')
+    .update(dbPayload)
+    .eq('id', id)
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error updating table in DB:', error);
+    throw error;
+  }
+  return mapTableFromDB(data);
+};
+
+export const deleteTableFromDB = async (id: string, tableNumber: string): Promise<void> => {
+  // Check if active orders exist on this table
+  const { data: activeOrders } = await supabase
+    .from('orders')
+    .select('id')
+    .eq('table_number', tableNumber)
+    .in('status', ['pending', 'sent_to_kitchen', 'preparing', 'ready', 'served']);
+
+  if (activeOrders && activeOrders.length > 0) {
+    throw new Error(`Cannot delete ${tableNumber} because it currently has active open orders.`);
+  }
+
+  const { error } = await supabase
+    .from('dining_tables')
+    .delete()
+    .eq('id', id);
+
+  if (error) {
+    console.error('Error deleting table from DB:', error);
+    throw error;
+  }
+};
+
+export const releaseTableInDB = async (tableNumber: string): Promise<void> => {
+  await updateTableStatusInDB(tableNumber, 'available', undefined);
 };
 

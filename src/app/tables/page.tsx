@@ -23,10 +23,12 @@ import {
   Sparkles,
   Scissors,
   Palette,
+  LayoutGrid,
 } from 'lucide-react';
 import { useTableSessions } from '@/hooks/useRestaurantData';
 import { useAuthStore } from '@/lib/auth';
 import { TableSession } from '@/types';
+import { TableManagementTab } from '@/components/tables/TableManagementTab';
 
 const DEFAULT_TABLES: TableSession[] = Array.from({ length: 12 }, (_, i) => {
   const num = i + 1;
@@ -66,10 +68,18 @@ export default function TableStandeesPage() {
     });
   }, [dbTables]);
 
+  const [activeTab, setActiveTab] = useState<'management' | 'standees'>('management');
   const [viewMode, setViewMode] = useState<ViewMode>('3d_tabletop');
   const [themeMode, setThemeMode] = useState<ThemeMode>('obsidian');
   const [selectedTableNumber, setSelectedTableNumber] = useState<string>('Table 1');
   const [printMode, setPrintMode] = useState<'single' | 'all'>('single');
+
+  // Keep selected table valid when tables list updates
+  useEffect(() => {
+    if (tables.length > 0 && !tables.some((t) => t.tableNumber === selectedTableNumber)) {
+      setSelectedTableNumber(tables[0].tableNumber);
+    }
+  }, [tables, selectedTableNumber]);
 
   // Wi-Fi network credentials
   const wifiSsid = 'Hasans-Guest';
@@ -523,143 +533,180 @@ export default function TableStandeesPage() {
         }
       `}</style>
 
-      {/* ================= TOP NAVIGATION BAR (NO PRINT) ================= */}
-      <div className="no-print bg-white border-b border-neutral-200 sticky top-14 z-30 shadow-2xs">
-        <div className="max-w-[1720px] mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-3">
-          {/* Left: Clean Title */}
-          <div className="flex items-center gap-2.5 shrink-0">
-            <div>
-              <h1 className="text-sm font-bold text-neutral-900 tracking-tight leading-none">
-                Table Standees
-              </h1>
-              <p className="text-[11px] text-neutral-500 mt-0.5 hidden lg:block">
-                Double-Sided QR Cards (Order &amp; Wi-Fi)
-              </p>
-            </div>
-          </div>
-
-          {/* Center: Minimalist 1-Click Table Selector Strip */}
-          <div className="flex items-center gap-1 overflow-x-auto no-scrollbar bg-neutral-100 p-1 rounded-xl">
+      {/* ================= PRIMARY SUB-NAVIGATION (NO PRINT) ================= */}
+      <div className="no-print bg-white border-b border-[#E5E5E5] sticky top-14 z-30 shadow-2xs">
+        <div className="max-w-[1720px] mx-auto px-4 sm:px-6 h-13 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-1.5 p-1 bg-[#F5F5F5] rounded-xl border border-[#E5E5E5]/80">
             <button
               type="button"
-              onClick={() => setPrintMode('all')}
-              className={`px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
-                printMode === 'all'
-                  ? 'bg-neutral-900 text-white shadow-2xs'
-                  : 'text-neutral-600 hover:text-neutral-900'
+              onClick={() => setActiveTab('management')}
+              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer select-none ${
+                activeTab === 'management'
+                  ? 'bg-white text-[#1F1F1F] shadow-2xs'
+                  : 'text-[#737373] hover:text-[#1F1F1F]'
               }`}
             >
-              All ({tables.length})
+              <LayoutGrid className="w-3.5 h-3.5" />
+              <span>Floor &amp; Table Management</span>
             </button>
-            <div className="w-px h-3.5 bg-neutral-300 mx-0.5 shrink-0" />
-            {tables.map((t) => {
-              const num = t.tableNumber.replace(/\D/g, '');
-              const isSelected = printMode === 'single' && selectedTableNumber === t.tableNumber;
-              return (
-                <button
-                  key={t.tableNumber}
-                  type="button"
-                  onClick={() => {
-                    setSelectedTableNumber(t.tableNumber);
-                    setPrintMode('single');
-                  }}
-                  className={`min-w-[28px] h-7 px-1.5 rounded-lg text-xs font-semibold flex items-center justify-center transition-all shrink-0 ${
-                    isSelected
-                      ? 'bg-neutral-900 text-white shadow-2xs'
-                      : 'text-neutral-600 hover:text-neutral-900'
-                  }`}
-                  title={t.tableNumber}
-                >
-                  {num || t.tableNumber}
-                </button>
-              );
-            })}
+
+            <button
+              type="button"
+              onClick={() => setActiveTab('standees')}
+              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer select-none ${
+                activeTab === 'standees'
+                  ? 'bg-white text-[#1F1F1F] shadow-2xs'
+                  : 'text-[#737373] hover:text-[#1F1F1F]'
+              }`}
+            >
+              <QrCode className="w-3.5 h-3.5" />
+              <span>QR Standees Studio</span>
+            </button>
           </div>
 
-          {/* Right: Restrained View Controls & Print Action */}
-          <div className="flex items-center gap-2 shrink-0">
-            {/* Theme Toggle: Obsidian vs Ivory */}
-            <div className="hidden sm:flex items-center bg-neutral-100 p-0.5 rounded-lg text-xs">
-              <button
-                type="button"
-                onClick={() => setThemeMode('obsidian')}
-                className={`flex items-center gap-1 px-2.5 py-1 rounded-md font-medium transition-all ${
-                  themeMode === 'obsidian'
-                    ? 'bg-neutral-900 text-white shadow-2xs'
-                    : 'text-neutral-600 hover:text-neutral-900'
-                }`}
-              >
-                <div className="w-2 h-2 rounded-full bg-neutral-900 border border-white/30" />
-                <span>Obsidian</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setThemeMode('ivory')}
-                className={`flex items-center gap-1 px-2.5 py-1 rounded-md font-medium transition-all ${
-                  themeMode === 'ivory'
-                    ? 'bg-white text-neutral-900 shadow-2xs font-semibold'
-                    : 'text-neutral-600 hover:text-neutral-900'
-                }`}
-              >
-                <div className="w-2 h-2 rounded-full bg-neutral-200 border border-neutral-400" />
-                <span>Ivory</span>
-              </button>
-            </div>
-
-            {/* View Mode Switcher: 3D Simulator vs Print Sheet */}
-            <div className="flex items-center bg-neutral-100 p-0.5 rounded-lg text-xs">
-              <button
-                type="button"
-                onClick={() => setViewMode('3d_tabletop')}
-                className={`flex items-center gap-1.5 px-3 py-1 rounded-md font-medium transition-all ${
-                  viewMode === '3d_tabletop'
-                    ? 'bg-white text-neutral-900 shadow-2xs font-semibold'
-                    : 'text-neutral-600 hover:text-neutral-900'
-                }`}
-              >
-                <Rotate3d className="w-3.5 h-3.5" />
-                <span>3D Card</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setViewMode('print_sheet')}
-                className={`flex items-center gap-1.5 px-3 py-1 rounded-md font-medium transition-all ${
-                  viewMode === 'print_sheet'
-                    ? 'bg-white text-neutral-900 shadow-2xs font-semibold'
-                    : 'text-neutral-600 hover:text-neutral-900'
-                }`}
-              >
-                <FileText className="w-3.5 h-3.5" />
-                <span>Print Sheet</span>
-              </button>
-            </div>
-
-            {/* Download QR */}
-            <button
-              type="button"
-              onClick={handleDownloadQR}
-              className="p-1.5 rounded-lg border border-neutral-200 bg-white hover:bg-neutral-50 text-neutral-700 transition-colors"
-              title={`Download QR for ${activeTable.tableNumber}`}
-            >
-              <Download className="w-3.5 h-3.5" />
-            </button>
-
-            {/* Single Dynamic Print Button */}
-            <button
-              type="button"
-              onClick={handlePrint}
-              className="px-3.5 py-1.5 rounded-lg bg-neutral-900 hover:bg-black text-white text-xs font-semibold flex items-center gap-1.5 transition-all shadow-2xs"
-            >
-              <Printer className="w-3.5 h-3.5" />
-              <span>
-                {printMode === 'all'
-                  ? `Print All (${tables.length} Tables)`
-                  : `Print ${activeTable.tableNumber}`}
-              </span>
-            </button>
+          <div className="text-[11px] font-semibold text-[#737373] hidden sm:block">
+            {activeTab === 'management' ? (
+              <span>Manage active tables, seat capacity, and live status</span>
+            ) : (
+              <span>3D preview and printable 80mm table standees</span>
+            )}
           </div>
         </div>
       </div>
+
+      {activeTab === 'management' ? (
+        /* ================= TABLE MANAGEMENT TAB CONTENT ================= */
+        <div className="max-w-[1720px] mx-auto px-4 sm:px-6 py-6">
+          <TableManagementTab />
+        </div>
+      ) : (
+        /* ================= STANDIES STUDIO TAB CONTENT ================= */
+        <>
+          {/* Top Sub-Bar for Standees Studio */}
+          <div className="no-print bg-[#FAFAFA] border-b border-neutral-200">
+            <div className="max-w-[1720px] mx-auto px-4 sm:px-6 h-12 flex items-center justify-between gap-3">
+              {/* Left: Minimalist 1-Click Table Selector Strip */}
+              <div className="flex items-center gap-1 overflow-x-auto no-scrollbar bg-neutral-100 p-1 rounded-xl">
+                <button
+                  type="button"
+                  onClick={() => setPrintMode('all')}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
+                    printMode === 'all'
+                      ? 'bg-neutral-900 text-white shadow-2xs'
+                      : 'text-neutral-600 hover:text-neutral-900'
+                  }`}
+                >
+                  All ({tables.length})
+                </button>
+                <div className="w-px h-3.5 bg-neutral-300 mx-0.5 shrink-0" />
+                {tables.map((t) => {
+                  const num = t.tableNumber.replace(/\D/g, '');
+                  const isSelected = printMode === 'single' && selectedTableNumber === t.tableNumber;
+                  return (
+                    <button
+                      key={t.tableNumber}
+                      type="button"
+                      onClick={() => {
+                        setSelectedTableNumber(t.tableNumber);
+                        setPrintMode('single');
+                      }}
+                      className={`min-w-[28px] h-7 px-1.5 rounded-lg text-xs font-semibold flex items-center justify-center transition-all shrink-0 ${
+                        isSelected
+                          ? 'bg-neutral-900 text-white shadow-2xs'
+                          : 'text-neutral-600 hover:text-neutral-900'
+                      }`}
+                      title={t.tableNumber}
+                    >
+                      {num || t.tableNumber}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Right: Restrained View Controls & Print Action */}
+              <div className="flex items-center gap-2 shrink-0">
+                {/* Theme Toggle: Obsidian vs Ivory */}
+                <div className="hidden sm:flex items-center bg-neutral-100 p-0.5 rounded-lg text-xs">
+                  <button
+                    type="button"
+                    onClick={() => setThemeMode('obsidian')}
+                    className={`flex items-center gap-1 px-2.5 py-1 rounded-md font-medium transition-all ${
+                      themeMode === 'obsidian'
+                        ? 'bg-neutral-900 text-white shadow-2xs'
+                        : 'text-neutral-600 hover:text-neutral-900'
+                    }`}
+                  >
+                    <div className="w-2 h-2 rounded-full bg-neutral-900 border border-white/30" />
+                    <span>Obsidian</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setThemeMode('ivory')}
+                    className={`flex items-center gap-1 px-2.5 py-1 rounded-md font-medium transition-all ${
+                      themeMode === 'ivory'
+                        ? 'bg-white text-neutral-900 shadow-2xs font-semibold'
+                        : 'text-neutral-600 hover:text-neutral-900'
+                    }`}
+                  >
+                    <div className="w-2 h-2 rounded-full bg-neutral-200 border border-neutral-400" />
+                    <span>Ivory</span>
+                  </button>
+                </div>
+
+                {/* View Mode Switcher: 3D Simulator vs Print Sheet */}
+                <div className="flex items-center bg-neutral-100 p-0.5 rounded-lg text-xs">
+                  <button
+                    type="button"
+                    onClick={() => setViewMode('3d_tabletop')}
+                    className={`flex items-center gap-1.5 px-3 py-1 rounded-md font-medium transition-all ${
+                      viewMode === '3d_tabletop'
+                        ? 'bg-white text-neutral-900 shadow-2xs font-semibold'
+                        : 'text-neutral-600 hover:text-neutral-900'
+                    }`}
+                  >
+                    <Rotate3d className="w-3.5 h-3.5" />
+                    <span>3D Card</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setViewMode('print_sheet')}
+                    className={`flex items-center gap-1.5 px-3 py-1 rounded-md font-medium transition-all ${
+                      viewMode === 'print_sheet'
+                        ? 'bg-white text-neutral-900 shadow-2xs font-semibold'
+                        : 'text-neutral-600 hover:text-neutral-900'
+                    }`}
+                  >
+                    <FileText className="w-3.5 h-3.5" />
+                    <span>Print Sheet</span>
+                  </button>
+                </div>
+
+                {/* Download QR */}
+                <button
+                  type="button"
+                  onClick={handleDownloadQR}
+                  className="p-1.5 rounded-lg border border-neutral-200 bg-white hover:bg-neutral-50 text-neutral-700 transition-colors"
+                  title={`Download QR for ${activeTable.tableNumber}`}
+                >
+                  <Download className="w-3.5 h-3.5" />
+                </button>
+
+                {/* Single Dynamic Print Button */}
+                <button
+                  type="button"
+                  onClick={handlePrint}
+                  className="px-3.5 py-1.5 rounded-lg bg-neutral-900 hover:bg-black text-white text-xs font-semibold flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer"
+                >
+                  <Printer className="w-3.5 h-3.5" />
+                  <span>
+                    {printMode === 'all'
+                      ? `Print All (${tables.length} Tables)`
+                      : `Print ${activeTable.tableNumber}`}
+                  </span>
+                </button>
+              </div>
+            </div>
+          </div>
 
       {/* ================= MAIN CONTENT ================= */}
       <div className="max-w-[1720px] mx-auto px-4 sm:px-6 py-6">
@@ -1040,6 +1087,8 @@ export default function TableStandeesPage() {
           </div>
         )}
       </div>
-    </div>
+    </>
+    )}
+  </div>
   );
 }

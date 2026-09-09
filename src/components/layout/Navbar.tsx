@@ -56,7 +56,7 @@ export function Navbar() {
         },
         {
           href: '/tables',
-          label: 'Table Standees',
+          label: 'Tables & Floor',
           icon: QrCode,
           badge: null,
         },
@@ -89,7 +89,7 @@ export function Navbar() {
         },
         {
           href: '/tables',
-          label: 'Table Standees',
+          label: 'Tables & Floor',
           icon: QrCode,
           badge: null,
         },

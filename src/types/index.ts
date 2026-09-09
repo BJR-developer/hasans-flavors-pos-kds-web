@@ -131,11 +131,14 @@ export interface Order {
 }
 
 export interface TableSession {
+  id?: string;
   tableNumber: string;
+  capacity?: number;
   guestCount: number;
   status: 'available' | 'occupied' | 'billing';
   activeOrderId?: string;
   joinedAt?: string;
+  updatedAt?: string;
 }
 
 export type UserRole = 'staff' | 'kds' | 'owner';
