@@ -1,5 +1,5 @@
 import { supabase } from './supabase';
-import { Dish, Order, TableSession, Category } from '@/types';
+import { Dish, Order, TableSession, Category, AddonOption } from '@/types';
 
 // Map database snake_case row to TypeScript Dish
 export const mapDishFromDB = (row: any): Dish => ({
@@ -754,4 +754,103 @@ export const deleteTableFromDB = async (id: string, tableNumber: string): Promis
 export const releaseTableInDB = async (tableNumber: string): Promise<void> => {
   await updateTableStatusInDB(tableNumber, 'available', undefined);
 };
+
+// 4. ADD-ONS API
+export const mapAddonFromDB = (row: any): AddonOption => ({
+  id: row.id,
+  name: row.name,
+  price: Number(row.price || 0),
+  inStock: row.in_stock ?? true,
+  createdAt: row.created_at,
+  updatedAt: row.updated_at,
+});
+
+export const fetchAddonsFromDB = async (): Promise<AddonOption[]> => {
+  const { data, error } = await supabase
+    .from('addons')
+    .select('*')
+    .order('created_at', { ascending: true });
+
+  if (error) {
+    console.error('Error fetching addons from DB:', error);
+    throw error;
+  }
+  return (data || []).map(mapAddonFromDB);
+};
+
+export const createAddonInDB = async ({
+  name,
+  price,
+  inStock = true,
+}: {
+  name: string;
+  price: number;
+  inStock?: boolean;
+}): Promise<AddonOption> => {
+  const id = `addon_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+  const cleanName = name.trim();
+
+  const { data, error } = await supabase
+    .from('addons')
+    .insert({
+      id,
+      name: cleanName,
+      price: Number(price) || 0,
+      in_stock: inStock,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    })
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error creating addon in DB:', error);
+    throw error;
+  }
+  return mapAddonFromDB(data);
+};
+
+export const updateAddonInDB = async (
+  id: string,
+  updates: { name?: string; price?: number; inStock?: boolean }
+): Promise<AddonOption> => {
+  const dbPayload: any = { updated_at: new Date().toISOString() };
+  if (updates.name !== undefined) dbPayload.name = updates.name.trim();
+  if (updates.price !== undefined) dbPayload.price = Number(updates.price) || 0;
+  if (updates.inStock !== undefined) dbPayload.in_stock = updates.inStock;
+
+  const { data, error } = await supabase
+    .from('addons')
+    .update(dbPayload)
+    .eq('id', id)
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error updating addon in DB:', error);
+    throw error;
+  }
+  return mapAddonFromDB(data);
+};
+
+export const deleteAddonInDB = async (id: string): Promise<void> => {
+  const { error } = await supabase.from('addons').delete().eq('id', id);
+  if (error) {
+    console.error('Error deleting addon in DB:', error);
+    throw error;
+  }
+};
+
+export const toggleAddonStockInDB = async (id: string, inStock: boolean): Promise<void> => {
+  const { error } = await supabase
+    .from('addons')
+    .update({ in_stock: inStock, updated_at: new Date().toISOString() })
+    .eq('id', id);
+
+  if (error) {
+    console.error('Error toggling addon stock in DB:', error);
+    throw error;
+  }
+};
+
 

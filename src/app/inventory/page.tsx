@@ -4,13 +4,14 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { InventoryTable } from '@/components/inventory/InventoryTable';
 import { CategoryManagementTab } from '@/components/inventory/CategoryManagementTab';
+import { AddonManagementTab } from '@/components/inventory/AddonManagementTab';
 import { useAuthStore } from '@/lib/auth';
-import { ShieldAlert, Boxes, Layers } from 'lucide-react';
+import { ShieldAlert, Boxes, Layers, PlusCircle } from 'lucide-react';
 
 export default function InventoryPage() {
   const router = useRouter();
   const { user, isLoading } = useAuthStore();
-  const [activeTab, setActiveTab] = useState<'dishes' | 'categories'>('dishes');
+  const [activeTab, setActiveTab] = useState<'dishes' | 'categories' | 'addons'>('dishes');
 
   useEffect(() => {
     if (!isLoading && !user) {
@@ -80,13 +81,28 @@ export default function InventoryPage() {
               <Layers className="w-3.5 h-3.5" />
               <span>Category Management</span>
             </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveTab('addons')}
+              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer select-none ${
+                activeTab === 'addons'
+                  ? 'bg-white text-[#1F1F1F] shadow-2xs'
+                  : 'text-[#737373] hover:text-[#1F1F1F]'
+              }`}
+            >
+              <PlusCircle className="w-3.5 h-3.5" />
+              <span>Sides &amp; Add-ons</span>
+            </button>
           </div>
 
           <div className="text-[11px] font-semibold text-[#737373] hidden sm:block">
             {activeTab === 'dishes' ? (
               <span>Catalog pricing, availability, and bulk operations</span>
-            ) : (
+            ) : activeTab === 'categories' ? (
               <span>Manage menu sections, category cover photos, and dish assignments</span>
+            ) : (
+              <span>Manage optional sides, sauces, desserts, and add-on pricing</span>
             )}
           </div>
         </div>
@@ -95,9 +111,13 @@ export default function InventoryPage() {
       {/* Tab Contents */}
       {activeTab === 'dishes' ? (
         <InventoryTable />
-      ) : (
+      ) : activeTab === 'categories' ? (
         <div className="flex-1 flex flex-col p-4 lg:p-6 max-w-[1720px] mx-auto w-full">
           <CategoryManagementTab />
+        </div>
+      ) : (
+        <div className="flex-1 flex flex-col p-4 lg:p-6 max-w-[1720px] mx-auto w-full">
+          <AddonManagementTab />
         </div>
       )}
     </div>

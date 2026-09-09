@@ -27,8 +27,13 @@ import {
   createCategoryInDB,
   updateCategoryInDB,
   deleteCategoryInDB,
+  fetchAddonsFromDB,
+  createAddonInDB,
+  updateAddonInDB,
+  deleteAddonInDB,
+  toggleAddonStockInDB,
 } from '@/lib/api';
-import { Category, Dish, Order, OrderStatus, PaymentMethod, PaymentStatus, TableSession, CartItem } from '@/types';
+import { Category, Dish, Order, OrderStatus, PaymentMethod, PaymentStatus, TableSession, CartItem, AddonOption } from '@/types';
 
 export const QUERY_KEYS = {
   orders: ['orders'] as const,
@@ -36,6 +41,7 @@ export const QUERY_KEYS = {
   categories: ['categories'] as const,
   tables: ['tables'] as const,
   dailyStats: ['dailyStats'] as const,
+  addons: ['addons'] as const,
 };
 
 // 1. Orders Query - 100% Live from Supabase
@@ -507,6 +513,93 @@ export function useDeleteCategory() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.categories });
+    },
+  });
+}
+
+// 6. ADD-ONS HOOKS (100% Live from Supabase)
+export function useAddons() {
+  return useQuery<AddonOption[]>({
+    queryKey: QUERY_KEYS.addons,
+    queryFn: async (): Promise<AddonOption[]> => {
+      try {
+        const data = await fetchAddonsFromDB();
+        return data;
+      } catch (e) {
+        console.error('Error fetching addons from Supabase:', e);
+        return [];
+      }
+    },
+    staleTime: 1000 * 60 * 5,
+  });
+}
+
+// Create New Add-on
+export function useCreateAddon() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      name,
+      price,
+      inStock,
+    }: {
+      name: string;
+      price: number;
+      inStock?: boolean;
+    }) => {
+      return createAddonInDB({ name, price, inStock });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.addons });
+    },
+  });
+}
+
+// Update Existing Add-on
+export function useUpdateAddon() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      id,
+      updates,
+    }: {
+      id: string;
+      updates: { name?: string; price?: number; inStock?: boolean };
+    }) => {
+      return updateAddonInDB(id, updates);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.addons });
+    },
+  });
+}
+
+// Delete Add-on
+export function useDeleteAddon() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      return deleteAddonInDB(id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.addons });
+    },
+  });
+}
+
+// Toggle Add-on Stock Availability
+export function useToggleAddonStock() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, inStock }: { id: string; inStock: boolean }) => {
+      return toggleAddonStockInDB(id, inStock);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.addons });
     },
   });
 }

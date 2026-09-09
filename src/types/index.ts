@@ -66,6 +66,9 @@ export interface AddonOption {
   id: string;
   name: string;
   price: number;
+  inStock?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface CartItem {

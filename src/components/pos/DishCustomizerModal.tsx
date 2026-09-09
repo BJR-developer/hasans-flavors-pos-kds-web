@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { X, Plus, Minus, Flame, Sparkles, ChevronLeft, ChevronRight, Images, Layers } from 'lucide-react';
 import { Dish, CartItem, PortionOption, AddonOption, SelectedVariant } from '@/types';
 import { PORTION_OPTIONS, ADDON_OPTIONS, SPICE_LEVELS } from '@/data/options';
 import { SafeImage } from '@/components/common/SafeImage';
+import { useAddons } from '@/hooks/useRestaurantData';
 
 interface DishCustomizerModalProps {
   dish: Dish | null;
@@ -43,6 +44,13 @@ function DishCustomizerModalContent({
   const [selectedSpice, setSelectedSpice] = useState<number>(dish.spiceLevel || (hasLegacySpice ? 2 : 0));
   const [selectedAddons, setSelectedAddons] = useState<AddonOption[]>([]);
   const [specialNotes, setSpecialNotes] = useState('');
+
+  // 100% Dynamic Addons from Supabase (filtered to in-stock only)
+  const { data: dbAddons = [] } = useAddons();
+  const availableAddons = useMemo(() => {
+    const list = dbAddons.length > 0 ? dbAddons : ADDON_OPTIONS;
+    return list.filter((a) => a.inStock !== false);
+  }, [dbAddons]);
 
   // Custom Variants Selection Map
   const [selectedVariantsMap, setSelectedVariantsMap] = useState<Record<string, string>>(() => {
@@ -306,35 +314,37 @@ function DishCustomizerModalContent({
           ) : null}
 
           {/* Add-ons Checklist */}
-          <div>
-            <label className="block text-xs font-extrabold text-[#2D2926] uppercase tracking-wider mb-2">
-              Optional Sides & Add-ons
-            </label>
-            <div className="grid grid-cols-2 gap-2">
-              {ADDON_OPTIONS.map((addon) => {
-                const isSelected = selectedAddons.some((a) => a.id === addon.id);
-                return (
-                  <button
-                    key={addon.id}
-                    type="button"
-                    onClick={() => toggleAddon(addon)}
-                    className={`flex items-center justify-between p-2.5 rounded-xl border text-left transition-all ${
-                      isSelected
-                        ? 'border-[#2E7D32] bg-[#E8F5E9] text-[#2E7D32] shadow-xs'
-                        : 'border-[#E9E8E7] bg-white text-[#5B403D] hover:bg-[#F4F3F2]'
-                    }`}
-                  >
-                    <div className="pr-2">
-                      <p className="text-xs font-bold leading-tight">{addon.name}</p>
-                    </div>
-                    <span className="text-xs font-extrabold whitespace-nowrap">
-                      +₱{addon.price}
-                    </span>
-                  </button>
-                );
-              })}
+          {availableAddons.length > 0 && (
+            <div>
+              <label className="block text-xs font-extrabold text-[#2D2926] uppercase tracking-wider mb-2">
+                Optional Sides &amp; Add-ons
+              </label>
+              <div className="grid grid-cols-2 gap-2">
+                {availableAddons.map((addon) => {
+                  const isSelected = selectedAddons.some((a) => a.id === addon.id);
+                  return (
+                    <button
+                      key={addon.id}
+                      type="button"
+                      onClick={() => toggleAddon(addon)}
+                      className={`flex items-center justify-between p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
+                        isSelected
+                          ? 'border-[#2E7D32] bg-[#E8F5E9] text-[#2E7D32] shadow-xs'
+                          : 'border-[#E9E8E7] bg-white text-[#5B403D] hover:bg-[#F4F3F2]'
+                      }`}
+                    >
+                      <div className="pr-2 min-w-0">
+                        <p className="text-xs font-bold leading-tight truncate">{addon.name}</p>
+                      </div>
+                      <span className="text-xs font-extrabold whitespace-nowrap shrink-0">
+                        +₱{addon.price}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Kitchen Special Notes */}
           <div>
