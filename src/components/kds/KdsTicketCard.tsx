@@ -156,31 +156,20 @@ export function KdsTicketCard({
       draggable={!animatingDirection && !isFlyingOrigin}
       onDragStart={(e) => onDragStart?.(e, order)}
       onDragEnd={onDragEnd}
-      className={`bg-white rounded-xl border flex flex-col overflow-hidden transition-all duration-200 cursor-grab active:cursor-grabbing select-none ${
-        isFlyingOrigin
+      className={`bg-white rounded-xl border flex flex-col overflow-hidden transition-all duration-200 cursor-grab active:cursor-grabbing select-none ${isFlyingOrigin
           ? 'opacity-20 scale-95 pointer-events-none'
           : isJustMoved
-          ? 'ring-2 ring-emerald-500 shadow-md animate-in fade-in slide-in-from-left-4 duration-300'
-          : isUrgent
-          ? 'border-red-400 shadow-2xs'
-          : 'border-neutral-200 hover:border-neutral-300 hover:shadow-2xs'
-      }`}
+            ? 'ring-2 ring-emerald-500 shadow-md animate-in fade-in slide-in-from-left-4 duration-300'
+            : isUrgent
+              ? 'border-red-400 shadow-2xs'
+              : 'border-neutral-200 hover:border-neutral-300 hover:shadow-2xs'
+        }`}
     >
-      {/* Visual Just-Moved Beacon */}
-      {isJustMoved && (
-        <div className="bg-emerald-600 text-white text-[10px] font-bold px-2 py-0.5 flex items-center justify-between animate-pulse">
-          <span className="flex items-center gap-1">
-            <Sparkles className="w-3 h-3" /> Moved to this column
-          </span>
-          <span className="text-[9px] font-mono uppercase">Live</span>
-        </div>
-      )}
 
       {/* Ticket Header with Dynamic High-Contrast Color Theme */}
       <div
-        className={`px-3.5 py-2.5 border-b flex items-center justify-between gap-2 transition-colors ${
-          colorTheme.headerBg
-        } ${colorTheme.headerText}`}
+        className={`px-3.5 py-2.5 border-b flex items-center justify-between gap-2 transition-colors ${colorTheme.headerBg
+          } ${colorTheme.headerText}`}
       >
         <div className="flex items-center gap-2 flex-wrap min-w-0">
           <div className="flex items-center gap-1">
@@ -194,9 +183,8 @@ export function KdsTicketCard({
             <button
               type="button"
               onClick={() => setIsChangeTableOpen(true)}
-              className={`flex items-center gap-1 text-[10.5px] font-extrabold px-2 py-0.5 rounded-md transition-all cursor-pointer shadow-2xs ${
-                colorTheme.badgeBg
-              }`}
+              className={`flex items-center gap-1 text-[10.5px] font-extrabold px-2 py-0.5 rounded-md transition-all cursor-pointer shadow-2xs ${colorTheme.badgeBg
+                }`}
               title="Click to move to another available table"
             >
               <span>{order.tableNumber || 'Dine-In'}</span>
@@ -204,20 +192,18 @@ export function KdsTicketCard({
             </button>
           ) : (
             <span
-              className={`text-[10.5px] font-bold px-2 py-0.5 rounded-md ${
-                colorTheme.badgeBg
-              }`}
+              className={`text-[10.5px] font-bold px-2 py-0.5 rounded-md ${colorTheme.badgeBg
+                }`}
             >
               {order.type === 'delivery' ? 'Delivery' : 'Takeout'}
             </span>
           )}
 
           <span
-            className={`text-[9.5px] font-extrabold uppercase px-1.5 py-0.5 rounded ${
-              order.paymentStatus === 'paid'
+            className={`text-[9.5px] font-extrabold uppercase px-1.5 py-0.5 rounded ${order.paymentStatus === 'paid'
                 ? 'bg-emerald-950/70 text-emerald-200 border border-emerald-400/40'
                 : 'bg-black/25 text-inherit border border-current/20'
-            }`}
+              }`}
           >
             {order.paymentStatus === 'paid' ? '★ PAID' : 'UNPAID'}
           </span>
@@ -260,17 +246,15 @@ export function KdsTicketCard({
             <div
               key={item.cartItemId}
               onClick={() => handleToggleItem(item.cartItemId)}
-              className={`pt-2 first:pt-0 flex items-start gap-2.5 cursor-pointer select-none group ${
-                isDone ? 'opacity-35' : 'opacity-100'
-              }`}
+              className={`pt-2 first:pt-0 flex items-start gap-2.5 cursor-pointer select-none group ${isDone ? 'opacity-35' : 'opacity-100'
+                }`}
             >
               {/* Minimal Checkbox */}
               <div
-                className={`w-4 h-4 rounded mt-0.5 flex items-center justify-center border transition-colors shrink-0 ${
-                  isDone
+                className={`w-4 h-4 rounded mt-0.5 flex items-center justify-center border transition-colors shrink-0 ${isDone
                     ? 'bg-neutral-900 border-neutral-900 text-white'
                     : 'border-neutral-300 bg-white group-hover:border-neutral-600'
-                }`}
+                  }`}
               >
                 {isDone && <Check className="w-3 h-3 stroke-[3]" />}
               </div>
@@ -279,16 +263,14 @@ export function KdsTicketCard({
               <div className="flex-1 min-w-0">
                 <div className="flex items-baseline gap-1.5">
                   <span
-                    className={`font-bold text-xs ${
-                      isDone ? 'line-through text-neutral-400' : 'text-neutral-900'
-                    }`}
+                    className={`font-bold text-xs ${isDone ? 'line-through text-neutral-400' : 'text-neutral-900'
+                      }`}
                   >
                     {item.quantity}×
                   </span>
                   <span
-                    className={`font-medium text-xs leading-snug ${
-                      isDone ? 'line-through text-neutral-400' : 'text-neutral-900'
-                    }`}
+                    className={`font-medium text-xs leading-snug ${isDone ? 'line-through text-neutral-400' : 'text-neutral-900'
+                      }`}
                   >
                     {item.dish.name}
                   </span>
@@ -314,16 +296,15 @@ export function KdsTicketCard({
                     item.spiceLevel > 0 &&
                     !item.selectedVariants?.some((v) => v.groupName.toLowerCase().includes('spice')) &&
                     getSpiceLabel(item.spiceLevel) && (
-                    <span className={`px-1.5 py-0.5 rounded font-bold ${
-                      item.spiceLevel >= 4
-                        ? 'bg-red-100 text-red-700'
-                        : item.spiceLevel === 3
-                        ? 'bg-amber-100 text-amber-800'
-                        : 'bg-neutral-100 text-neutral-700'
-                    }`}>
-                      Spice: {getSpiceLabel(item.spiceLevel)}
-                    </span>
-                  )}
+                      <span className={`px-1.5 py-0.5 rounded font-bold ${item.spiceLevel >= 4
+                          ? 'bg-red-100 text-red-700'
+                          : item.spiceLevel === 3
+                            ? 'bg-amber-100 text-amber-800'
+                            : 'bg-neutral-100 text-neutral-700'
+                        }`}>
+                        Spice: {getSpiceLabel(item.spiceLevel)}
+                      </span>
+                    )}
 
                   {item.selectedAddons?.map((a) => (
                     <span key={a.id}>• +{a.name}</span>
@@ -395,15 +376,14 @@ export function KdsTicketCard({
         <button
           type="button"
           onClick={handleBumpNext}
-          className={`flex items-center justify-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold text-white transition-colors shadow-2xs ${
-            order.status === 'pending' || order.status === 'sent_to_kitchen'
+          className={`flex items-center justify-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold text-white transition-colors shadow-2xs ${order.status === 'pending' || order.status === 'sent_to_kitchen'
               ? 'bg-red-600 hover:bg-red-700'
               : order.status === 'preparing'
-              ? 'bg-neutral-900 hover:bg-black'
-              : order.status === 'ready'
-              ? 'bg-blue-600 hover:bg-blue-700'
-              : 'bg-emerald-600 hover:bg-emerald-700'
-          }`}
+                ? 'bg-neutral-900 hover:bg-black'
+                : order.status === 'ready'
+                  ? 'bg-blue-600 hover:bg-blue-700'
+                  : 'bg-emerald-600 hover:bg-emerald-700'
+            }`}
         >
           {(order.status === 'pending' || order.status === 'sent_to_kitchen') && (
             <>
