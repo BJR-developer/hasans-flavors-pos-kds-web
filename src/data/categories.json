@@ -2,64 +2,109 @@
   {
     "id": "all",
     "name": "All Dishes",
+    "slug": "all",
     "icon": "restaurant-outline",
-    "count": 67,
-    "imageUrl": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=400&q=80"
+    "count": 102,
+    "imageUrl": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=600&q=80",
+    "match": "All Dishes"
   },
   {
-    "id": "biryani",
-    "name": "Biryani & Rice",
-    "match": "biryani|rice",
+    "id": "rice-biryani",
+    "name": "Rice & Biryani",
+    "slug": "rice-biryani",
     "icon": "bowl-outline",
-    "count": 19,
-    "imageUrl": "https://halalfood.com.ph/wp-content/uploads/2026/08/WhatsApp-Image-2026-08-01-at-10.09.05-PM.jpeg"
+    "count": 18,
+    "imageUrl": "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=600&q=80",
+    "match": "Rice & Biryani"
   },
   {
-    "id": "curries",
-    "name": "Curries & Karahi",
-    "match": "curry|karahi|haleem|nihari",
+    "id": "chicken-specials",
+    "name": "Chicken & Non-Veg Specials",
+    "slug": "chicken-specials",
     "icon": "flame-outline",
-    "count": 9,
-    "imageUrl": "https://images.unsplash.com/photo-1589302168068-964664d93dc0?auto=format&fit=crop&w=400&q=80"
-  },
-  {
-    "id": "bbq",
-    "name": "BBQ & Kababs",
-    "match": "kabab|bbq|tikka",
-    "icon": "bonfire-outline",
-    "count": 5,
-    "imageUrl": "https://halalfood.com.ph/wp-content/uploads/2026/08/WhatsApp-Image-2026-07-31-at-9.39.37-PM.jpeg"
-  },
-  {
-    "id": "rolls",
-    "name": "Rolls & Fast Food",
-    "match": "roll|burger|wrap|bite",
-    "icon": "fast-food-outline",
     "count": 12,
-    "imageUrl": "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?auto=format&fit=crop&w=400&q=80"
+    "imageUrl": "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?auto=format&fit=crop&w=600&q=80",
+    "match": "Chicken & Non-Veg Specials"
   },
   {
-    "id": "drinks",
-    "name": "Soft Drinks & Beverages",
-    "match": "drink|beverage|cola|coke|sprite|royal|water|lassi|chai|tea|soda|lemonade",
-    "icon": "water-outline",
-    "count": 10,
-    "imageUrl": "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&w=400&q=80"
+    "id": "vegetarian-specials",
+    "name": "Vegetarian Specials",
+    "slug": "vegetarian-specials",
+    "icon": "leaf-outline",
+    "count": 13,
+    "imageUrl": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=600&q=80",
+    "match": "Vegetarian Specials"
   },
   {
-    "id": "breads",
-    "name": "Fresh Breads & Roti",
-    "match": "roti|naan|paratha|chapati",
+    "id": "paratha-breads",
+    "name": "Kothu · Paratha & Breads",
+    "slug": "paratha-breads",
     "icon": "pizza-outline",
-    "count": 3,
-    "imageUrl": "https://halalfood.com.ph/wp-content/uploads/2026/08/adadad.jpeg"
+    "count": 13,
+    "imageUrl": "https://images.unsplash.com/photo-1626074353765-517a681e40be?auto=format&fit=crop&w=600&q=80",
+    "match": "Kothu · Paratha & Breads"
   },
   {
-    "id": "combos",
-    "name": "Party Bilao & Combos",
-    "match": "bilao|combo|platter",
+    "id": "snacks-street",
+    "name": "Snacks & Street Bites",
+    "slug": "snacks-street",
+    "icon": "fast-food-outline",
+    "count": 13,
+    "imageUrl": "https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=600&q=80",
+    "match": "Snacks & Street Bites"
+  },
+  {
+    "id": "student-meals",
+    "name": "Student Meals",
+    "slug": "student-meals",
+    "icon": "school-outline",
+    "count": 7,
+    "imageUrl": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80",
+    "match": "Student Meals"
+  },
+  {
+    "id": "family-meals",
+    "name": "Family / Sharing Meals",
+    "slug": "family-meals",
     "icon": "people-outline",
-    "count": 3,
-    "imageUrl": "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=400&q=80"
+    "count": 2,
+    "imageUrl": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80",
+    "match": "Family / Sharing Meals"
+  },
+  {
+    "id": "bbq-combos",
+    "name": "BBQ Combos",
+    "slug": "bbq-combos",
+    "icon": "bonfire-outline",
+    "count": 2,
+    "imageUrl": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80",
+    "match": "BBQ Combos"
+  },
+  {
+    "id": "sweets-dessert",
+    "name": "Fresh Indo-Pak Sweets",
+    "slug": "sweets-dessert",
+    "icon": "sparkles-outline",
+    "count": 11,
+    "imageUrl": "https://images.unsplash.com/photo-1599785209707-a456fc1337bb?auto=format&fit=crop&w=600&q=80",
+    "match": "Fresh Indo-Pak Sweets"
+  },
+  {
+    "id": "shakes-lassi",
+    "name": "Shakes & Lassi",
+    "slug": "shakes-lassi",
+    "icon": "wine-outline",
+    "count": 10,
+    "imageUrl": "https://images.unsplash.com/photo-1553787499-6f9133860278?auto=format&fit=crop&w=600&q=80",
+    "match": "Shakes & Lassi"
+  },
+  {
+    "id": "shisha",
+    "name": "Shisha Lounge",
+    "slug": "shisha",
+    "icon": "cloud-outline",
+    "count": 1,
+    "imageUrl": "https://images.unsplash.com/photo-1527661591475-527312dd65f5?auto=format&fit=crop&w=600&q=80",
+    "match": "Shisha Lounge"
   }
 ]
