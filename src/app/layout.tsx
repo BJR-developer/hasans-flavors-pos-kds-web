@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { QueryProvider } from '@/providers/QueryProvider';
 import { Navbar } from '@/components/layout/Navbar';
+import { OrderNotificationListener } from '@/components/layout/OrderNotificationListener';
 
 export const metadata: Metadata = {
   title: "Hasan's Flavors • POS & Kitchen KDS Operations",
@@ -20,6 +21,7 @@ export default function RootLayout({
         <QueryProvider>
           <Navbar />
           <main className="flex-1 flex flex-col min-h-0">{children}</main>
+          <OrderNotificationListener />
         </QueryProvider>
       </body>
     </html>

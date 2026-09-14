@@ -172,7 +172,8 @@ export function PosCartPane({
     if (items.length === 0) return;
 
     const isPayNow = paymentTiming === 'pay_now';
-    const finalPaymentStatus: PaymentStatus = isPayNow ? 'paid' : 'unpaid';
+    const isOnlinePay = isPayNow && (paymentMethod === 'gcash' || paymentMethod === 'card');
+    const finalPaymentStatus: PaymentStatus = isPayNow ? (isOnlinePay ? 'unpaid' : 'paid') : 'unpaid';
 
     try {
       const orderPayload: Omit<Order, 'id' | 'orderNumber' | 'createdAt'> = {
@@ -189,9 +190,9 @@ export function PosCartPane({
         deliveryFee,
         discount: 0,
         total,
-        amountPaid: isPayNow ? total : 0,
-        balanceDue: isPayNow ? 0 : total,
-        status: 'pending',
+        amountPaid: isPayNow && !isOnlinePay ? total : 0,
+        balanceDue: isPayNow && !isOnlinePay ? 0 : total,
+        status: isOnlinePay ? 'draft' : 'pending',
         paymentMethod,
         paymentStatus: finalPaymentStatus,
         cashTendered: isPayNow && paymentMethod === 'cash' ? (tenderedNum > 0 ? tenderedNum : total) : undefined,
@@ -200,6 +201,35 @@ export function PosCartPane({
       };
 
       const created = await createOrderMutation.mutateAsync(orderPayload);
+
+      // Launch PayMongo Checkout for GCash / Card if Pay Now
+      if (isPayNow && (paymentMethod === 'gcash' || paymentMethod === 'card')) {
+        try {
+          const res = await fetch('/api/paymongo/checkout', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              orderId: created.id,
+              orderNumber: created.orderNumber,
+              amount: total,
+              paymentMethod,
+              items: items.map((i) => ({
+                name: i.dish?.name || 'Food Item',
+                price: i.unitPrice || i.dish?.price || 0,
+                quantity: i.quantity,
+              })),
+              customerName: orderPayload.customerName || 'Diner',
+            }),
+          });
+          const payData = await res.json();
+          if (payData.checkoutUrl) {
+            window.open(payData.checkoutUrl, '_blank');
+          }
+        } catch (payErr) {
+          console.error('PayMongo launch error:', payErr);
+        }
+      }
+
       onOrderCompleted(created);
       onClearCart();
       setCashTendered('');
@@ -365,8 +395,8 @@ export function PosCartPane({
           </div>
         ) : (
           <>
-            {/* 2 Channel Buttons: Dine-In & Takeout */}
-            <div className="grid grid-cols-2 gap-1 bg-[#F5F5F5] p-1 rounded-lg">
+            {/* 3 Channel Buttons: Dine-In, Takeout, & Delivery */}
+            <div className="grid grid-cols-3 gap-1 bg-[#F5F5F5] p-1 rounded-lg">
               <button
                 type="button"
                 onClick={() => handleChannelChange('dine_in')}
@@ -391,6 +421,18 @@ export function PosCartPane({
               >
                 <ShoppingBag className="w-3.5 h-3.5" />
                 <span>Takeout</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleChannelChange('delivery')}
+                className={`flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-semibold transition-all ${
+                  orderType === 'delivery'
+                    ? 'bg-white text-[#1F1F1F] shadow-xs'
+                    : 'text-[#737373] hover:text-[#1F1F1F]'
+                }`}
+              >
+                <span>Delivery</span>
               </button>
             </div>
 
@@ -745,12 +787,12 @@ export function PosCartPane({
 
             {paymentTiming === 'pay_now' && (
               <div className="space-y-2 pt-1">
-                {/* Method selector for Pay Now: Cash or Card */}
-                <div className="grid grid-cols-2 gap-1.5">
+                {/* Method selector for Pay Now: Cash, Card, GCash, or INR QR */}
+                <div className="grid grid-cols-4 gap-1">
                   <button
                     type="button"
                     onClick={() => setPaymentMethod('cash')}
-                    className={`flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-xs font-semibold transition-all border ${
+                    className={`flex items-center justify-center gap-1 py-1.5 rounded-lg text-xs font-semibold transition-all border ${
                       paymentMethod === 'cash'
                         ? 'bg-neutral-900 text-white border-neutral-900 shadow-2xs'
                         : 'bg-white text-neutral-600 border-neutral-200 hover:bg-neutral-100'
@@ -762,7 +804,7 @@ export function PosCartPane({
                   <button
                     type="button"
                     onClick={() => setPaymentMethod('card')}
-                    className={`flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-xs font-semibold transition-all border ${
+                    className={`flex items-center justify-center gap-1 py-1.5 rounded-lg text-xs font-semibold transition-all border ${
                       paymentMethod === 'card'
                         ? 'bg-neutral-900 text-white border-neutral-900 shadow-2xs'
                         : 'bg-white text-neutral-600 border-neutral-200 hover:bg-neutral-100'
@@ -771,7 +813,36 @@ export function PosCartPane({
                     <CreditCard className="w-3.5 h-3.5" />
                     <span>Card</span>
                   </button>
+                  <button
+                    type="button"
+                    onClick={() => setPaymentMethod('gcash')}
+                    className={`flex items-center justify-center gap-1 py-1.5 rounded-lg text-xs font-semibold transition-all border ${
+                      paymentMethod === 'gcash'
+                        ? 'bg-neutral-900 text-white border-neutral-900 shadow-2xs'
+                        : 'bg-white text-neutral-600 border-neutral-200 hover:bg-neutral-100'
+                    }`}
+                  >
+                    <span>GCash</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPaymentMethod('inr_qr')}
+                    className={`flex items-center justify-center gap-1 py-1.5 rounded-lg text-xs font-semibold transition-all border ${
+                      paymentMethod === 'inr_qr'
+                        ? 'bg-neutral-900 text-white border-neutral-900 shadow-2xs'
+                        : 'bg-white text-neutral-600 border-neutral-200 hover:bg-neutral-100'
+                    }`}
+                  >
+                    <span>INR QR</span>
+                  </button>
                 </div>
+
+                {paymentMethod === 'inr_qr' && (
+                  <div className="p-2 bg-amber-50 rounded-lg border border-amber-200 text-xs flex items-center justify-between">
+                    <span className="text-amber-900 font-medium">Rate: 1.65 (₱{total.toLocaleString()} × 1.65)</span>
+                    <span className="font-mono font-bold text-amber-900">₹{Math.round(total * 1.65).toLocaleString()} INR</span>
+                  </div>
+                )}
 
                 {paymentMethod === 'cash' && (
                   <div className="space-y-1.5">

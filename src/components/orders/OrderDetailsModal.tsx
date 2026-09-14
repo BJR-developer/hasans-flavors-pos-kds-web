@@ -163,6 +163,23 @@ export function OrderDetailsModal({
         {/* Body Content */}
         <div className="p-6 max-h-[65vh] overflow-y-auto space-y-6">
 
+          {/* INR QR / UPI Manual Verification Card */}
+          {currentOrder.paymentMethod === 'inr_qr' && (
+            <div className="p-3.5 bg-indigo-50/80 rounded-xl border border-indigo-200 text-xs text-indigo-950 space-y-1.5">
+              <div className="flex items-center justify-between">
+                <span className="font-bold uppercase text-[10px] tracking-wide text-indigo-700">
+                  ⚡ INR UPI Payment (Manual Verification)
+                </span>
+                <span className="text-[11px] font-mono font-bold bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded">
+                  ₹{Math.round(total * 1.65).toLocaleString()} INR
+                </span>
+              </div>
+              <p className="text-[11px] text-indigo-900 leading-relaxed">
+                Customer selected UPI QR. Please review the customer's transfer screenshot or match the 12-digit UTR below against your GPay/PhonePe business account.
+              </p>
+            </div>
+          )}
+
           {/* Order-Level Special Dining / Cooking Instructions */}
           {currentOrder.specialNotes && (
             <div className="p-3 bg-amber-50 rounded-xl border border-amber-200 text-xs text-amber-900">

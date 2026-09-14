@@ -14,6 +14,12 @@ import {
   LogIn,
   ShieldAlert,
   QrCode,
+  Bike,
+  Bell,
+  MessageSquareText,
+  Check,
+  Phone,
+  X,
 } from 'lucide-react';
 import { useOrders } from '@/hooks/useRestaurantData';
 import { useAuthStore } from '@/lib/auth';
@@ -23,6 +29,8 @@ export function Navbar() {
   const router = useRouter();
   const { data: orders = [] } = useOrders();
   const { user, initialize, signOut } = useAuthStore();
+  const [isNotifOpen, setIsNotifOpen] = React.useState(false);
+  const [readNoteIds, setReadNoteIds] = React.useState<string[]>([]);
 
   useEffect(() => {
     initialize();
@@ -37,6 +45,18 @@ export function Navbar() {
   const activeOrdersCount = orders.filter(
     (o) => o.status !== 'completed' && o.status !== 'cancelled'
   ).length;
+
+  // Running deliveries count
+  const runningDeliveriesCount = orders.filter(
+    (o) => o.type === 'delivery' && o.status !== 'completed' && o.status !== 'cancelled'
+  ).length;
+
+  // Active customer special notes & instructions
+  const activeNotes = orders.filter(
+    (o) => o.specialNotes && o.specialNotes.trim() && o.status !== 'completed' && o.status !== 'cancelled'
+  );
+  const unreadNotes = activeNotes.filter((o) => !readNoteIds.includes(o.id));
+  const unreadCount = unreadNotes.length;
 
   // STRICT ROLE SEPARATION PER USER DIRECTIVE:
   // - Owner: Can ONLY access Owner Dashboard (/analytics) and Table Standees (/tables).
@@ -74,6 +94,12 @@ export function Navbar() {
           label: 'Kitchen (KDS)',
           icon: ChefHat,
           badge: kitchenQueueCount > 0 ? kitchenQueueCount : null,
+        },
+        {
+          href: '/delivery',
+          label: 'Delivery',
+          icon: Bike,
+          badge: runningDeliveriesCount > 0 ? runningDeliveriesCount : null,
         },
         {
           href: '/orders',
@@ -163,7 +189,107 @@ export function Navbar() {
         )}
 
         {/* Right Tools: Role Badge, Quick Role Switcher, Sign Out */}
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-2 shrink-0 relative">
+          {/* Notifications / Diner Messages Bell */}
+          {!isSignInPage && user && isCashier && (
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setIsNotifOpen((prev) => !prev)}
+                title="Customer Special Instructions & Requests"
+                className={`relative p-2 rounded-lg border transition-colors flex items-center justify-center ${
+                  unreadCount > 0
+                    ? 'border-amber-300 bg-amber-50 text-amber-900 hover:bg-amber-100'
+                    : 'border-[#E5E5E5] bg-white text-[#525252] hover:bg-[#F5F5F5]'
+                }`}
+              >
+                <Bell className="w-4 h-4" />
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#BA1A20] text-white text-[9.5px] font-black flex items-center justify-center animate-pulse shadow-xs">
+                    {unreadCount}
+                  </span>
+                )}
+              </button>
+
+              {/* Dropdown Popover for Diner Messages & Instructions */}
+              {isNotifOpen && (
+                <div className="absolute right-0 top-12 w-80 sm:w-96 bg-white rounded-xl shadow-2xl border border-neutral-200 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
+                  <div className="p-3 bg-neutral-50 border-b border-neutral-200 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <MessageSquareText className="w-4 h-4 text-[#BA1A20]" />
+                      <span className="text-xs font-bold text-neutral-900">
+                        Diner Messages ({activeNotes.length})
+                      </span>
+                    </div>
+                    {unreadCount > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setReadNoteIds(activeNotes.map((o) => o.id));
+                        }}
+                        className="text-[10.5px] font-bold text-[#BA1A20] hover:underline"
+                      >
+                        Mark all as read
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="max-h-72 overflow-y-auto divide-y divide-neutral-100 p-2 space-y-1.5">
+                    {activeNotes.length === 0 ? (
+                      <div className="p-6 text-center text-neutral-400 text-xs">
+                        No active customer requests or special notes.
+                      </div>
+                    ) : (
+                      activeNotes.map((noteOrder) => {
+                        const isRead = readNoteIds.includes(noteOrder.id);
+                        return (
+                          <div
+                            key={noteOrder.id}
+                            className={`p-2.5 rounded-lg border text-xs transition-colors ${
+                              isRead
+                                ? 'bg-white border-neutral-100 text-neutral-600'
+                                : 'bg-amber-50/70 border-amber-200 text-amber-950 font-medium'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between gap-1 mb-1">
+                              <span className="font-mono font-bold text-[11px] text-neutral-900">
+                                {noteOrder.orderNumber} • {noteOrder.customerName}
+                              </span>
+                              <div className="flex items-center gap-1.5">
+                                {noteOrder.customerPhone && (
+                                  <a
+                                    href={`tel:${noteOrder.customerPhone}`}
+                                    className="text-neutral-500 hover:text-neutral-900 p-0.5 rounded"
+                                    title={`Call ${noteOrder.customerPhone}`}
+                                  >
+                                    <Phone className="w-3 h-3" />
+                                  </a>
+                                )}
+                                {!isRead && (
+                                  <button
+                                    type="button"
+                                    onClick={() => setReadNoteIds((prev) => [...prev, noteOrder.id])}
+                                    title="Mark as Read"
+                                    className="p-0.5 rounded hover:bg-amber-200/60 text-amber-800"
+                                  >
+                                    <Check className="w-3.5 h-3.5" />
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                            <p className="text-[11.5px] leading-relaxed text-neutral-800 italic">
+                              "{noteOrder.specialNotes}"
+                            </p>
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
           {!isSignInPage && user ? (
             <div className="flex items-center gap-1.5 sm:gap-2">
               {/* Role Indicator Chip */}

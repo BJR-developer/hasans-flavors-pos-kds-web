@@ -97,7 +97,7 @@ export type OrderStatus =
   | 'served'
   | 'completed'
   | 'cancelled';
-export type PaymentMethod = 'cash' | 'gcash' | 'card';
+export type PaymentMethod = 'cash' | 'gcash' | 'card' | 'inr_qr';
 export type PaymentStatus = 'unpaid' | 'partially_paid' | 'paid' | 'refunded';
 
 export interface PaymentRecord {

@@ -19,6 +19,44 @@ function getAudioContext(): AudioContext | null {
 }
 
 /**
+ * Play a resonant triple-strike restaurant bell chime when a new order arrives
+ */
+export function playIncomingOrderBell() {
+  try {
+    const ctx = getAudioContext();
+    if (!ctx) return;
+
+    const strikes = [0, 0.18, 0.38];
+    const frequencies = [880, 1046.5, 1318.5]; // A5, C6, E6 chime triad
+
+    strikes.forEach((strikeTime, index) => {
+      const now = ctx.currentTime + strikeTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(frequencies[index % frequencies.length], now);
+      // Bright metallic chime overtone
+      osc.frequency.exponentialRampToValueAtTime(
+        frequencies[index % frequencies.length] * 1.5,
+        now + 0.6
+      );
+
+      gain.gain.setValueAtTime(0.35, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.65);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(now);
+      osc.stop(now + 0.65);
+    });
+  } catch (err) {
+    console.error('Incoming order bell playback error:', err);
+  }
+}
+
+/**
  * Play a double harmonic chime for new kitchen orders
  */
 export function playOrderChime() {
