@@ -7,7 +7,7 @@
     "formattedPrice": "₱30",
     "category": "Rice & Biryani",
     "description": "Steamed fragrant long-grain basmati rice.",
-    "imageUrl": "https://images.unsplash.com/photo-1516684732162-798a0062be99?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/plain-basmati-rice-1-cup.jpg",
     "spiceLevel": 0,
     "isHalal": true,
     "isChefSpecial": false,
@@ -16,7 +16,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 24
+    "reviewCount": 24,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/plain-basmati-rice-1-cup.jpg"
+    ]
   },
   {
     "id": "5001",
@@ -26,7 +29,7 @@
     "formattedPrice": "₱50",
     "category": "Rice & Biryani",
     "description": "Full serving of steamed fragrant long-grain basmati rice.",
-    "imageUrl": "https://images.unsplash.com/photo-1516684732162-798a0062be99?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/plain-basmati-rice-full.jpg",
     "spiceLevel": 0,
     "isHalal": true,
     "isChefSpecial": false,
@@ -35,7 +38,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 25
+    "reviewCount": 25,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/plain-basmati-rice-full.jpg"
+    ]
   },
   {
     "id": "5002",
@@ -45,7 +51,7 @@
     "formattedPrice": "₱50",
     "category": "Rice & Biryani",
     "description": "Basmati rice tempered with cumin seeds and whole fragrant spices.",
-    "imageUrl": "https://images.unsplash.com/photo-1536304993881-ff6e9eefa2a6?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/jeera-rice.jpg",
     "spiceLevel": 0,
     "isHalal": true,
     "isChefSpecial": false,
@@ -54,7 +60,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 26
+    "reviewCount": 26,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/jeera-rice.jpg"
+    ]
   },
   {
     "id": "5003",
@@ -64,7 +73,7 @@
     "formattedPrice": "₱50",
     "category": "Rice & Biryani",
     "description": "Wok-tossed fried rice with delicate seasoning and fresh veggies.",
-    "imageUrl": "https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/chinese-fried-rice.jpg",
     "spiceLevel": 0,
     "isHalal": true,
     "isChefSpecial": false,
@@ -73,7 +82,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 27
+    "reviewCount": 27,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/chinese-fried-rice.jpg"
+    ]
   },
   {
     "id": "5004",
@@ -83,7 +95,7 @@
     "formattedPrice": "₱100",
     "category": "Rice & Biryani",
     "description": "Fiery wok-tossed fried rice infused with chilli oil and spices.",
-    "imageUrl": "https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/chinese-spicy-fried-rice.jpg",
     "spiceLevel": 2,
     "isHalal": true,
     "isChefSpecial": false,
@@ -92,7 +104,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 28
+    "reviewCount": 28,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/chinese-spicy-fried-rice.jpg"
+    ]
   },
   {
     "id": "5005",
@@ -102,7 +117,7 @@
     "formattedPrice": "₱80",
     "category": "Rice & Biryani",
     "description": "Aromatic basmati rice cooked with sweet green peas and mild spices.",
-    "imageUrl": "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/peas-pulao.jpg",
     "spiceLevel": 0,
     "isHalal": true,
     "isChefSpecial": false,
@@ -111,7 +126,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 29
+    "reviewCount": 29,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/peas-pulao.jpg"
+    ]
   },
   {
     "id": "5006",
@@ -121,7 +139,7 @@
     "formattedPrice": "₱120",
     "category": "Rice & Biryani",
     "description": "Fragrant basmati rice gently simmered with garden-fresh vegetables.",
-    "imageUrl": "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/veg-pulao.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": false,
@@ -130,7 +148,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 30
+    "reviewCount": 30,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/veg-pulao.jpg"
+    ]
   },
   {
     "id": "5007",
@@ -140,7 +161,7 @@
     "formattedPrice": "₱180",
     "category": "Rice & Biryani",
     "description": "Aromatic basmati pulao enriched with fresh cottage cheese cubes.",
-    "imageUrl": "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/paneer-veg-pulao.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": false,
@@ -149,7 +170,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 31
+    "reviewCount": 31,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/paneer-veg-pulao.jpg"
+    ]
   },
   {
     "id": "5008",
@@ -159,7 +183,7 @@
     "formattedPrice": "₱120",
     "category": "Rice & Biryani",
     "description": "Scrambled egg and wok-tossed spicy basmati rice with chilli and garlic.",
-    "imageUrl": "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/egg-spicy-fried-rice.jpg",
     "spiceLevel": 2,
     "isHalal": true,
     "isChefSpecial": false,
@@ -168,7 +192,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 32
+    "reviewCount": 32,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/egg-spicy-fried-rice.jpg"
+    ]
   },
   {
     "id": "5009",
@@ -178,7 +205,7 @@
     "formattedPrice": "₱140",
     "category": "Rice & Biryani",
     "description": "Savory fried rice tossed with tender shredded chicken and spicy wok aroma.",
-    "imageUrl": "https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/chicken-spicy-fried-rice.jpg",
     "spiceLevel": 2,
     "isHalal": true,
     "isChefSpecial": false,
@@ -187,7 +214,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 33
+    "reviewCount": 33,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/chicken-spicy-fried-rice.jpg"
+    ]
   },
   {
     "id": "5010",
@@ -197,7 +227,7 @@
     "formattedPrice": "₱160",
     "category": "Rice & Biryani",
     "description": "Ultimate combination of chicken, eggs, and fiery seasoned wok-fried rice.",
-    "imageUrl": "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/egg-chicken-spicy-fried-rice.jpg",
     "spiceLevel": 2,
     "isHalal": true,
     "isChefSpecial": false,
@@ -206,7 +236,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 34
+    "reviewCount": 34,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/egg-chicken-spicy-fried-rice.jpg"
+    ]
   },
   {
     "id": "5011",
@@ -216,7 +249,7 @@
     "formattedPrice": "₱140",
     "category": "Rice & Biryani",
     "description": "Authentic dum biryani layered with marinated chicken, saffron, and basmati rice.",
-    "imageUrl": "https://halalfood.com.ph/wp-content/uploads/2026/08/WhatsApp-Image-2026-08-01-at-10.09.06-PM.jpeg",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/chicken-biryani.jpg",
     "spiceLevel": 2,
     "isHalal": true,
     "isChefSpecial": false,
@@ -225,7 +258,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 35
+    "reviewCount": 35,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/chicken-biryani.jpg"
+    ]
   },
   {
     "id": "5012",
@@ -235,7 +271,7 @@
     "formattedPrice": "₱200",
     "category": "Rice & Biryani",
     "description": "Aromatic biryani topped with crisp, deep-fried spicy South Indian chicken 65.",
-    "imageUrl": "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/chicken-65-biryani.jpg",
     "spiceLevel": 3,
     "isHalal": true,
     "isChefSpecial": false,
@@ -244,7 +280,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 36
+    "reviewCount": 36,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/chicken-65-biryani.jpg"
+    ]
   },
   {
     "id": "5013",
@@ -254,7 +293,7 @@
     "formattedPrice": "₱120",
     "category": "Rice & Biryani",
     "description": "Layered aromatic basmati rice cooked with spiced farm-fresh vegetables.",
-    "imageUrl": "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/veg-biryani.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": false,
@@ -263,7 +302,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 37
+    "reviewCount": 37,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/veg-biryani.jpg"
+    ]
   },
   {
     "id": "5014",
@@ -273,7 +315,7 @@
     "formattedPrice": "₱150",
     "category": "Rice & Biryani",
     "description": "Fragrant dum biryani paired with spicy, golden-fried vegetarian 65 bites.",
-    "imageUrl": "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/veg-65-biryani.jpg",
     "spiceLevel": 2,
     "isHalal": true,
     "isChefSpecial": false,
@@ -282,7 +324,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 38
+    "reviewCount": 38,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/veg-65-biryani.jpg"
+    ]
   },
   {
     "id": "5015",
@@ -292,7 +337,7 @@
     "formattedPrice": "₱300",
     "category": "Rice & Biryani",
     "description": "Rich royal biryani with tender bone-in mutton slow-cooked in dum style.",
-    "imageUrl": "https://images.unsplash.com/photo-1633945274405-b6c8069047b0?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/mutton-biryani.jpg",
     "spiceLevel": 2,
     "isHalal": true,
     "isChefSpecial": false,
@@ -301,7 +346,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 39
+    "reviewCount": 39,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/mutton-biryani.jpg"
+    ]
   },
   {
     "id": "5016",
@@ -311,7 +359,7 @@
     "formattedPrice": "₱1,100",
     "category": "Rice & Biryani",
     "description": "Grand family feast bilao tray loaded with authentic chicken dum biryani.",
-    "imageUrl": "https://halalfood.com.ph/wp-content/uploads/2026/08/WhatsApp-Image-2026-08-01-at-10.09.05-PM.jpeg",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/chicken-biryani-bilao-good-for-8-people.jpg",
     "spiceLevel": 2,
     "isHalal": true,
     "isChefSpecial": false,
@@ -320,7 +368,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 40
+    "reviewCount": 40,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/chicken-biryani-bilao-good-for-8-people.jpg"
+    ]
   },
   {
     "id": "5017",
@@ -330,7 +381,7 @@
     "formattedPrice": "₱200",
     "category": "Rice & Biryani",
     "description": "Flavorful aromatic yellow basmati rice with tender chicken, special creamy mayonnaise sauce and chili sauce.",
-    "imageUrl": "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/chicken-fiesta-rice.jpg",
     "spiceLevel": 2,
     "isHalal": true,
     "isChefSpecial": false,
@@ -339,7 +390,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 41
+    "reviewCount": 41,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/chicken-fiesta-rice.jpg"
+    ]
   },
   {
     "id": "5018",
@@ -349,7 +403,7 @@
     "formattedPrice": "₱180",
     "category": "Chicken & Non-Veg Specials",
     "description": "Slow-simmered rich stew infused with cracked wheat, lentils, and tender chicken.",
-    "imageUrl": "https://halalfood.com.ph/wp-content/uploads/2026/08/WhatsApp-Image-2026-07-ssat-9.39.37-PM.jpeg",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/chicken-haleem.jpg",
     "spiceLevel": 2,
     "isHalal": true,
     "isChefSpecial": true,
@@ -358,7 +412,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 42
+    "reviewCount": 42,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/chicken-haleem.jpg"
+    ]
   },
   {
     "id": "5019",
@@ -368,7 +425,7 @@
     "formattedPrice": "₱150",
     "category": "Chicken & Non-Veg Specials",
     "description": "Traditional slow-cooked Mughlai chicken stew with a rich aromatic gravy.",
-    "imageUrl": "https://halalfood.com.ph/wp-content/uploads/2026/08/WhatsApp-Image-2026-08-01-at-10.09.04-PM.jpeg",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/chicken-nihari.jpg",
     "spiceLevel": 2,
     "isHalal": true,
     "isChefSpecial": true,
@@ -377,7 +434,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 43
+    "reviewCount": 43,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/chicken-nihari.jpg"
+    ]
   },
   {
     "id": "5020",
@@ -387,7 +447,7 @@
     "formattedPrice": "₱100",
     "category": "Chicken & Non-Veg Specials",
     "description": "Tender chicken morsels in a velvety tomato, cream, and rich butter sauce.",
-    "imageUrl": "https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/butter-chicken-malai-curry.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": true,
@@ -396,7 +456,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 44
+    "reviewCount": 44,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/butter-chicken-malai-curry.jpg"
+    ]
   },
   {
     "id": "5021",
@@ -406,7 +469,7 @@
     "formattedPrice": "₱180",
     "category": "Chicken & Non-Veg Specials",
     "description": "Classic Desi-style homestyle chicken curry simmered in robust spices.",
-    "imageUrl": "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/chicken-spicy-curry.jpg",
     "spiceLevel": 3,
     "isHalal": true,
     "isChefSpecial": true,
@@ -415,7 +478,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 45
+    "reviewCount": 45,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/chicken-spicy-curry.jpg"
+    ]
   },
   {
     "id": "5022",
@@ -425,7 +491,7 @@
     "formattedPrice": "₱250",
     "category": "Chicken & Non-Veg Specials",
     "description": "Royal Mughlai chicken curry prepared with yogurt, fried onions, and nuts.",
-    "imageUrl": "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/chicken-korma.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": true,
@@ -434,7 +500,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 46
+    "reviewCount": 46,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/chicken-korma.jpg"
+    ]
   },
   {
     "id": "5023",
@@ -444,7 +513,7 @@
     "formattedPrice": "₱300",
     "category": "Chicken & Non-Veg Specials",
     "description": "Mild, creamy chicken stew simmered with fresh cream and cardamom.",
-    "imageUrl": "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/chicken-malai-curry.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": true,
@@ -453,7 +522,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 47
+    "reviewCount": 47,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/chicken-malai-curry.jpg"
+    ]
   },
   {
     "id": "5024",
@@ -463,7 +535,7 @@
     "formattedPrice": "₱250",
     "category": "Chicken & Non-Veg Specials",
     "description": "Boneless chicken simmered in a luscious roasted garlic and white cream gravy.",
-    "imageUrl": "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/creamy-garlic-chicken.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": true,
@@ -472,7 +544,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 48
+    "reviewCount": 48,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/creamy-garlic-chicken.jpg"
+    ]
   },
   {
     "id": "5025",
@@ -482,7 +557,7 @@
     "formattedPrice": "₱150",
     "category": "Chicken & Non-Veg Specials",
     "description": "Mughlai roasted chicken in a tangy tomato, milk, and spicy curd gravy.",
-    "imageUrl": "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/chicken-changizi.jpg",
     "spiceLevel": 2,
     "isHalal": true,
     "isChefSpecial": true,
@@ -491,7 +566,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 49
+    "reviewCount": 49,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/chicken-changizi.jpg"
+    ]
   },
   {
     "id": "5026",
@@ -501,7 +579,7 @@
     "formattedPrice": "₱120",
     "category": "Chicken & Non-Veg Specials",
     "description": "Crisp, fiery spiced deep-fried chicken cubes tossed with curry leaves.",
-    "imageUrl": "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/chicken-65.jpg",
     "spiceLevel": 3,
     "isHalal": true,
     "isChefSpecial": true,
@@ -510,7 +588,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 50
+    "reviewCount": 50,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/chicken-65.jpg"
+    ]
   },
   {
     "id": "5027",
@@ -520,7 +601,7 @@
     "formattedPrice": "₱100",
     "category": "Chicken & Non-Veg Specials",
     "description": "Marinated chicken fritters dipped in seasoned gram flour and deep-fried.",
-    "imageUrl": "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/chicken-pakora.jpg",
     "spiceLevel": 2,
     "isHalal": true,
     "isChefSpecial": true,
@@ -529,7 +610,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 51
+    "reviewCount": 51,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/chicken-pakora.jpg"
+    ]
   },
   {
     "id": "5028",
@@ -539,7 +623,7 @@
     "formattedPrice": "₱120",
     "category": "Chicken & Non-Veg Specials",
     "description": "Charcoal flame-grilled chicken marinated in aromatic mint and coriander spices.",
-    "imageUrl": "https://halalfood.com.ph/wp-content/uploads/2026/08/WhatsApp-Image-2026-07-31-at-9.39.37-PM.jpeg",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/bbq-chicken-solo-green-masala.jpg",
     "spiceLevel": 2,
     "isHalal": true,
     "isChefSpecial": true,
@@ -548,7 +632,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 52
+    "reviewCount": 52,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/bbq-chicken-solo-green-masala.jpg"
+    ]
   },
   {
     "id": "5029",
@@ -558,7 +645,7 @@
     "formattedPrice": "₱130",
     "category": "Chicken & Non-Veg Specials",
     "description": "A full spicy meal – one of Hasan's special favorites, crispy and seasoned.",
-    "imageUrl": "https://halalfood.com.ph/wp-content/uploads/2026/08/adadad.jpeg",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/crunchy-bite.jpg",
     "spiceLevel": 3,
     "isHalal": true,
     "isChefSpecial": true,
@@ -567,7 +654,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 53
+    "reviewCount": 53,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/crunchy-bite.jpg"
+    ]
   },
   {
     "id": "5030",
@@ -577,7 +667,7 @@
     "formattedPrice": "₱150",
     "category": "Vegetarian Specials",
     "description": "Tender mushrooms sauteed in spicy crushed garlic and red chilli sauce.",
-    "imageUrl": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/chilli-garlic-mushroom.jpg",
     "spiceLevel": 2,
     "isHalal": true,
     "isChefSpecial": false,
@@ -586,7 +676,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 24
+    "reviewCount": 24,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/chilli-garlic-mushroom.jpg"
+    ]
   },
   {
     "id": "5031",
@@ -596,7 +689,7 @@
     "formattedPrice": "₱200",
     "category": "Vegetarian Specials",
     "description": "Plump button mushrooms smothered in rich garlic white cream gravy.",
-    "imageUrl": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/creamy-garlic-mushroom.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": false,
@@ -605,7 +698,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 25
+    "reviewCount": 25,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/creamy-garlic-mushroom.jpg"
+    ]
   },
   {
     "id": "5032",
@@ -615,7 +711,7 @@
     "formattedPrice": "₱250",
     "category": "Vegetarian Specials",
     "description": "Fresh cottage cheese in a silky, rich spiced tomato and butter gravy.",
-    "imageUrl": "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/paneer-butter-masala.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": false,
@@ -624,7 +720,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 26
+    "reviewCount": 26,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/paneer-butter-masala.jpg"
+    ]
   },
   {
     "id": "5033",
@@ -634,7 +733,7 @@
     "formattedPrice": "₱320",
     "category": "Vegetarian Specials",
     "description": "Cottage cheese cubes gently cooked in a rich, nut and yogurt-based korma sauce.",
-    "imageUrl": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/paneer-korma.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": false,
@@ -643,7 +742,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 27
+    "reviewCount": 27,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/paneer-korma.jpg"
+    ]
   },
   {
     "id": "5034",
@@ -653,7 +755,7 @@
     "formattedPrice": "₱350",
     "category": "Vegetarian Specials",
     "description": "Delicate paneer stewed in an ultra-creamy, velvety white sauce.",
-    "imageUrl": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/paneer-malai-curry.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": false,
@@ -662,7 +764,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 28
+    "reviewCount": 28,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/paneer-malai-curry.jpg"
+    ]
   },
   {
     "id": "5035",
@@ -672,7 +777,7 @@
     "formattedPrice": "₱130",
     "category": "Vegetarian Specials",
     "description": "Protein-rich soya chunks tossed with fiery chilli and roasted garlic.",
-    "imageUrl": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/chilli-garlic-soya-chunk.jpg",
     "spiceLevel": 2,
     "isHalal": true,
     "isChefSpecial": false,
@@ -681,7 +786,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 29
+    "reviewCount": 29,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/chilli-garlic-soya-chunk.jpg"
+    ]
   },
   {
     "id": "5036",
@@ -691,7 +799,7 @@
     "formattedPrice": "₱150",
     "category": "Vegetarian Specials",
     "description": "Juicy soya chunks cooked in hearty onion-tomato masala gravy.",
-    "imageUrl": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/spicy-soya-chunk-curry.jpg",
     "spiceLevel": 2,
     "isHalal": true,
     "isChefSpecial": false,
@@ -700,7 +808,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 30
+    "reviewCount": 30,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/spicy-soya-chunk-curry.jpg"
+    ]
   },
   {
     "id": "5037",
@@ -710,7 +821,7 @@
     "formattedPrice": "₱100",
     "category": "Vegetarian Specials",
     "description": "Fresh spinach puree blended with cream and tender paneer cubes.",
-    "imageUrl": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/malai-paneer-palak.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": false,
@@ -719,7 +830,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 31
+    "reviewCount": 31,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/malai-paneer-palak.jpg"
+    ]
   },
   {
     "id": "5038",
@@ -729,7 +843,7 @@
     "formattedPrice": "₱70",
     "category": "Vegetarian Specials",
     "description": "Minced spiced vegetarian delicacy simmered with fresh herbs and tomatoes.",
-    "imageUrl": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/veg-qeema.jpg",
     "spiceLevel": 2,
     "isHalal": true,
     "isChefSpecial": false,
@@ -738,7 +852,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 32
+    "reviewCount": 32,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/veg-qeema.jpg"
+    ]
   },
   {
     "id": "5039",
@@ -748,7 +865,7 @@
     "formattedPrice": "₱70",
     "category": "Vegetarian Specials",
     "description": "Homestyle black lentils slow-cooked with ginger, garlic, and butter.",
-    "imageUrl": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/maa-dal.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": false,
@@ -757,7 +874,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 33
+    "reviewCount": 33,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/maa-dal.jpg"
+    ]
   },
   {
     "id": "5040",
@@ -767,7 +887,7 @@
     "formattedPrice": "₱60",
     "category": "Vegetarian Specials",
     "description": "Kidney beans cooked until tender in thick spiced onion-tomato gravy.",
-    "imageUrl": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/rajma-veg.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": false,
@@ -776,7 +896,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 34
+    "reviewCount": 34,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/rajma-veg.jpg"
+    ]
   },
   {
     "id": "5041",
@@ -786,7 +909,7 @@
     "formattedPrice": "₱20",
     "category": "Vegetarian Specials",
     "description": "Flavorful side gravy made with aromatic herbs and spices.",
-    "imageUrl": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/veg-gravy.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": false,
@@ -795,7 +918,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 35
+    "reviewCount": 35,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/veg-gravy.jpg"
+    ]
   },
   {
     "id": "5042",
@@ -805,7 +931,7 @@
     "formattedPrice": "₱100",
     "category": "Vegetarian Specials",
     "description": "Seasonal garden vegetables tossed with cumin and traditional masala.",
-    "imageUrl": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/mix-vegetables.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": false,
@@ -814,7 +940,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 36
+    "reviewCount": 36,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/mix-vegetables.jpg"
+    ]
   },
   {
     "id": "5043",
@@ -824,7 +953,7 @@
     "formattedPrice": "₱100",
     "category": "Kothu · Paratha & Breads",
     "description": "Shredded flaky paratha stir-fried with chicken, egg, and spicy gravy.",
-    "imageUrl": "https://images.unsplash.com/photo-1626074353765-517a681e40be?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/chicken-kothu-paratha.jpg",
     "spiceLevel": 2,
     "isHalal": true,
     "isChefSpecial": false,
@@ -833,7 +962,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 37
+    "reviewCount": 37,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/chicken-kothu-paratha.jpg"
+    ]
   },
   {
     "id": "5044",
@@ -843,7 +975,7 @@
     "formattedPrice": "₱90",
     "category": "Kothu · Paratha & Breads",
     "description": "Chopped flaky paratha tossed with crisp vegetables and rich spices.",
-    "imageUrl": "https://images.unsplash.com/photo-1626074353765-517a681e40be?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/veg-kothu-paratha.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": false,
@@ -852,7 +984,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 38
+    "reviewCount": 38,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/veg-kothu-paratha.jpg"
+    ]
   },
   {
     "id": "5045",
@@ -862,7 +997,7 @@
     "formattedPrice": "₱120",
     "category": "Kothu · Paratha & Breads",
     "description": "Street-style kothu paratha tossed with cottage cheese and herbs.",
-    "imageUrl": "https://images.unsplash.com/photo-1626074353765-517a681e40be?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/paneer-kothu-paratha.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": false,
@@ -871,7 +1006,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 39
+    "reviewCount": 39,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/paneer-kothu-paratha.jpg"
+    ]
   },
   {
     "id": "5046",
@@ -881,7 +1019,7 @@
     "formattedPrice": "₱120",
     "category": "Kothu · Paratha & Breads",
     "description": "Whole wheat flatbread stuffed with spiced minced chicken.",
-    "imageUrl": "https://images.unsplash.com/photo-1626074353765-517a681e40be?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/chicken-paratha.jpg",
     "spiceLevel": 2,
     "isHalal": true,
     "isChefSpecial": false,
@@ -890,7 +1028,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 40
+    "reviewCount": 40,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/chicken-paratha.jpg"
+    ]
   },
   {
     "id": "5047",
@@ -900,7 +1041,7 @@
     "formattedPrice": "₱70",
     "category": "Kothu · Paratha & Breads",
     "description": "Signature golden crispy layered paratha made with authentic recipe.",
-    "imageUrl": "https://halalfood.com.ph/wp-content/uploads/2026/08/addadad.jpeg",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/hasan-special-paratha.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": false,
@@ -909,7 +1050,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 41
+    "reviewCount": 41,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/hasan-special-paratha.jpg"
+    ]
   },
   {
     "id": "5048",
@@ -919,7 +1063,7 @@
     "formattedPrice": "₱70",
     "category": "Kothu · Paratha & Breads",
     "description": "Tandoori flatbread stuffed with spiced mashed potatoes and green herbs.",
-    "imageUrl": "https://images.unsplash.com/photo-1626074353765-517a681e40be?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/aloo-paratha.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": false,
@@ -928,7 +1072,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 42
+    "reviewCount": 42,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/aloo-paratha.jpg"
+    ]
   },
   {
     "id": "5049",
@@ -938,7 +1085,7 @@
     "formattedPrice": "₱50",
     "category": "Kothu · Paratha & Breads",
     "description": "Flaky, multi-layered golden paratha made with wheat dough.",
-    "imageUrl": "https://images.unsplash.com/photo-1626074353765-517a681e40be?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/lacha-kerala-paratha.jpg",
     "spiceLevel": 0,
     "isHalal": true,
     "isChefSpecial": false,
@@ -947,7 +1094,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 43
+    "reviewCount": 43,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/lacha-kerala-paratha.jpg"
+    ]
   },
   {
     "id": "5050",
@@ -957,7 +1107,7 @@
     "formattedPrice": "₱60",
     "category": "Kothu · Paratha & Breads",
     "description": "Pan-fried layered flatbread stuffed with finely chopped spiced onions.",
-    "imageUrl": "https://images.unsplash.com/photo-1626074353765-517a681e40be?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/onion-paratha.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": false,
@@ -966,7 +1116,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 44
+    "reviewCount": 44,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/onion-paratha.jpg"
+    ]
   },
   {
     "id": "5051",
@@ -976,7 +1129,7 @@
     "formattedPrice": "₱70",
     "category": "Kothu · Paratha & Breads",
     "description": "Crispy flatbread stuffed with grated white radish, carom seeds, and herbs.",
-    "imageUrl": "https://images.unsplash.com/photo-1626074353765-517a681e40be?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/moli-paratha.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": false,
@@ -985,7 +1138,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 45
+    "reviewCount": 45,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/moli-paratha.jpg"
+    ]
   },
   {
     "id": "5052",
@@ -995,7 +1151,7 @@
     "formattedPrice": "₱80",
     "category": "Kothu · Paratha & Breads",
     "description": "Sweet, leavened Persian-Mughlai bread baked with saffron and milk.",
-    "imageUrl": "https://images.unsplash.com/photo-1626074353765-517a681e40be?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/taftan.jpg",
     "spiceLevel": 0,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1004,7 +1160,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 46
+    "reviewCount": 46,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/taftan.jpg"
+    ]
   },
   {
     "id": "5053",
@@ -1014,7 +1173,7 @@
     "formattedPrice": "₱60",
     "category": "Kothu · Paratha & Breads",
     "description": "Classic soft, pillowy leavened flatbread freshly baked in tandoor.",
-    "imageUrl": "https://images.unsplash.com/photo-1626074353765-517a681e40be?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/naan.jpg",
     "spiceLevel": 0,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1023,7 +1182,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 47
+    "reviewCount": 47,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/naan.jpg"
+    ]
   },
   {
     "id": "5054",
@@ -1033,7 +1195,7 @@
     "formattedPrice": "₱70",
     "category": "Kothu · Paratha & Breads",
     "description": "Traditional royal naan topped with sesame seeds and brushed with butter.",
-    "imageUrl": "https://images.unsplash.com/photo-1626074353765-517a681e40be?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/roghni-naan.jpg",
     "spiceLevel": 0,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1042,7 +1204,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 48
+    "reviewCount": 48,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/roghni-naan.jpg"
+    ]
   },
   {
     "id": "5055",
@@ -1052,7 +1217,7 @@
     "formattedPrice": "₱15",
     "category": "Kothu · Paratha & Breads",
     "description": "Warm, unleavened whole wheat flatbread prepared fresh on the tawa.",
-    "imageUrl": "https://halalfood.com.ph/wp-content/uploads/2026/08/adadad.jpeg",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/chapati.jpg",
     "spiceLevel": 0,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1061,7 +1226,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 49
+    "reviewCount": 49,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/chapati.jpg"
+    ]
   },
   {
     "id": "5056",
@@ -1071,7 +1239,7 @@
     "formattedPrice": "₱100",
     "category": "Snacks & Street Bites",
     "description": "Crispy assorted vegetable and onion fritters spiced with signature seasonings.",
-    "imageUrl": "https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/hasan-special-pakora.jpg",
     "spiceLevel": 2,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1080,7 +1248,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 50
+    "reviewCount": 50,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/hasan-special-pakora.jpg"
+    ]
   },
   {
     "id": "5057",
@@ -1090,7 +1261,7 @@
     "formattedPrice": "₱50",
     "category": "Snacks & Street Bites",
     "description": "Spiced potato stuffed bread slices coated in chickpea batter and golden fried.",
-    "imageUrl": "https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/bread-pakora.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1099,7 +1270,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 51
+    "reviewCount": 51,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/bread-pakora.jpg"
+    ]
   },
   {
     "id": "5058",
@@ -1109,7 +1283,7 @@
     "formattedPrice": "₱60",
     "category": "Snacks & Street Bites",
     "description": "Classic street-style double egg omelette wrapped around toasted bread.",
-    "imageUrl": "https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/bread-omelette.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1118,7 +1292,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 52
+    "reviewCount": 52,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/bread-omelette.jpg"
+    ]
   },
   {
     "id": "5059",
@@ -1128,7 +1305,7 @@
     "formattedPrice": "₱60",
     "category": "Snacks & Street Bites",
     "description": "Fluffy two-egg omelette beaten with onions, tomatoes, and green chillies.",
-    "imageUrl": "https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/egg-omelette.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1137,7 +1314,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 53
+    "reviewCount": 53,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/egg-omelette.jpg"
+    ]
   },
   {
     "id": "5060",
@@ -1147,7 +1327,7 @@
     "formattedPrice": "₱100",
     "category": "Snacks & Street Bites",
     "description": "Hearty omelette loaded with savory spiced potato hash.",
-    "imageUrl": "https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/aloo-omelette.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1156,7 +1336,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 24
+    "reviewCount": 24,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/aloo-omelette.jpg"
+    ]
   },
   {
     "id": "5061",
@@ -1166,7 +1349,7 @@
     "formattedPrice": "₱100",
     "category": "Snacks & Street Bites",
     "description": "Crispy vegetable patty in a toasted bun with house sauces and fresh veggies.",
-    "imageUrl": "https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/veg-burger.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1175,7 +1358,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 25
+    "reviewCount": 25,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/veg-burger.jpg"
+    ]
   },
   {
     "id": "5062",
@@ -1185,7 +1371,7 @@
     "formattedPrice": "₱100",
     "category": "Snacks & Street Bites",
     "description": "Crisp hollow puris served with spiced potato filling and tangy mint water.",
-    "imageUrl": "https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/pani-puri.jpg",
     "spiceLevel": 2,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1194,7 +1380,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 26
+    "reviewCount": 26,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/pani-puri.jpg"
+    ]
   },
   {
     "id": "5063",
@@ -1204,7 +1393,7 @@
     "formattedPrice": "₱150",
     "category": "Snacks & Street Bites",
     "description": "Smoky grilled chicken pieces wrapped inside a warm, flaky paratha with chutney.",
-    "imageUrl": "https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/bbq-paratha-roll.jpg",
     "spiceLevel": 2,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1213,7 +1402,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 27
+    "reviewCount": 27,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/bbq-paratha-roll.jpg"
+    ]
   },
   {
     "id": "5064",
@@ -1223,7 +1415,7 @@
     "formattedPrice": "₱120",
     "category": "Snacks & Street Bites",
     "description": "Thinly sliced spiced roasted chicken wrapped in flatbread with garlic sauce.",
-    "imageUrl": "https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/chicken-shawarma.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1232,7 +1424,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 28
+    "reviewCount": 28,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/chicken-shawarma.jpg"
+    ]
   },
   {
     "id": "5065",
@@ -1242,7 +1437,7 @@
     "formattedPrice": "₱100",
     "category": "Snacks & Street Bites",
     "description": "Spiced grilled veggies and pickles wrapped in soft flatbread.",
-    "imageUrl": "https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/veg-shawarma.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1251,7 +1446,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 29
+    "reviewCount": 29,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/veg-shawarma.jpg"
+    ]
   },
   {
     "id": "5066",
@@ -1261,7 +1459,7 @@
     "formattedPrice": "₱30",
     "category": "Snacks & Street Bites",
     "description": "Crisp golden pastry triangle filled with spiced potatoes and peas.",
-    "imageUrl": "https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/aloo-samosa.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1270,7 +1468,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 30
+    "reviewCount": 30,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/aloo-samosa.jpg"
+    ]
   },
   {
     "id": "5067",
@@ -1280,7 +1481,7 @@
     "formattedPrice": "₱30",
     "category": "Snacks & Street Bites",
     "description": "Shallow-fried patties made with seasoned shredded chicken and potatoes.",
-    "imageUrl": "https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/chicken-cutlets.jpg",
     "spiceLevel": 2,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1289,7 +1490,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 31
+    "reviewCount": 31,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/chicken-cutlets.jpg"
+    ]
   },
   {
     "id": "5068",
@@ -1299,7 +1503,7 @@
     "formattedPrice": "₱120",
     "category": "Snacks & Street Bites",
     "description": "Crushed samosas topped with spicy chana masala, sweet chutney, yogurt and sev.",
-    "imageUrl": "https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/samosa-chaat.jpg",
     "spiceLevel": 2,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1308,7 +1512,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 32
+    "reviewCount": 32,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/samosa-chaat.jpg"
+    ]
   },
   {
     "id": "5069",
@@ -1318,7 +1525,7 @@
     "formattedPrice": "₱90",
     "category": "Student Meals",
     "description": "Budget-friendly student plate with chicken curry and fragrant basmati rice.",
-    "imageUrl": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/chicken-meal.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1327,7 +1534,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 33
+    "reviewCount": 33,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/chicken-meal.jpg"
+    ]
   },
   {
     "id": "5070",
@@ -1337,7 +1547,7 @@
     "formattedPrice": "₱90",
     "category": "Student Meals",
     "description": "Homestyle chicken curry served with steamed basmati rice.",
-    "imageUrl": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/chicken-curry-meal.jpg",
     "spiceLevel": 2,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1346,7 +1556,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 34
+    "reviewCount": 34,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/chicken-curry-meal.jpg"
+    ]
   },
   {
     "id": "5071",
@@ -1356,7 +1569,7 @@
     "formattedPrice": "₱90",
     "category": "Student Meals",
     "description": "Spicy chicken 65 bites paired with a generous portion of basmati rice.",
-    "imageUrl": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/chicken-65-meal.jpg",
     "spiceLevel": 2,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1365,7 +1578,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 35
+    "reviewCount": 35,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/chicken-65-meal.jpg"
+    ]
   },
   {
     "id": "5072",
@@ -1375,7 +1591,7 @@
     "formattedPrice": "₱90",
     "category": "Student Meals",
     "description": "Healthy vegetable curry served hot with fluffy basmati rice.",
-    "imageUrl": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/vegetable-meal.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1384,7 +1600,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 36
+    "reviewCount": 36,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/vegetable-meal.jpg"
+    ]
   },
   {
     "id": "5073",
@@ -1394,7 +1613,7 @@
     "formattedPrice": "₱90",
     "category": "Student Meals",
     "description": "Complete comfort student meal with seasoned dal, 2 chapatis, and basmati rice.",
-    "imageUrl": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/dal-2-chapati-basmati-rice.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1403,7 +1622,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 37
+    "reviewCount": 37,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/dal-2-chapati-basmati-rice.jpg"
+    ]
   },
   {
     "id": "5074",
@@ -1413,7 +1635,7 @@
     "formattedPrice": "₱90",
     "category": "Student Meals",
     "description": "Hearty North-Indian rajma kidney beans with 2 soft chapatis and basmati rice.",
-    "imageUrl": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/rajma-2-chapati-basmati-rice.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1422,7 +1644,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 38
+    "reviewCount": 38,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/rajma-2-chapati-basmati-rice.jpg"
+    ]
   },
   {
     "id": "5075",
@@ -1432,7 +1657,7 @@
     "formattedPrice": "₱90",
     "category": "Student Meals",
     "description": "Flavorful slow-cooked chicken nihari with fresh basmati rice.",
-    "imageUrl": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/chicken-nihari-meal.jpg",
     "spiceLevel": 2,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1441,7 +1666,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 39
+    "reviewCount": 39,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/chicken-nihari-meal.jpg"
+    ]
   },
   {
     "id": "5076",
@@ -1451,7 +1679,7 @@
     "formattedPrice": "₱1,100",
     "category": "Family / Sharing Meals",
     "description": "Good for 8 people – Grand feast bilao of layered aromatic dum biryani.",
-    "imageUrl": "https://halalfood.com.ph/wp-content/uploads/2026/08/WhatsApp-Image-2026-08-01-at-10.09.05-PM.jpeg",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/chicken-biryani-bilao-good-for-8-people.jpg",
     "spiceLevel": 2,
     "isHalal": true,
     "isChefSpecial": true,
@@ -1460,7 +1688,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 40
+    "reviewCount": 40,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/chicken-biryani-bilao-good-for-8-people.jpg"
+    ]
   },
   {
     "id": "5077",
@@ -1470,7 +1701,7 @@
     "formattedPrice": "₱600",
     "category": "Family / Sharing Meals",
     "description": "Good for 4-5 people – Yellow basmati rice loaded with chicken and signature sauces.",
-    "imageUrl": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/chicken-fiesta-rice-family-size.jpg",
     "spiceLevel": 2,
     "isHalal": true,
     "isChefSpecial": true,
@@ -1479,7 +1710,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 41
+    "reviewCount": 41,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/chicken-fiesta-rice-family-size.jpg"
+    ]
   },
   {
     "id": "5078",
@@ -1489,7 +1723,7 @@
     "formattedPrice": "₱110",
     "category": "BBQ Combos",
     "description": "Flame-grilled spiced BBQ chicken quarter served with wok veg fried rice.",
-    "imageUrl": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/1-pc-bbq-chicken-1-cup-veg-fried-rice.jpg",
     "spiceLevel": 2,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1498,7 +1732,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 42
+    "reviewCount": 42,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/1-pc-bbq-chicken-1-cup-veg-fried-rice.jpg"
+    ]
   },
   {
     "id": "5079",
@@ -1508,7 +1745,7 @@
     "formattedPrice": "₱200",
     "category": "BBQ Combos",
     "description": "Two pieces of smoky BBQ chicken served with two servings of veg fried rice.",
-    "imageUrl": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/2-pcs-bbq-chicken-2-cups-veg-fried-rice.jpg",
     "spiceLevel": 2,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1517,7 +1754,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 43
+    "reviewCount": 43,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/2-pcs-bbq-chicken-2-cups-veg-fried-rice.jpg"
+    ]
   },
   {
     "id": "5080",
@@ -1527,7 +1767,7 @@
     "formattedPrice": "₱550",
     "category": "Fresh Indo-Pak Sweets",
     "description": "Traditional rich condensed milk fudge delicacy sold per kilogram.",
-    "imageUrl": "https://images.unsplash.com/photo-1599785209707-a456fc1337bb?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/topin-khoya-per-kg.jpg",
     "spiceLevel": 0,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1536,7 +1776,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 44
+    "reviewCount": 44,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/topin-khoya-per-kg.jpg"
+    ]
   },
   {
     "id": "5081",
@@ -1546,7 +1789,7 @@
     "formattedPrice": "₱750",
     "category": "Fresh Indo-Pak Sweets",
     "description": "Spongy, delicate pink cottage cheese balls steeped in rose sugar syrup.",
-    "imageUrl": "https://images.unsplash.com/photo-1599785209707-a456fc1337bb?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/pink-rasgulla-per-kg.jpg",
     "spiceLevel": 0,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1555,7 +1798,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 45
+    "reviewCount": 45,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/pink-rasgulla-per-kg.jpg"
+    ]
   },
   {
     "id": "5082",
@@ -1565,7 +1811,7 @@
     "formattedPrice": "₱650",
     "category": "Fresh Indo-Pak Sweets",
     "description": "Classic soft, melt-in-mouth cottage cheese spheres soaked in cardamom syrup.",
-    "imageUrl": "https://images.unsplash.com/photo-1599785209707-a456fc1337bb?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/white-rasgulla-per-kg.jpg",
     "spiceLevel": 0,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1574,7 +1820,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 46
+    "reviewCount": 46,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/white-rasgulla-per-kg.jpg"
+    ]
   },
   {
     "id": "5083",
@@ -1584,7 +1833,7 @@
     "formattedPrice": "₱400",
     "category": "Fresh Indo-Pak Sweets",
     "description": "Warm golden-brown milk solid dumplings drenched in fragrant syrup.",
-    "imageUrl": "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/gulab-jamun-per-kg.jpg",
     "spiceLevel": 0,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1593,7 +1842,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 47
+    "reviewCount": 47,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/gulab-jamun-per-kg.jpg"
+    ]
   },
   {
     "id": "5084",
@@ -1603,7 +1855,7 @@
     "formattedPrice": "₱400",
     "category": "Fresh Indo-Pak Sweets",
     "description": "Traditional festive sweet roundels made from chickpea flour, ghee, and sugar.",
-    "imageUrl": "https://images.unsplash.com/photo-1599785209707-a456fc1337bb?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/laddu-per-kg.jpg",
     "spiceLevel": 0,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1612,7 +1864,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 48
+    "reviewCount": 48,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/laddu-per-kg.jpg"
+    ]
   },
   {
     "id": "5085",
@@ -1622,7 +1877,7 @@
     "formattedPrice": "₱650",
     "category": "Fresh Indo-Pak Sweets",
     "description": "Rich carrot-and-khoya confection garnished with roasted nuts.",
-    "imageUrl": "https://images.unsplash.com/photo-1599785209707-a456fc1337bb?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/gajrela-barfi-per-kg.jpg",
     "spiceLevel": 0,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1631,7 +1886,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 49
+    "reviewCount": 49,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/gajrela-barfi-per-kg.jpg"
+    ]
   },
   {
     "id": "5086",
@@ -1641,7 +1899,7 @@
     "formattedPrice": "₱750",
     "category": "Fresh Indo-Pak Sweets",
     "description": "Fresh, unaged, pure homemade cottage cheese block sold per kilogram.",
-    "imageUrl": "https://images.unsplash.com/photo-1599785209707-a456fc1337bb?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/paneer-per-kg.jpg",
     "spiceLevel": 0,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1650,7 +1908,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 50
+    "reviewCount": 50,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/paneer-per-kg.jpg"
+    ]
   },
   {
     "id": "5087",
@@ -1660,7 +1921,7 @@
     "formattedPrice": "₱550",
     "category": "Fresh Indo-Pak Sweets",
     "description": "Traditional flaky glazed pastry with a crisp shell and soft center.",
-    "imageUrl": "https://images.unsplash.com/photo-1599785209707-a456fc1337bb?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/balushahi-per-kg.jpg",
     "spiceLevel": 0,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1669,7 +1930,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 51
+    "reviewCount": 51,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/balushahi-per-kg.jpg"
+    ]
   },
   {
     "id": "5088",
@@ -1679,7 +1943,7 @@
     "formattedPrice": "₱1,000",
     "category": "Fresh Indo-Pak Sweets",
     "description": "Caramelized grainy milk sweet prepared with pure milk and clarified butter.",
-    "imageUrl": "https://images.unsplash.com/photo-1599785209707-a456fc1337bb?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/milk-cake-per-kg.jpg",
     "spiceLevel": 0,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1688,7 +1952,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 52
+    "reviewCount": 52,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/milk-cake-per-kg.jpg"
+    ]
   },
   {
     "id": "5089",
@@ -1698,7 +1965,7 @@
     "formattedPrice": "₱500",
     "category": "Fresh Indo-Pak Sweets",
     "description": "Toasted gram flour fudge infused with cardamom and topped with pistachios.",
-    "imageUrl": "https://images.unsplash.com/photo-1599785209707-a456fc1337bb?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/besan-barfi-per-kg.jpg",
     "spiceLevel": 0,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1707,7 +1974,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 53
+    "reviewCount": 53,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/besan-barfi-per-kg.jpg"
+    ]
   },
   {
     "id": "5090",
@@ -1717,7 +1987,7 @@
     "formattedPrice": "₱120",
     "category": "Fresh Indo-Pak Sweets",
     "description": "Warm aromatic semolina halwa cooked with pure ghee, sugar, and almonds.",
-    "imageUrl": "https://images.unsplash.com/photo-1599785209707-a456fc1337bb?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/halwa.jpg",
     "spiceLevel": 0,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1726,7 +1996,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 24
+    "reviewCount": 24,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/halwa.jpg"
+    ]
   },
   {
     "id": "5091",
@@ -1736,7 +2009,7 @@
     "formattedPrice": "₱50",
     "category": "Shakes & Lassi",
     "description": "Thick, creamy blended shake made with ripe bananas and chilled milk.",
-    "imageUrl": "https://images.unsplash.com/photo-1553787499-6f9133860278?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/banana-shake.jpg",
     "spiceLevel": 0,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1745,7 +2018,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 25
+    "reviewCount": 25,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/banana-shake.jpg"
+    ]
   },
   {
     "id": "5092",
@@ -1755,7 +2031,7 @@
     "formattedPrice": "₱60",
     "category": "Shakes & Lassi",
     "description": "Sweet, luscious shake prepared with real tropical mango pulp.",
-    "imageUrl": "https://images.unsplash.com/photo-1546173159-315724a31696?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/mango-shake.jpg",
     "spiceLevel": 0,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1764,7 +2040,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 26
+    "reviewCount": 26,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/mango-shake.jpg"
+    ]
   },
   {
     "id": "5093",
@@ -1774,7 +2053,7 @@
     "formattedPrice": "₱60",
     "category": "Shakes & Lassi",
     "description": "Refreshing summer shake made with chilled watermelon.",
-    "imageUrl": "https://images.unsplash.com/photo-1553787499-6f9133860278?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/watermelon-shake.jpg",
     "spiceLevel": 0,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1783,7 +2062,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 27
+    "reviewCount": 27,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/watermelon-shake.jpg"
+    ]
   },
   {
     "id": "5094",
@@ -1793,7 +2075,7 @@
     "formattedPrice": "₱100",
     "category": "Shakes & Lassi",
     "description": "Nutritious powerhouse shake blended with premium Arabic dates and milk.",
-    "imageUrl": "https://images.unsplash.com/photo-1553787499-6f9133860278?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/dates-shake.jpg",
     "spiceLevel": 0,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1802,7 +2084,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 28
+    "reviewCount": 28,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/dates-shake.jpg"
+    ]
   },
   {
     "id": "5095",
@@ -1812,7 +2097,7 @@
     "formattedPrice": "₱60",
     "category": "Shakes & Lassi",
     "description": "Creamy pink shake bursting with fresh strawberry sweetness.",
-    "imageUrl": "https://images.unsplash.com/photo-1553787499-6f9133860278?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/strawberry-shake.jpg",
     "spiceLevel": 0,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1821,7 +2106,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 29
+    "reviewCount": 29,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/strawberry-shake.jpg"
+    ]
   },
   {
     "id": "5096",
@@ -1831,7 +2119,7 @@
     "formattedPrice": "₱60",
     "category": "Shakes & Lassi",
     "description": "Traditional thick churned yogurt beverage flavored with strawberry.",
-    "imageUrl": "https://images.unsplash.com/photo-1553787499-6f9133860278?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/strawberry-lassi.jpg",
     "spiceLevel": 0,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1840,7 +2128,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 30
+    "reviewCount": 30,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/strawberry-lassi.jpg"
+    ]
   },
   {
     "id": "5097",
@@ -1850,7 +2141,7 @@
     "formattedPrice": "₱60",
     "category": "Shakes & Lassi",
     "description": "Classic Punjabi sweet churned yogurt drink served ice-cold.",
-    "imageUrl": "https://images.unsplash.com/photo-1553787499-6f9133860278?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/sweet-lassi.jpg",
     "spiceLevel": 0,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1859,7 +2150,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 31
+    "reviewCount": 31,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/sweet-lassi.jpg"
+    ]
   },
   {
     "id": "5098",
@@ -1869,7 +2163,7 @@
     "formattedPrice": "₱60",
     "category": "Shakes & Lassi",
     "description": "Savory cooling yogurt lassi seasoned with roasted cumin and black salt.",
-    "imageUrl": "https://images.unsplash.com/photo-1553787499-6f9133860278?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/salt-lassi.jpg",
     "spiceLevel": 0,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1878,7 +2172,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 32
+    "reviewCount": 32,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/salt-lassi.jpg"
+    ]
   },
   {
     "id": "5099",
@@ -1888,7 +2185,7 @@
     "formattedPrice": "₱60",
     "category": "Shakes & Lassi",
     "description": "Crisp and zesty freshly squeezed lemon refresher.",
-    "imageUrl": "https://images.unsplash.com/photo-1553787499-6f9133860278?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/lemonade.jpg",
     "spiceLevel": 0,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1897,7 +2194,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 33
+    "reviewCount": 33,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/lemonade.jpg"
+    ]
   },
   {
     "id": "5100",
@@ -1907,7 +2207,7 @@
     "formattedPrice": "₱20",
     "category": "Shakes & Lassi",
     "description": "Classic Coca-Cola 295ml bottle.",
-    "imageUrl": "https://images.unsplash.com/photo-1553787499-6f9133860278?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/coke-mismo.jpg",
     "spiceLevel": 0,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1916,7 +2216,10 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 34
+    "reviewCount": 34,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/coke-mismo.jpg"
+    ]
   },
   {
     "id": "5101",
@@ -1926,7 +2229,7 @@
     "formattedPrice": "₱250",
     "category": "Shisha Lounge",
     "description": "Ask our staff for today's available shisha flavors and charcoal service.",
-    "imageUrl": "https://images.unsplash.com/photo-1527661591475-527312dd65f5?auto=format&fit=crop&w=800&q=80",
+    "imageUrl": "https://restaurant.aura-predictions.site/dishes/shisha-flavors.jpg",
     "spiceLevel": 0,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1935,6 +2238,9 @@
     "preparationTime": "10-15 mins",
     "calories": "350 - 650 kcal",
     "rating": "4.8",
-    "reviewCount": 35
+    "reviewCount": 35,
+    "imageUrls": [
+      "https://restaurant.aura-predictions.site/dishes/shisha-flavors.jpg"
+    ]
   }
 ]
