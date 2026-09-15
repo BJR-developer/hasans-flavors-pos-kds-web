@@ -57,8 +57,10 @@ export function formatDeliveryShareText(order: Order): string {
 
   const paymentDesc =
     order.paymentStatus === 'paid'
-      ? `PAID in full (${order.paymentMethod.toUpperCase()})`
-      : `COLLECT ₱${order.total.toLocaleString()} (Cash on Delivery)`;
+      ? `PAID in full (${order.paymentMethod === 'gcash' ? 'GCash' : order.paymentMethod === 'card' ? 'Card' : order.paymentMethod === 'inr_qr' ? 'INR UPI' : 'Cash'})`
+      : order.paymentMethod === 'cash'
+      ? `COLLECT ₱${order.total.toLocaleString()} (${order.type === 'delivery' ? 'Cash on Delivery' : 'Cash at Counter'})`
+      : `UNPAID (${order.paymentMethod.toUpperCase()} Pending Payment)`;
 
   lines.push(`💰 Bill: ₱${order.total.toLocaleString()} [${paymentDesc}]`);
 

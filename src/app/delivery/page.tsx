@@ -50,15 +50,15 @@ export default function DeliveryPage() {
     }
   }, [user, authLoading, router]);
 
-  // Filter only delivery orders
+  // Filter only delivery orders (strictly exclude incomplete draft checkouts)
   const deliveryOrders = useMemo(() => {
-    return orders.filter((o) => o.type === 'delivery');
+    return orders.filter((o) => o.type === 'delivery' && o.status !== 'draft');
   }, [orders]);
 
   // Statistics
   const stats = useMemo(() => {
     const active = deliveryOrders.filter(
-      (o) => o.status !== 'completed' && o.status !== 'cancelled'
+      (o) => o.status !== 'completed' && o.status !== 'cancelled' && o.status !== 'draft'
     );
     const pendingDispatch = deliveryOrders.filter(
       (o) => o.status === 'pending' || o.status === 'sent_to_kitchen' || o.status === 'preparing'
@@ -82,7 +82,7 @@ export default function DeliveryPage() {
     return deliveryOrders.filter((o) => {
       // Tab filter
       if (activeTab === 'active') {
-        if (o.status === 'completed' || o.status === 'cancelled') return false;
+        if (o.status === 'completed' || o.status === 'cancelled' || o.status === 'draft') return false;
       } else if (activeTab === 'pending') {
         if (o.status !== 'pending' && o.status !== 'sent_to_kitchen' && o.status !== 'preparing') {
           return false;
@@ -448,16 +448,34 @@ export default function DeliveryPage() {
                       </div>
 
                       <div className="text-right">
-                        <span
-                          className={`text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md ${
-                            isPaid ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'
-                          }`}
-                        >
-                          {isPaid ? '★ Paid in Full' : 'Cash on Delivery'}
-                        </span>
-                        <span className="text-[10px] text-neutral-500 block mt-0.5">
-                          Method: {order.paymentMethod.toUpperCase()}
-                        </span>
+                        {isPaid ? (
+                          <>
+                            <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 border border-emerald-200 inline-block">
+                              ★ Paid via {order.paymentMethod === 'gcash' ? 'GCash' : order.paymentMethod === 'card' ? 'Card' : order.paymentMethod === 'inr_qr' ? 'INR UPI' : 'Cash'}
+                            </span>
+                            <span className="text-[10px] text-emerald-700 font-semibold block mt-0.5">
+                              Payment Verified
+                            </span>
+                          </>
+                        ) : order.paymentMethod === 'cash' ? (
+                          <>
+                            <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md bg-amber-100 text-amber-800 border border-amber-200 inline-block">
+                              Cash on Delivery
+                            </span>
+                            <span className="text-[10px] text-amber-900 font-medium block mt-0.5 font-mono">
+                              Collect ₱{order.total.toLocaleString()}
+                            </span>
+                          </>
+                        ) : (
+                          <>
+                            <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md bg-orange-100 text-orange-800 border border-orange-200 inline-block">
+                              {order.paymentMethod === 'gcash' ? 'GCash' : order.paymentMethod === 'card' ? 'Card' : 'UPI/INR'} (Unpaid)
+                            </span>
+                            <span className="text-[10px] text-orange-700 font-medium block mt-0.5">
+                              Payment Pending
+                            </span>
+                          </>
+                        )}
                       </div>
                     </div>
 

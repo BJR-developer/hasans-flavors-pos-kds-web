@@ -319,6 +319,7 @@ export const fetchOrdersFromDB = async (): Promise<Order[]> => {
   const { data, error } = await supabase
     .from('orders')
     .select('*')
+    .neq('status', 'draft')
     .order('created_at', { ascending: false });
 
   if (error) {

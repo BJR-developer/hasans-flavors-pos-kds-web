@@ -80,6 +80,7 @@ export function Navbar() {
       o.type === 'delivery' &&
       o.status !== 'completed' &&
       o.status !== 'cancelled' &&
+      o.status !== 'draft' &&
       new Date(o.createdAt).getTime() >= recent24hCutoff
   ).length;
 
@@ -88,6 +89,7 @@ export function Navbar() {
     (o) =>
       isMobileOrder(o) &&
       o.status !== 'cancelled' &&
+      o.status !== 'draft' &&
       new Date(o.createdAt).getTime() >= recent24hCutoff
   );
 

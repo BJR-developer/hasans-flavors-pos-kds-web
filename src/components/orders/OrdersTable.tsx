@@ -75,12 +75,12 @@ export function OrdersTable() {
       if (statusFilter === 'completed') return o.status === 'completed';
       if (statusFilter === 'cancelled') return o.status === 'cancelled';
       if (statusFilter === 'open') {
-        return o.status !== 'completed' && o.status !== 'cancelled';
+        return o.status !== 'completed' && o.status !== 'cancelled' && o.status !== 'draft';
       }
       if (statusFilter === 'unpaid') {
-        return o.paymentStatus === 'unpaid' || o.paymentStatus === 'partially_paid';
+        return (o.paymentStatus === 'unpaid' || o.paymentStatus === 'partially_paid') && o.status !== 'draft';
       }
-      return true;
+      return o.status !== 'draft';
     });
   }, [orders, statusFilter]);
 

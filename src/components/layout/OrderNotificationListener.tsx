@@ -45,6 +45,11 @@ export function OrderNotificationListener() {
             return;
           }
 
+          // DRAFT EXCLUSION: If an online order is just starting checkout, DO NOT notify staff yet!
+          if (newRow.status === 'draft') {
+            return;
+          }
+
           // Play loud restaurant service bell for incoming mobile order
           if (soundEnabled) {
             try {
@@ -69,6 +74,48 @@ export function OrderNotificationListener() {
           setTimeout(() => {
             setActiveToast((cur) => (cur?.id === String(newRow.id) ? null : cur));
           }, 10000);
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'orders' },
+        (payload: any) => {
+          const newRow = payload.new;
+          const oldRow = payload.old;
+          if (!newRow) return;
+
+          // When an online checkout is paid, the webhook/verify transitions status from 'draft' to 'pending'
+          const isPromotedFromDraft =
+            (!oldRow || oldRow.status === 'draft') &&
+            (newRow.status === 'pending' || newRow.status === 'preparing');
+
+          if (isPromotedFromDraft) {
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.orders });
+
+            if (!isMobileOrder(newRow)) return;
+
+            if (soundEnabled) {
+              try {
+                playIncomingOrderBell();
+              } catch (e) {
+                console.error('Audio chime error:', e);
+              }
+            }
+
+            setActiveToast({
+              id: String(newRow.id),
+              orderNumber: newRow.order_number || '#New',
+              type: newRow.type || 'dine_in',
+              total: Number(newRow.total || 0),
+              customerName: newRow.customer_name || 'Mobile Customer',
+              tableNumber: newRow.table_number || undefined,
+              notes: newRow.notes || undefined,
+            });
+
+            setTimeout(() => {
+              setActiveToast((cur) => (cur?.id === String(newRow.id) ? null : cur));
+            }, 10000);
+          }
         }
       )
       .subscribe();
