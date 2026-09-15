@@ -8,10 +8,12 @@ import {
   Plus,
   ArrowRight,
   ArrowRightLeft,
+  Clock,
 } from 'lucide-react';
 import { Order, OrderStatus } from '@/types';
 import {
   useUpdateOrderStatus,
+  useUpdateOrderEstimatedMinutes,
   useOrders,
 } from '@/hooks/useRestaurantData';
 import { ChangeTableModal } from '../tables/ChangeTableModal';
@@ -31,6 +33,7 @@ export function OrderDetailsModal({
 }: OrderDetailsModalProps) {
   const router = useRouter();
   const updateStatusMutation = useUpdateOrderStatus();
+  const updateEstimatedMinutes = useUpdateOrderEstimatedMinutes();
   const { data: allOrders = [] } = useOrders();
 
   // Keep order reactive so status changes and added items update immediately
@@ -326,6 +329,74 @@ export function OrderDetailsModal({
                     }`}
                   >
                     {st.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Preparation & Delivery ETA Control (Live syncs to Customer App) */}
+          <div className="pt-4 border-t border-neutral-100">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5 text-neutral-500" />
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-neutral-400">
+                  Customer App ETA
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="font-mono text-xs font-bold text-neutral-900">
+                  {currentOrder.estimatedMinutes || (currentOrder.type === 'delivery' ? 25 : 10)} mins
+                </span>
+                <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const cur = currentOrder.estimatedMinutes || (currentOrder.type === 'delivery' ? 25 : 10);
+                      if (cur > 5) {
+                        updateEstimatedMinutes.mutate({ orderId: currentOrder.id, estimatedMinutes: cur - 5 });
+                      }
+                    }}
+                    title="Subtract 5 minutes"
+                    className="w-5 h-5 rounded bg-neutral-100 hover:bg-neutral-200 border border-neutral-200 flex items-center justify-center text-xs font-bold text-neutral-700 transition-colors"
+                  >
+                    -
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const cur = currentOrder.estimatedMinutes || (currentOrder.type === 'delivery' ? 25 : 10);
+                      if (cur < 120) {
+                        updateEstimatedMinutes.mutate({ orderId: currentOrder.id, estimatedMinutes: cur + 5 });
+                      }
+                    }}
+                    title="Add 5 minutes"
+                    className="w-5 h-5 rounded bg-neutral-100 hover:bg-neutral-200 border border-neutral-200 flex items-center justify-center text-xs font-bold text-neutral-700 transition-colors"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Quick ETA Presets */}
+            <div className="grid grid-cols-5 gap-1.5">
+              {[10, 15, 20, 30, 45].map((mins) => {
+                const isSelected = (currentOrder.estimatedMinutes || 10) === mins;
+                return (
+                  <button
+                    key={mins}
+                    type="button"
+                    onClick={() =>
+                      updateEstimatedMinutes.mutate({ orderId: currentOrder.id, estimatedMinutes: mins })
+                    }
+                    className={`py-1 text-xs font-semibold rounded-lg border transition-colors ${
+                      isSelected
+                        ? 'bg-neutral-900 text-white border-neutral-900 shadow-2xs'
+                        : 'bg-white text-neutral-600 border-neutral-200 hover:bg-neutral-100'
+                    }`}
+                  >
+                    {mins}m
                   </button>
                 );
               })}

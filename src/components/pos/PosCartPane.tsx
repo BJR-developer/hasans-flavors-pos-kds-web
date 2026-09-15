@@ -18,6 +18,7 @@ import {
   CreditCard,
   Banknote,
   ArrowRightLeft,
+  Clock,
 } from 'lucide-react';
 import { CartItem, OrderType, PaymentMethod, PaymentStatus, Order } from '@/types';
 import {
@@ -65,6 +66,7 @@ export function PosCartPane({
   const [paymentTiming, setPaymentTiming] = useState<'pay_later' | 'pay_now'>('pay_later');
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('cash');
   const [settleMethod, setSettleMethod] = useState<PaymentMethod>('cash');
+  const [prepTimeMinutes, setPrepTimeMinutes] = useState<number>(10);
 
   // Cash calculations
   const [cashTendered, setCashTendered] = useState<string>('');
@@ -197,7 +199,7 @@ export function PosCartPane({
         paymentStatus: finalPaymentStatus,
         cashTendered: isPayNow && paymentMethod === 'cash' ? (tenderedNum > 0 ? tenderedNum : total) : undefined,
         changeDue: isPayNow && paymentMethod === 'cash' ? (tenderedNum > 0 ? changeDue : 0) : undefined,
-        estimatedMinutes: 20,
+        estimatedMinutes: prepTimeMinutes,
       };
 
       const created = await createOrderMutation.mutateAsync(orderPayload);
@@ -882,6 +884,30 @@ export function PosCartPane({
                 )}
               </div>
             )}
+
+            {/* Quick Kitchen Prep ETA Selector (Standard: 10m, adjustable) */}
+            <div className="flex items-center justify-between px-1 py-1 text-xs border border-neutral-100 bg-neutral-50/70 rounded-lg">
+              <div className="flex items-center gap-1.5 text-neutral-500 font-medium">
+                <Clock className="w-3.5 h-3.5 text-neutral-600" />
+                <span className="text-[11px] font-semibold text-neutral-700">Kitchen Prep ETA:</span>
+              </div>
+              <div className="flex items-center gap-1">
+                {[10, 15, 20, 30].map((mins) => (
+                  <button
+                    key={mins}
+                    type="button"
+                    onClick={() => setPrepTimeMinutes(mins)}
+                    className={`px-2 py-0.5 rounded text-[11px] font-bold border transition-colors ${
+                      prepTimeMinutes === mins
+                        ? 'bg-neutral-900 text-white border-neutral-900'
+                        : 'bg-white text-neutral-600 border-neutral-200 hover:bg-neutral-100'
+                    }`}
+                  >
+                    {mins}m
+                  </button>
+                ))}
+              </div>
+            </div>
 
             {paymentTiming === 'pay_later' ? (
               <button

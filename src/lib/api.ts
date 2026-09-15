@@ -66,7 +66,13 @@ export const mapOrderFromDB = (row: any): Order => {
     specialNotes: row.notes || undefined,
     items: Array.isArray(row.items) ? row.items : [],
     createdAt: row.created_at,
-    estimatedMinutes: Number(row.estimated_minutes || 20),
+    estimatedMinutes: Number(
+      row.estimated_minutes !== undefined && row.estimated_minutes !== null
+        ? row.estimated_minutes
+        : row.type === 'delivery'
+        ? 25
+        : 10
+    ),
   };
 };
 
@@ -357,6 +363,7 @@ export const createOrderInDB = async (order: Order): Promise<Order> => {
     ] : []),
     notes: order.specialNotes || null,
     items: order.items,
+    estimated_minutes: order.estimatedMinutes || (order.type === 'delivery' ? 25 : 10),
     created_at: order.createdAt,
     updated_at: new Date().toISOString(),
   };
