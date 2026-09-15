@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
@@ -12,51 +12,99 @@ import {
   BarChart3,
   LogOut,
   LogIn,
-  ShieldAlert,
   QrCode,
   Bike,
   Bell,
-  MessageSquareText,
   Check,
+  CheckCheck,
   Phone,
-  X,
+  Smartphone,
+  ArrowRight,
+  Sparkles,
+  ShoppingBag,
+  ExternalLink,
+  Share2,
 } from 'lucide-react';
 import { useOrders } from '@/hooks/useRestaurantData';
 import { useAuthStore } from '@/lib/auth';
+import { isMobileOrder } from '@/lib/orderUtils';
+import { useOrderNotifications } from '@/lib/orderNotifications';
+import { ShareOrderModal } from '@/components/orders/ShareOrderModal';
+import { Order } from '@/types';
 
 export function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
   const { data: orders = [] } = useOrders();
   const { user, initialize, signOut } = useAuthStore();
-  const [isNotifOpen, setIsNotifOpen] = React.useState(false);
-  const [readNoteIds, setReadNoteIds] = React.useState<string[]>([]);
+  const [isNotifOpen, setIsNotifOpen] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
+  const [shareOrder, setShareOrder] = useState<Order | null>(null);
+  const notifRef = useRef<HTMLDivElement>(null);
+
+  const { isRead, markAsRead, markAllAsRead } = useOrderNotifications();
 
   useEffect(() => {
     initialize();
   }, [initialize]);
 
+  // Click outside to close notification dropdown
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (notifRef.current && !notifRef.current.contains(e.target as Node)) {
+        setIsNotifOpen(false);
+      }
+    }
+    if (isNotifOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isNotifOpen]);
+
   const isSignInPage = pathname === '/signin';
 
-  const kitchenQueueCount = orders.filter(
-    (o) => o.status === 'pending' || o.status === 'preparing'
-  ).length;
+  // Scope active counts strictly to last 24 hours (matching KdsBoard logic)
+  const recent24hCutoff = Date.now() - 24 * 60 * 60 * 1000;
 
-  const activeOrdersCount = orders.filter(
-    (o) => o.status !== 'completed' && o.status !== 'cancelled'
+  const kitchenQueueCount = orders.filter(
+    (o) =>
+      (o.status === 'pending' || o.status === 'preparing' || o.status === 'sent_to_kitchen') &&
+      new Date(o.createdAt).getTime() >= recent24hCutoff
   ).length;
 
   // Running deliveries count
   const runningDeliveriesCount = orders.filter(
-    (o) => o.type === 'delivery' && o.status !== 'completed' && o.status !== 'cancelled'
+    (o) =>
+      o.type === 'delivery' &&
+      o.status !== 'completed' &&
+      o.status !== 'cancelled' &&
+      new Date(o.createdAt).getTime() >= recent24hCutoff
   ).length;
 
-  // Active customer special notes & instructions
-  const activeNotes = orders.filter(
-    (o) => o.specialNotes && o.specialNotes.trim() && o.status !== 'completed' && o.status !== 'cancelled'
+  // Mobile customer orders within the last 24 hours (Delivery, Takeout, Mobile Dine-In)
+  const recentMobileOrders = orders.filter(
+    (o) =>
+      isMobileOrder(o) &&
+      o.status !== 'cancelled' &&
+      new Date(o.createdAt).getTime() >= recent24hCutoff
   );
-  const unreadNotes = activeNotes.filter((o) => !readNoteIds.includes(o.id));
-  const unreadCount = unreadNotes.length;
+
+  // Unread mobile orders: only orders that have NOT been read/dismissed yet
+  const unreadMobileOrders = recentMobileOrders.filter((o) => !isRead(o.id));
+  const readMobileOrders = recentMobileOrders.filter((o) => isRead(o.id));
+  const unreadCount = unreadMobileOrders.length;
+
+  // Helper for human-readable relative time
+  const formatTimeAgo = (dateStr: string) => {
+    const diffMs = Date.now() - new Date(dateStr).getTime();
+    const mins = Math.floor(diffMs / (60 * 1000));
+    if (mins < 1) return 'Just now';
+    if (mins < 60) return `${mins}m ago`;
+    const hours = Math.floor(mins / 60);
+    return `${hours}h ago`;
+  };
 
   // STRICT ROLE SEPARATION PER USER DIRECTIVE:
   // - Owner: Can ONLY access Owner Dashboard (/analytics) and Table Standees (/tables).
@@ -190,99 +238,222 @@ export function Navbar() {
 
         {/* Right Tools: Role Badge, Quick Role Switcher, Sign Out */}
         <div className="flex items-center gap-2 shrink-0 relative">
-          {/* Notifications / Diner Messages Bell */}
+          {/* Notifications: Mobile Orders Only (Delivery, Takeout, Mobile Dine-In) */}
           {!isSignInPage && user && isCashier && (
-            <div className="relative">
+            <div className="relative" ref={notifRef}>
               <button
                 type="button"
                 onClick={() => setIsNotifOpen((prev) => !prev)}
-                title="Customer Special Instructions & Requests"
+                title="Mobile Order Notifications (Delivery, Takeout, Dine-in)"
                 className={`relative p-2 rounded-lg border transition-colors flex items-center justify-center ${
                   unreadCount > 0
-                    ? 'border-amber-300 bg-amber-50 text-amber-900 hover:bg-amber-100'
+                    ? 'border-red-300 bg-red-50 text-[#BA1A20] hover:bg-red-100 shadow-xs'
                     : 'border-[#E5E5E5] bg-white text-[#525252] hover:bg-[#F5F5F5]'
                 }`}
               >
-                <Bell className="w-4 h-4" />
+                <Bell className={`w-4 h-4 ${unreadCount > 0 ? 'text-[#BA1A20]' : ''}`} />
                 {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#BA1A20] text-white text-[9.5px] font-black flex items-center justify-center animate-pulse shadow-xs">
+                  <span className="absolute -top-1 -right-1 min-w-[17px] h-[17px] px-1 rounded-full bg-[#BA1A20] text-white text-[9.5px] font-black flex items-center justify-center animate-pulse shadow-xs">
                     {unreadCount}
                   </span>
                 )}
               </button>
 
-              {/* Dropdown Popover for Diner Messages & Instructions */}
+              {/* Dropdown Popover for Mobile Orders Notifications */}
               {isNotifOpen && (
-                <div className="absolute right-0 top-12 w-80 sm:w-96 bg-white rounded-xl shadow-2xl border border-neutral-200 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
-                  <div className="p-3 bg-neutral-50 border-b border-neutral-200 flex items-center justify-between">
+                <div className="absolute right-0 top-12 w-84 sm:w-96 bg-white rounded-xl shadow-2xl border border-neutral-200 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
+                  <div className="p-3 bg-neutral-900 text-white flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <MessageSquareText className="w-4 h-4 text-[#BA1A20]" />
-                      <span className="text-xs font-bold text-neutral-900">
-                        Diner Messages ({activeNotes.length})
-                      </span>
+                      <div className="w-6 h-6 rounded-full bg-[#BA1A20] flex items-center justify-center">
+                        <Smartphone className="w-3.5 h-3.5 text-white" />
+                      </div>
+                      <div>
+                        <h4 className="text-xs font-extrabold tracking-tight">Mobile Order Alerts</h4>
+                        <p className="text-[10px] text-neutral-400">
+                          {unreadCount > 0 ? `${unreadCount} unread incoming` : 'All caught up'}
+                        </p>
+                      </div>
                     </div>
                     {unreadCount > 0 && (
                       <button
                         type="button"
                         onClick={() => {
-                          setReadNoteIds(activeNotes.map((o) => o.id));
+                          markAllAsRead(unreadMobileOrders.map((o) => o.id));
                         }}
-                        className="text-[10.5px] font-bold text-[#BA1A20] hover:underline"
+                        className="text-[10.5px] font-bold text-amber-400 hover:text-amber-300 flex items-center gap-1 transition-colors"
+                        title="Mark all notifications as read"
                       >
-                        Mark all as read
+                        <CheckCheck className="w-3.5 h-3.5" />
+                        <span>Mark all read</span>
                       </button>
                     )}
                   </div>
 
-                  <div className="max-h-72 overflow-y-auto divide-y divide-neutral-100 p-2 space-y-1.5">
-                    {activeNotes.length === 0 ? (
-                      <div className="p-6 text-center text-neutral-400 text-xs">
-                        No active customer requests or special notes.
+                  <div className="max-h-80 overflow-y-auto divide-y divide-neutral-100 p-2 space-y-2">
+                    {unreadMobileOrders.length === 0 ? (
+                      <div className="p-6 text-center space-y-2">
+                        <div className="w-10 h-10 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto">
+                          <Check className="w-5 h-5 stroke-[2.5]" />
+                        </div>
+                        <p className="text-xs font-bold text-neutral-800">No Unread Mobile Orders</p>
+                        <p className="text-[11px] text-neutral-400 leading-relaxed max-w-[240px] mx-auto">
+                          When customers order from mobile (Delivery, Takeout, or Dine-In), you will be alerted here.
+                        </p>
                       </div>
                     ) : (
-                      activeNotes.map((noteOrder) => {
-                        const isRead = readNoteIds.includes(noteOrder.id);
+                      unreadMobileOrders.map((order) => {
                         return (
                           <div
-                            key={noteOrder.id}
-                            className={`p-2.5 rounded-lg border text-xs transition-colors ${
-                              isRead
-                                ? 'bg-white border-neutral-100 text-neutral-600'
-                                : 'bg-amber-50/70 border-amber-200 text-amber-950 font-medium'
-                            }`}
+                            key={order.id}
+                            className="p-3 rounded-xl border border-amber-200 bg-amber-50/50 hover:bg-amber-50 transition-colors space-y-2"
                           >
-                            <div className="flex items-center justify-between gap-1 mb-1">
-                              <span className="font-mono font-bold text-[11px] text-neutral-900">
-                                {noteOrder.orderNumber} • {noteOrder.customerName}
-                              </span>
-                              <div className="flex items-center gap-1.5">
-                                {noteOrder.customerPhone && (
-                                  <a
-                                    href={`tel:${noteOrder.customerPhone}`}
-                                    className="text-neutral-500 hover:text-neutral-900 p-0.5 rounded"
-                                    title={`Call ${noteOrder.customerPhone}`}
-                                  >
-                                    <Phone className="w-3 h-3" />
-                                  </a>
-                                )}
-                                {!isRead && (
-                                  <button
-                                    type="button"
-                                    onClick={() => setReadNoteIds((prev) => [...prev, noteOrder.id])}
-                                    title="Mark as Read"
-                                    className="p-0.5 rounded hover:bg-amber-200/60 text-amber-800"
-                                  >
-                                    <Check className="w-3.5 h-3.5" />
-                                  </button>
-                                )}
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="flex items-center gap-2">
+                                <span className="font-mono font-black text-xs text-neutral-900 bg-white px-2 py-0.5 rounded border border-neutral-200 shadow-2xs">
+                                  {order.orderNumber}
+                                </span>
+                                <span
+                                  className={`text-[10.5px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 ${
+                                    order.type === 'delivery'
+                                      ? 'bg-amber-100 text-amber-900 border border-amber-300'
+                                      : order.type === 'takeout'
+                                      ? 'bg-blue-100 text-blue-900 border border-blue-300'
+                                      : 'bg-emerald-100 text-emerald-900 border border-emerald-300'
+                                  }`}
+                                >
+                                  {order.type === 'delivery' ? (
+                                    <>
+                                      <Bike className="w-3 h-3" />
+                                      <span>Delivery</span>
+                                    </>
+                                  ) : order.type === 'takeout' ? (
+                                    <>
+                                      <ShoppingBag className="w-3 h-3" />
+                                      <span>Takeout</span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <UtensilsCrossed className="w-3 h-3" />
+                                      <span>{order.tableNumber || 'Dine-In'}</span>
+                                    </>
+                                  )}
+                                </span>
+                              </div>
+
+                              <div className="flex items-center gap-1">
+                                <span className="text-[10px] text-neutral-400 font-medium">
+                                  {formatTimeAgo(order.createdAt)}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => markAsRead(order.id)}
+                                  title="Mark as Read (dismiss)"
+                                  className="p-1 rounded hover:bg-neutral-200 text-neutral-500 hover:text-neutral-800 transition-colors ml-1"
+                                >
+                                  <Check className="w-3.5 h-3.5" />
+                                </button>
                               </div>
                             </div>
-                            <p className="text-[11.5px] leading-relaxed text-neutral-800 italic">
-                              "{noteOrder.specialNotes}"
-                            </p>
+
+                            <div className="flex items-baseline justify-between text-xs">
+                              <div className="font-semibold text-neutral-800 truncate">
+                                {order.customerName || 'Mobile Guest'}
+                              </div>
+                              <div className="font-bold text-[#BA1A20] font-mono">
+                                ₱{order.total.toLocaleString()}
+                              </div>
+                            </div>
+
+                            {/* Items count & preview */}
+                            <div className="text-[11px] text-neutral-600 line-clamp-1">
+                              <span className="font-medium text-neutral-700">
+                                {order.items.reduce((s, i) => s + (i.quantity || 1), 0)} items:
+                              </span>{' '}
+                              {order.items.map((it) => `${it.dish?.name || 'Item'} ×${it.quantity}`).join(', ')}
+                            </div>
+
+                            {/* Special instructions if any */}
+                            {order.specialNotes && (
+                              <div className="p-1.5 rounded bg-white/80 border border-amber-200 text-[10.5px] text-amber-950 italic">
+                                &ldquo;{order.specialNotes}&rdquo;
+                              </div>
+                            )}
+
+                            {/* Action Buttons */}
+                            <div className="flex items-center gap-2 pt-1">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  markAsRead(order.id);
+                                  setIsNotifOpen(false);
+                                  if (order.type === 'delivery') {
+                                    router.push('/delivery');
+                                  } else {
+                                    router.push('/kds');
+                                  }
+                                }}
+                                className="flex-1 py-1.5 px-2.5 rounded-lg bg-[#BA1A20] hover:bg-[#8B0000] text-white text-[11px] font-bold transition-colors flex items-center justify-center gap-1 shadow-2xs"
+                              >
+                                <span>View in {order.type === 'delivery' ? 'Delivery' : 'Kitchen (KDS)'}</span>
+                                <ArrowRight className="w-3 h-3" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setShareOrder(order)}
+                                title="Share address & order info to Messenger, Instagram, SMS..."
+                                className="py-1.5 px-2 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-neutral-800 text-[11px] font-semibold transition-colors flex items-center gap-1"
+                              >
+                                <Share2 className="w-3 h-3 text-[#BA1A20]" />
+                                <span>Share</span>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => markAsRead(order.id)}
+                                className="py-1.5 px-2 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-neutral-700 text-[11px] font-semibold transition-colors flex items-center gap-1"
+                              >
+                                <Check className="w-3 h-3" />
+                                <span>Done</span>
+                              </button>
+                            </div>
                           </div>
                         );
                       })
+                    )}
+
+                    {/* Past read orders toggle if user wants to see history */}
+                    {readMobileOrders.length > 0 && (
+                      <div className="pt-2">
+                        <button
+                          type="button"
+                          onClick={() => setShowHistory((v) => !v)}
+                          className="w-full text-center py-1.5 text-[10.5px] font-bold text-neutral-500 hover:text-neutral-800 transition-colors"
+                        >
+                          {showHistory
+                            ? 'Hide dismissed orders'
+                            : `View ${readMobileOrders.length} recently dismissed order${readMobileOrders.length > 1 ? 's' : ''}`}
+                        </button>
+
+                        {showHistory && (
+                          <div className="space-y-1.5 pt-1.5">
+                            {readMobileOrders.slice(0, 5).map((order) => (
+                              <div
+                                key={order.id}
+                                className="p-2 rounded-lg bg-neutral-50 border border-neutral-200 text-xs text-neutral-500 flex items-center justify-between"
+                              >
+                                <div>
+                                  <span className="font-mono font-bold text-neutral-700">
+                                    {order.orderNumber}
+                                  </span>{' '}
+                                  • {order.customerName} • ₱{order.total.toLocaleString()}
+                                </div>
+                                <span className="text-[10px] text-neutral-400">
+                                  {formatTimeAgo(order.createdAt)}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     )}
                   </div>
                 </div>
@@ -329,6 +500,15 @@ export function Navbar() {
           ) : null}
         </div>
       </div>
+
+      {/* Share Order & Address Modal */}
+      {shareOrder && (
+        <ShareOrderModal
+          isOpen={!!shareOrder}
+          onClose={() => setShareOrder(null)}
+          order={shareOrder}
+        />
+      )}
     </header>
   );
 }

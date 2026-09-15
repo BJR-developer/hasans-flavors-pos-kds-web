@@ -2,11 +2,13 @@
 
 import React, { useEffect, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { Bell, X, ArrowRight, Volume2, VolumeX } from 'lucide-react';
+import { Bell, X, ArrowRight, Volume2, VolumeX, Smartphone } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { playIncomingOrderBell } from '@/lib/audio';
 import { QUERY_KEYS } from '@/hooks/useRestaurantData';
 import { useRouter } from 'next/navigation';
+import { isMobileOrder } from '@/lib/orderUtils';
+import { markNotificationAsRead } from '@/lib/orderNotifications';
 
 interface IncomingOrderToast {
   id: string;
@@ -15,6 +17,7 @@ interface IncomingOrderToast {
   total: number;
   customerName?: string;
   tableNumber?: string;
+  notes?: string;
 }
 
 export function OrderNotificationListener() {
@@ -34,10 +37,15 @@ export function OrderNotificationListener() {
           const newRow = payload.new;
           if (!newRow) return;
 
-          // Invalidate orders cache so KDS, POS & Delivery boards update immediately
+          // Always invalidate orders cache so tables, KDS, & POS stay in background sync
           queryClient.invalidateQueries({ queryKey: QUERY_KEYS.orders });
 
-          // Play loud restaurant service bell
+          // STRICT FILTER: Only trigger notifications/chimes for orders originating from MOBILE
+          if (!isMobileOrder(newRow)) {
+            return;
+          }
+
+          // Play loud restaurant service bell for incoming mobile order
           if (soundEnabled) {
             try {
               playIncomingOrderBell();
@@ -46,20 +54,21 @@ export function OrderNotificationListener() {
             }
           }
 
-          // Show floating visual alert toast
+          // Show floating visual alert toast for incoming mobile order
           setActiveToast({
             id: String(newRow.id),
             orderNumber: newRow.order_number || '#New',
             type: newRow.type || 'dine_in',
             total: Number(newRow.total || 0),
-            customerName: newRow.customer_name || 'Guest',
+            customerName: newRow.customer_name || 'Mobile Customer',
             tableNumber: newRow.table_number || undefined,
+            notes: newRow.notes || undefined,
           });
 
-          // Auto dismiss after 8 seconds
+          // Auto dismiss toast after 10 seconds
           setTimeout(() => {
             setActiveToast((cur) => (cur?.id === String(newRow.id) ? null : cur));
-          }, 8000);
+          }, 10000);
         }
       )
       .subscribe();
@@ -80,12 +89,14 @@ export function OrderNotificationListener() {
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between gap-1">
-            <span className="text-xs font-black uppercase tracking-wider text-amber-400">
-              🔔 New Incoming Order!
+            <span className="text-[11px] font-black uppercase tracking-wider text-amber-400 flex items-center gap-1">
+              <Smartphone className="w-3.5 h-3.5" />
+              <span>New Mobile Order!</span>
             </span>
             <button
               onClick={() => setActiveToast(null)}
-              className="text-neutral-400 hover:text-white p-0.5 rounded"
+              className="text-neutral-400 hover:text-white p-0.5 rounded transition-colors"
+              title="Close alert"
             >
               <X className="w-4 h-4" />
             </button>
@@ -97,16 +108,22 @@ export function OrderNotificationListener() {
             </h4>
             <p className="text-xs text-neutral-300 mt-0.5">
               {activeToast.type === 'delivery'
-                ? `🛵 Delivery for ${activeToast.customerName}`
+                ? `🛵 Delivery • ${activeToast.customerName}`
                 : activeToast.type === 'dine_in'
-                ? `🍽️ Dine-In (${activeToast.tableNumber || 'Table'})`
-                : `🛍️ Takeout for ${activeToast.customerName}`}
+                ? `🍽️ Mobile Dine-In • ${activeToast.tableNumber || 'Table'}`
+                : `🛍️ Mobile Takeout • ${activeToast.customerName}`}
             </p>
+            {activeToast.notes && (
+              <p className="text-[11px] text-amber-300/90 italic truncate mt-0.5">
+                &ldquo;{activeToast.notes}&rdquo;
+              </p>
+            )}
           </div>
 
           <div className="mt-2.5 flex items-center gap-2">
             <button
               onClick={() => {
+                markNotificationAsRead(activeToast.id);
                 if (activeToast.type === 'delivery') {
                   router.push('/delivery');
                 } else {
@@ -120,9 +137,19 @@ export function OrderNotificationListener() {
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
             <button
+              onClick={() => {
+                markNotificationAsRead(activeToast.id);
+                setActiveToast(null);
+              }}
+              title="Dismiss & Mark Read"
+              className="py-1.5 px-2 bg-neutral-800 hover:bg-neutral-700 text-neutral-300 hover:text-white rounded-lg text-xs font-medium transition-colors"
+            >
+              Dismiss
+            </button>
+            <button
               onClick={() => setSoundEnabled((v) => !v)}
               title={soundEnabled ? 'Mute Order Chime' : 'Unmute Order Chime'}
-              className="p-1.5 bg-neutral-800 hover:bg-neutral-700 text-neutral-300 rounded-lg text-xs"
+              className="p-1.5 bg-neutral-800 hover:bg-neutral-700 text-neutral-300 rounded-lg text-xs transition-colors"
             >
               {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
             </button>

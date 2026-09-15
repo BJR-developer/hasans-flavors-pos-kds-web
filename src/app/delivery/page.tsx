@@ -20,12 +20,14 @@ import {
   ExternalLink,
   ChevronRight,
   User,
+  Share2,
 } from 'lucide-react';
 import { useOrders, useUpdateOrderStatus, useUpdateOrderPayment, useUpdateOrderEstimatedMinutes } from '@/hooks/useRestaurantData';
 import { useAuthStore } from '@/lib/auth';
 import { Order, OrderStatus, PaymentStatus } from '@/types';
 import { ThermalReceiptModal } from '@/components/pos/ThermalReceiptModal';
 import { OrderDetailsModal } from '@/components/orders/OrderDetailsModal';
+import { ShareOrderModal } from '@/components/orders/ShareOrderModal';
 
 export default function DeliveryPage() {
   const router = useRouter();
@@ -39,6 +41,7 @@ export default function DeliveryPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [receiptOrder, setReceiptOrder] = useState<Order | null>(null);
   const [detailOrder, setDetailOrder] = useState<Order | null>(null);
+  const [shareOrder, setShareOrder] = useState<Order | null>(null);
 
   // Authentication check
   useEffect(() => {
@@ -366,11 +369,45 @@ export default function DeliveryPage() {
 
                     {/* Delivery Address & Landmark */}
                     <div className="p-2.5 bg-neutral-50 rounded-lg border border-neutral-200/80 space-y-1">
-                      <div className="flex items-start gap-1.5 text-xs text-neutral-800 font-medium">
-                        <MapPin className="w-3.5 h-3.5 text-neutral-500 shrink-0 mt-0.5" />
-                        <span className="leading-snug">
-                          {order.deliveryAddress || 'No address specified'}
-                        </span>
+                      <div className="flex items-start justify-between gap-1.5">
+                        <div className="flex items-start gap-1.5 text-xs text-neutral-800 font-medium flex-1 min-w-0">
+                          <MapPin className="w-3.5 h-3.5 text-neutral-500 shrink-0 mt-0.5" />
+                          <span className="leading-snug break-words">
+                            {order.deliveryAddress || 'No address specified'}
+                          </span>
+                        </div>
+
+                        {/* Direct Google Maps & Share buttons */}
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          {(() => {
+                            const rawTarget = `${order.deliveryAddress || ''} ${order.specialNotes || ''}`;
+                            const mapMatch = rawTarget.match(/https:\/\/maps\.google\.com\/\?q=[^\s|]+/);
+                            const mapsUrl = mapMatch ? mapMatch[0] : (order.deliveryAddress ? `https://maps.google.com/?q=${encodeURIComponent(order.deliveryAddress)}` : null);
+
+                            return mapsUrl ? (
+                              <a
+                                href={mapsUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                title="Open location in Google Maps"
+                                className="inline-flex items-center gap-1 text-[10.5px] font-bold text-emerald-700 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 px-2 py-0.5 rounded border border-emerald-200 transition-colors"
+                              >
+                                <ExternalLink className="w-3 h-3" />
+                                <span>Google Maps</span>
+                              </a>
+                            ) : null;
+                          })()}
+
+                          <button
+                            type="button"
+                            onClick={() => setShareOrder(order)}
+                            title="Share Address anywhere (Messenger, Instagram, SMS...)"
+                            className="inline-flex items-center gap-1 text-[10.5px] font-bold text-white bg-[#BA1A20] hover:bg-[#8B0000] px-2 py-0.5 rounded shadow-2xs transition-colors cursor-pointer"
+                          >
+                            <Share2 className="w-3 h-3" />
+                            <span>Share</span>
+                          </button>
+                        </div>
                       </div>
                       {order.specialNotes && (
                         <div className="text-[10.5px] text-amber-900 bg-amber-50/80 px-2 py-1 rounded border border-amber-200/60 mt-1 italic">
@@ -481,6 +518,15 @@ export default function DeliveryPage() {
           order={detailOrder}
           onClose={() => setDetailOrder(null)}
           onPrintReceipt={(ord) => setReceiptOrder(ord)}
+        />
+      )}
+
+      {/* Share Delivery Order Modal */}
+      {shareOrder && (
+        <ShareOrderModal
+          isOpen={!!shareOrder}
+          onClose={() => setShareOrder(null)}
+          order={shareOrder}
         />
       )}
     </div>

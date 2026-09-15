@@ -9,6 +9,9 @@ import {
   ArrowRight,
   ArrowRightLeft,
   Clock,
+  Share2,
+  MapPin,
+  ExternalLink,
 } from 'lucide-react';
 import { Order, OrderStatus } from '@/types';
 import {
@@ -17,6 +20,8 @@ import {
   useOrders,
 } from '@/hooks/useRestaurantData';
 import { ChangeTableModal } from '../tables/ChangeTableModal';
+import { ShareOrderModal } from './ShareOrderModal';
+import { getOrderMapsUrl } from '@/lib/shareOrder';
 
 interface OrderDetailsModalProps {
   order: Order | null;
@@ -42,6 +47,7 @@ export function OrderDetailsModal({
   // Local optimistic status for instantaneous UI response on click
   const [optimisticStatus, setOptimisticStatus] = useState<OrderStatus | null>(null);
   const [isChangeTableOpen, setIsChangeTableOpen] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   useEffect(() => {
     setOptimisticStatus(null);
@@ -147,6 +153,13 @@ export function OrderDetailsModal({
 
           <div className="flex items-center gap-1">
             <button
+              onClick={() => setIsShareModalOpen(true)}
+              title="Share Order & Address to Messenger, Instagram, SMS..."
+              className="p-1.5 rounded-lg text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100 transition-colors"
+            >
+              <Share2 className="w-4 h-4 text-[#BA1A20]" />
+            </button>
+            <button
               onClick={() => onPrintReceipt(currentOrder)}
               title="Print Receipt"
               className="p-1.5 rounded-lg text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100 transition-colors"
@@ -165,6 +178,45 @@ export function OrderDetailsModal({
 
         {/* Body Content */}
         <div className="p-6 max-h-[65vh] overflow-y-auto space-y-6">
+
+          {/* Delivery Destination & Google Maps */}
+          {(currentOrder.type === 'delivery' || currentOrder.deliveryAddress) && (
+            <div className="p-3.5 bg-neutral-900 text-white rounded-xl flex items-center justify-between gap-3 shadow-xs">
+              <div className="flex items-start gap-2.5 min-w-0 flex-1">
+                <MapPin className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
+                <div className="min-w-0 flex-1">
+                  <span className="text-[10px] uppercase font-bold text-neutral-400 block tracking-wider">
+                    Delivery Destination
+                  </span>
+                  <p className="text-xs font-semibold text-neutral-100 leading-snug break-words">
+                    {currentOrder.deliveryAddress || 'Address on record'}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-1.5 shrink-0">
+                {getOrderMapsUrl(currentOrder) && (
+                  <a
+                    href={getOrderMapsUrl(currentOrder)!}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-400 hover:text-emerald-300 bg-neutral-800 hover:bg-neutral-700 px-2.5 py-1 rounded-lg border border-neutral-700 transition-colors"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5" />
+                    <span>Maps</span>
+                  </a>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setIsShareModalOpen(true)}
+                  className="inline-flex items-center gap-1 text-[11px] font-bold text-white bg-[#BA1A20] hover:bg-[#8B0000] px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
+                >
+                  <Share2 className="w-3.5 h-3.5" />
+                  <span>Share</span>
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* INR QR / UPI Manual Verification Card */}
           {currentOrder.paymentMethod === 'inr_qr' && (
@@ -444,6 +496,15 @@ export function OrderDetailsModal({
         <ChangeTableModal
           isOpen={isChangeTableOpen}
           onClose={() => setIsChangeTableOpen(false)}
+          order={currentOrder}
+        />
+      )}
+
+      {/* Share Order & Address Modal */}
+      {isShareModalOpen && (
+        <ShareOrderModal
+          isOpen={isShareModalOpen}
+          onClose={() => setIsShareModalOpen(false)}
           order={currentOrder}
         />
       )}

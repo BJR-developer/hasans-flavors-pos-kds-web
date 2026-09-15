@@ -13,6 +13,9 @@ import {
   GripVertical,
   Sparkles,
   Clock,
+  MapPin,
+  ExternalLink,
+  Share2,
 } from 'lucide-react';
 import { Order, OrderStatus } from '@/types';
 import {
@@ -22,7 +25,9 @@ import {
 } from '@/hooks/useRestaurantData';
 import { playBumpChime } from '@/lib/audio';
 import { ChangeTableModal } from '../tables/ChangeTableModal';
+import { ShareOrderModal } from '../orders/ShareOrderModal';
 import { getOrderColorTheme } from '@/lib/orderColors';
+import { getOrderMapsUrl } from '@/lib/shareOrder';
 
 interface KdsTicketCardProps {
   order: Order;
@@ -54,7 +59,11 @@ export function KdsTicketCard({
 
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [isChangeTableOpen, setIsChangeTableOpen] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [animatingDirection, setAnimatingDirection] = useState<'forward' | 'backward' | null>(null);
+
+  const mapsUrl = useMemo(() => getOrderMapsUrl(order), [order]);
+  const hasDeliveryLocation = order.type === 'delivery' || !!order.deliveryAddress || !!mapsUrl;
 
   // Derive distinct, high-contrast visual theme for this order
   const colorTheme = useMemo(() => {
@@ -287,6 +296,52 @@ export function KdsTicketCard({
         </div>
       </div>
 
+      {/* Delivery Destination & 1-Tap Share for KDS & Cashiers */}
+      {hasDeliveryLocation && (
+        <div className="px-3 py-2 bg-neutral-900 text-white border-b border-neutral-800 flex items-center justify-between gap-2">
+          <div className="flex items-start gap-1.5 min-w-0 flex-1">
+            <MapPin className="w-3.5 h-3.5 text-red-400 shrink-0 mt-0.5" />
+            <div className="min-w-0 flex-1">
+              <span className="text-[9.5px] uppercase font-black text-amber-400 block tracking-wider leading-none mb-0.5">
+                🛵 Delivery Location
+              </span>
+              <span className="text-xs font-semibold text-neutral-100 truncate block">
+                {order.deliveryAddress || 'Address on record'}
+              </span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-1.5 shrink-0">
+            {mapsUrl && (
+              <a
+                href={mapsUrl}
+                target="_blank"
+                rel="noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                title="Open in Google Maps"
+                className="py-1 px-1.5 rounded bg-neutral-800 hover:bg-neutral-700 text-emerald-400 hover:text-emerald-300 transition-colors flex items-center gap-1 text-[10.5px] font-bold"
+              >
+                <ExternalLink className="w-3 h-3" />
+                <span className="hidden sm:inline">Maps</span>
+              </a>
+            )}
+
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsShareModalOpen(true);
+              }}
+              title="Share Address anywhere (Messenger, Instagram, SMS...)"
+              className="py-1 px-2 rounded bg-[#BA1A20] hover:bg-[#8B0000] text-white transition-colors flex items-center gap-1 text-[10.5px] font-bold shadow-2xs cursor-pointer"
+            >
+              <Share2 className="w-3 h-3" />
+              <span>Share</span>
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Order-Level Special Dining / Cooking Instructions */}
       {order.specialNotes && (
         <div className="px-3 py-1.5 bg-amber-50 border-b border-amber-200 text-[11px] text-amber-900 font-semibold flex items-start gap-1">
@@ -406,6 +461,17 @@ export function KdsTicketCard({
             <span>Update Order</span>
           </button>
 
+          {/* Quick Share Action anywhere (Messenger, Instagram, SMS...) */}
+          <button
+            type="button"
+            onClick={() => setIsShareModalOpen(true)}
+            title="Share Address & Details to Messenger, Instagram, SMS..."
+            className="flex items-center gap-1 px-2 py-1.5 rounded-lg border border-neutral-200 bg-white hover:bg-neutral-100 text-neutral-700 text-[11px] font-semibold transition-colors cursor-pointer"
+          >
+            <Share2 className="w-3 h-3 text-[#BA1A20]" />
+            <span>Share</span>
+          </button>
+
           {/* Change Table action for Dine-In tickets */}
           {order.type === 'dine_in' && (
             <button
@@ -471,6 +537,15 @@ export function KdsTicketCard({
         <ChangeTableModal
           isOpen={isChangeTableOpen}
           onClose={() => setIsChangeTableOpen(false)}
+          order={order}
+        />
+      )}
+
+      {/* Share Order & Address Modal */}
+      {isShareModalOpen && (
+        <ShareOrderModal
+          isOpen={isShareModalOpen}
+          onClose={() => setIsShareModalOpen(false)}
           order={order}
         />
       )}
