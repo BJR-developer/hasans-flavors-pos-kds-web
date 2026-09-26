@@ -65,6 +65,9 @@ function ProductFormContent({
   const [preparationTime, setPreparationTime] = useState(
     () => dishToEdit?.preparationTime || '15-20 mins'
   );
+  const [stockQuantity, setStockQuantity] = useState(() =>
+    dishToEdit?.stockQuantity !== undefined ? dishToEdit.stockQuantity.toString() : '50'
+  );
   const [inStock, setInStock] = useState(() => (dishToEdit ? dishToEdit.inStock : true));
   const [isChefSpecial, setIsChefSpecial] = useState(
     () => (dishToEdit ? dishToEdit.isChefSpecial || false : false)
@@ -299,6 +302,10 @@ function ProductFormContent({
       else effectiveSpiceLevel = 1;
     }
 
+    const stockParsed = parseInt(stockQuantity, 10);
+    const effectiveStock = isNaN(stockParsed) ? 50 : Math.max(0, stockParsed);
+    const effectiveInStock = effectiveStock > 0 && inStock;
+
     if (dishToEdit) {
       updateDishMutation.mutate({
         dishId: dishToEdit.id,
@@ -311,7 +318,8 @@ function ProductFormContent({
           description: description.trim() || 'Delicious authentic Pakistani specialty.',
           spiceLevel: effectiveSpiceLevel,
           preparationTime,
-          inStock,
+          stockQuantity: effectiveStock,
+          inStock: effectiveInStock,
           isChefSpecial,
           station,
           variants,
@@ -329,7 +337,8 @@ function ProductFormContent({
         isHalal: true,
         isChefSpecial,
         isPopular: false,
-        inStock,
+        stockQuantity: effectiveStock,
+        inStock: effectiveInStock,
         preparationTime,
         calories: '450 kcal',
         station,
@@ -380,8 +389,8 @@ function ProductFormContent({
             />
           </div>
 
-          {/* Category, Price & Prep Time in Responsive 3-Column Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          {/* Category, Price, Stock Quantity & Prep Time in Responsive 4-Column Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
             <div>
               <div className="flex items-center justify-between mb-1">
                 <label className="block text-xs font-bold text-[#1F1F1F]">
@@ -427,6 +436,21 @@ function ProductFormContent({
                   className="w-full pl-7 pr-3 py-2 text-xs font-semibold rounded-lg border border-[#E5E5E5] bg-[#FAFAFA] text-[#1F1F1F] focus:bg-white focus:outline-none focus:border-[#1F1F1F] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 />
               </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-[#1F1F1F] mb-1">
+                Stock (Units) *
+              </label>
+              <input
+                type="number"
+                required
+                min="0"
+                placeholder="50"
+                value={stockQuantity}
+                onChange={(e) => setStockQuantity(e.target.value)}
+                className="w-full px-3 py-2 text-xs font-semibold rounded-lg border border-[#E5E5E5] bg-[#FAFAFA] text-[#1F1F1F] focus:bg-white focus:outline-none focus:border-[#1F1F1F]"
+              />
             </div>
 
             <div>

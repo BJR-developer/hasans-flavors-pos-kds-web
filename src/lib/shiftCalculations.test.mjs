@@ -113,3 +113,43 @@ test('calculateShiftMetrics correctly filters orders by time window and cashier'
   assert.equal(result.cashSales, 500);
   assert.equal(result.expectedCash, 1500);
 });
+
+test('session order attribution correctly includes mobile self-checkout and cashier orders while excluding other cashier orders', () => {
+  const currentCashierId = 'cashier_rashed';
+  const orders = [
+    { id: 'ord_1', cashierId: null, cashierName: null, total: 190, paymentMethod: 'cash', status: 'completed' },
+    { id: 'ord_mob_3', cashierId: null, cashierName: null, total: 122, paymentMethod: 'cash', status: 'completed' },
+    { id: 'ord_mob_4', cashierId: null, cashierName: null, total: 320, paymentMethod: 'gcash', status: 'completed' },
+    { id: 'ord_5', cashierId: 'cashier_rashed', cashierName: 'Rashed khan', total: 100, paymentMethod: 'cash', status: 'completed' },
+    { id: 'ord_6', cashierId: 'cashier_rashed', cashierName: 'Rashed khan', total: 500, paymentMethod: 'cash', status: 'completed' },
+    { id: 'ord_7_other', cashierId: 'other_staff_id', cashierName: 'Other Staff', total: 450, paymentMethod: 'card', status: 'completed' },
+    { id: 'ord_8_cancelled', cashierId: currentCashierId, total: 200, paymentMethod: 'cash', status: 'cancelled' },
+  ];
+
+  // All session scope: includes current cashier's orders + unassigned/mobile orders; excludes other cashier & cancelled
+  const sessionOrders = orders.filter((o) => {
+    if (o.status === 'cancelled' || o.status === 'draft') return false;
+    if (o.cashierId && o.cashierId !== currentCashierId) return false;
+    return true;
+  });
+
+  assert.equal(sessionOrders.length, 5);
+
+  const totalGross = sessionOrders.reduce((sum, o) => sum + o.total, 0);
+  assert.equal(totalGross, 1232); // 190 + 122 + 320 + 100 + 500
+
+  const cashOrders = sessionOrders.filter((o) => o.paymentMethod === 'cash');
+  const gcashOrders = sessionOrders.filter((o) => o.paymentMethod === 'gcash');
+
+  assert.equal(cashOrders.length, 4);
+  assert.equal(cashOrders.reduce((s, o) => s + o.total, 0), 912); // 190 + 122 + 100 + 500
+
+  assert.equal(gcashOrders.length, 1);
+  assert.equal(gcashOrders[0].total, 320);
+
+  // Direct POS only scope: strictly matches current cashier
+  const directOrders = orders.filter((o) => o.cashierId === currentCashierId && o.status === 'completed');
+  assert.equal(directOrders.length, 2);
+  assert.equal(directOrders.reduce((s, o) => s + o.total, 0), 600); // 100 + 500
+});
+

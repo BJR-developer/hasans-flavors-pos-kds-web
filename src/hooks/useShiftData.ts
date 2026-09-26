@@ -6,6 +6,7 @@ import {
   fetchActiveShift,
   startShift,
   closeShift,
+  updateShiftOpeningCash,
 } from '@/lib/shiftApi';
 import { Shift } from '@/types';
 
@@ -65,6 +66,24 @@ export function useCloseShift() {
       notes?: string;
     }) => closeShift(params),
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: SHIFT_QUERY_KEYS.shifts });
+      queryClient.invalidateQueries({ queryKey: ['activeShift'] });
+    },
+  });
+}
+
+export function useUpdateShiftOpeningCash() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (params: {
+      shiftId: string;
+      newOpeningCash: number;
+      changedBy: string;
+      reason?: string;
+    }) => updateShiftOpeningCash(params),
+    onSuccess: (updatedShift) => {
+      queryClient.setQueriesData({ queryKey: ['activeShift'] }, updatedShift);
       queryClient.invalidateQueries({ queryKey: SHIFT_QUERY_KEYS.shifts });
       queryClient.invalidateQueries({ queryKey: ['activeShift'] });
     },

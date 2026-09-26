@@ -35,6 +35,7 @@ export interface Dish {
   isChefSpecial: boolean;
   isPopular: boolean;
   inStock: boolean;
+  stockQuantity?: number;
   preparationTime: string;
   calories: string;
   rating: string;
@@ -68,6 +69,7 @@ export interface AddonOption {
   price: number;
   imageUrl?: string;
   inStock?: boolean;
+  stockQuantity?: number;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -158,6 +160,13 @@ export interface Shift {
   totalDiscount: number;
   status: 'open' | 'closed';
   notes?: string;
+  initialFloatEdits?: {
+    previousAmount: number;
+    newAmount: number;
+    changedBy: string;
+    changedAt: string;
+    reason?: string;
+  }[];
   createdAt?: string;
   updatedAt?: string;
 }

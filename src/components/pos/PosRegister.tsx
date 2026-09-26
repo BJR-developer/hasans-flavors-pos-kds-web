@@ -328,30 +328,6 @@ export function PosRegister() {
                 </button>
               )}
             </div>
-
-            {/* Cashier Shift Handover & Calculations Button */}
-            <PosShiftButton />
-
-            {/* Cashier POS Settings Trigger Button */}
-            <Link
-              href="/settings?tab=pos"
-              title="Register & Financial Settings (VAT & Payment)"
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-[#E5E5E5] bg-white text-[#525252] hover:text-[#1F1F1F] hover:bg-[#F5F5F5] transition-colors text-xs font-semibold"
-            >
-              <SlidersHorizontal className="w-3.5 h-3.5 text-[#BA1A20]" />
-              <span className="hidden sm:inline text-[11px]">Settings</span>
-            </Link>
-
-            {/* Keyboard Shortcuts Trigger Button */}
-            <button
-              type="button"
-              onClick={() => setIsShortcutsModalOpen(true)}
-              title="Keyboard Shortcuts & Training Help (Press ?)"
-              className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-[#E5E5E5] bg-white text-[#525252] hover:text-[#1F1F1F] hover:bg-[#F5F5F5] transition-colors text-xs font-semibold"
-            >
-              <Keyboard className="w-3.5 h-3.5" />
-              <span className="hidden md:inline text-[11px]">Shortcuts (?)</span>
-            </button>
           </div>
         </div>
 

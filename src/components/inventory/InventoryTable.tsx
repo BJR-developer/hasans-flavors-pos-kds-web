@@ -36,6 +36,7 @@ import {
   useDishes,
   useCategories,
   useToggleDishStock,
+  useUpdateDishStockQuantity,
   useBulkDeleteDishes,
   useBulkUpdateDishStock,
 } from '@/hooks/useRestaurantData';
@@ -82,6 +83,96 @@ function formatLastUpdated(dateStr?: string): string {
   } catch {
     return '—';
   }
+}
+
+function InlineDishStockInput({ dish, currentQty }: { dish: Dish; currentQty: number }) {
+  const updateStockMutation = useUpdateDishStockQuantity();
+  const [val, setVal] = useState<string>(String(currentQty));
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    setVal(String(currentQty));
+  }, [currentQty]);
+
+  const commitStock = async (newVal: number) => {
+    const safeVal = Math.max(0, newVal);
+    setVal(String(safeVal));
+    if (safeVal === currentQty) return;
+    setIsSaving(true);
+    try {
+      await updateStockMutation.mutateAsync({ dishId: dish.id, quantity: safeVal });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleBlur = () => {
+    const num = parseInt(val, 10);
+    commitStock(isNaN(num) ? 0 : num);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.currentTarget.blur();
+    }
+  };
+
+  const isAvailable = dish.inStock && currentQty > 0;
+
+  return (
+    <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+      <div className="flex items-center border border-[#E5E5E5] rounded-lg bg-[#FAFAFA] p-0.5 shadow-2xs hover:border-[#A3A3A3] focus-within:border-[#1F1F1F] focus-within:bg-white transition-colors">
+        <button
+          type="button"
+          onClick={() => commitStock(Math.max(0, currentQty - 1))}
+          disabled={isSaving || currentQty <= 0}
+          className="w-5 h-5 flex items-center justify-center text-[#737373] hover:text-[#1F1F1F] hover:bg-[#E5E5E5] rounded disabled:opacity-30 cursor-pointer text-xs font-bold"
+          title="Decrease stock (-1)"
+        >
+          -
+        </button>
+        <input
+          type="number"
+          min="0"
+          value={val}
+          onChange={(e) => setVal(e.target.value)}
+          onBlur={handleBlur}
+          onKeyDown={handleKeyDown}
+          className="w-11 text-center text-xs font-bold text-[#1F1F1F] bg-transparent focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+          title="Directly edit stock quantity (press Enter or click outside to save)"
+        />
+        <button
+          type="button"
+          onClick={() => commitStock(currentQty + 1)}
+          disabled={isSaving}
+          className="w-5 h-5 flex items-center justify-center text-[#737373] hover:text-[#1F1F1F] hover:bg-[#E5E5E5] rounded disabled:opacity-30 cursor-pointer text-xs font-bold"
+          title="Increase stock (+1)"
+        >
+          +
+        </button>
+      </div>
+
+      <span
+        className={`inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded shrink-0 ${
+          isAvailable
+            ? 'text-[#2E7D32] bg-[#E8F5E9]'
+            : 'text-[#BA1A20] bg-[#FFF2F0]'
+        }`}
+      >
+        {isAvailable ? (
+          <>
+            <CheckCircle2 className="w-3 h-3" />
+            <span>Available</span>
+          </>
+        ) : (
+          <>
+            <XCircle className="w-3 h-3" />
+            <span>Out of Stock</span>
+          </>
+        )}
+      </span>
+    </div>
+  );
 }
 
 export function InventoryTable() {
@@ -400,31 +491,17 @@ export function InventoryTable() {
         ),
       },
       {
-        accessorKey: 'inStock',
-        header: 'Stock Status',
+        accessorKey: 'stockQuantity',
+        header: 'Stock / Quantity',
+        sortingFn: (rowA, rowB) => {
+          const qtyA = rowA.original.stockQuantity ?? (rowA.original.inStock ? 50 : 0);
+          const qtyB = rowB.original.stockQuantity ?? (rowB.original.inStock ? 50 : 0);
+          return qtyA - qtyB;
+        },
         cell: ({ row }) => {
-          const inStock = row.original.inStock;
-          return (
-            <span
-              className={`inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded ${
-                inStock
-                  ? 'text-[#2E7D32] bg-[#E8F5E9]'
-                  : 'text-[#BA1A20] bg-[#FFF2F0]'
-              }`}
-            >
-              {inStock ? (
-                <>
-                  <CheckCircle2 className="w-3 h-3" />
-                  <span>Available</span>
-                </>
-              ) : (
-                <>
-                  <XCircle className="w-3 h-3" />
-                  <span>Out of Stock</span>
-                </>
-              )}
-            </span>
-          );
+          const dish = row.original;
+          const currentQty = dish.stockQuantity ?? (dish.inStock ? 50 : 0);
+          return <InlineDishStockInput dish={dish} currentQty={currentQty} />;
         },
       },
       {

@@ -18,6 +18,7 @@ import {
   useAddons,
   useDeleteAddon,
   useToggleAddonStock,
+  useUpdateAddonStockQuantity,
 } from '@/hooks/useRestaurantData';
 import { AddonFormModal } from './AddonFormModal';
 import { SafeImage } from '@/components/common/SafeImage';
@@ -26,6 +27,7 @@ export function AddonManagementTab() {
   const { data: addons = [], isLoading } = useAddons();
   const deleteAddonMutation = useDeleteAddon();
   const toggleStockMutation = useToggleAddonStock();
+  const updateStockQtyMutation = useUpdateAddonStockQuantity();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [stockFilter, setStockFilter] = useState<'all' | 'instock' | 'outofstock'>('all');
@@ -35,7 +37,7 @@ export function AddonManagementTab() {
   // Filtered addons
   const filteredAddons = useMemo(() => {
     return addons.filter((item) => {
-      const isAvailable = item.inStock !== false;
+      const isAvailable = item.inStock !== false && (item.stockQuantity === undefined || item.stockQuantity > 0);
       if (stockFilter === 'instock' && !isAvailable) return false;
       if (stockFilter === 'outofstock' && isAvailable) return false;
 
@@ -48,7 +50,7 @@ export function AddonManagementTab() {
   }, [addons, stockFilter, searchQuery]);
 
   const totalCount = addons.length;
-  const inStockCount = addons.filter((a) => a.inStock !== false).length;
+  const inStockCount = addons.filter((a) => a.inStock !== false && (a.stockQuantity === undefined || a.stockQuantity > 0)).length;
   const outOfStockCount = totalCount - inStockCount;
 
   const handleToggleStock = async (addon: AddonOption) => {
@@ -57,6 +59,15 @@ export function AddonManagementTab() {
       await toggleStockMutation.mutateAsync({ id: addon.id, inStock: !current });
     } catch (err: any) {
       alert(err?.message || 'Failed to update stock status');
+    }
+  };
+
+  const handleUpdateStockQty = async (addon: AddonOption, quantity: number) => {
+    const safeQty = Math.max(0, quantity);
+    try {
+      await updateStockQtyMutation.mutateAsync({ id: addon.id, quantity: safeQty });
+    } catch (err: any) {
+      alert(err?.message || 'Failed to update stock quantity');
     }
   };
 
@@ -194,29 +205,52 @@ export function AddonManagementTab() {
                 </div>
 
                 <div className="pt-2.5 mt-2 border-t border-[#F5F5F5] flex items-center justify-between gap-2">
-                  {/* Stock Toggle Button */}
-                  <button
-                    type="button"
-                    onClick={() => handleToggleStock(addon)}
-                    className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold transition-all cursor-pointer select-none border ${
-                      isAvailable
-                        ? 'bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100'
-                        : 'bg-red-50 text-red-800 border-red-200 hover:bg-red-100'
-                    }`}
-                    title="Click to toggle stock availability"
-                  >
-                    {isAvailable ? (
-                      <>
-                        <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                        <span>In Stock</span>
-                      </>
-                    ) : (
-                      <>
-                        <XCircle className="w-3 h-3 text-red-600" />
-                        <span>Out of Stock</span>
-                      </>
-                    )}
-                  </button>
+                  {/* Stock Stepper & Status Badge */}
+                  <div className="flex items-center gap-1.5">
+                    <div className="flex items-center border border-[#E5E5E5] rounded-lg bg-[#FAFAFA] p-0.5 shadow-2xs hover:border-[#A3A3A3] focus-within:border-[#1F1F1F] focus-within:bg-white transition-colors">
+                      <button
+                        type="button"
+                        onClick={() => handleUpdateStockQty(addon, Math.max(0, (addon.stockQuantity ?? 50) - 1))}
+                        className="w-5 h-5 flex items-center justify-center text-[#737373] hover:text-[#1F1F1F] hover:bg-[#E5E5E5] rounded text-xs font-bold cursor-pointer"
+                        title="Decrease stock (-1)"
+                      >
+                        -
+                      </button>
+                      <input
+                        type="number"
+                        min="0"
+                        defaultValue={addon.stockQuantity ?? 50}
+                        key={`${addon.id}_${addon.stockQuantity}`}
+                        onBlur={(e) => handleUpdateStockQty(addon, parseInt(e.target.value, 10) || 0)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') e.currentTarget.blur();
+                        }}
+                        className="w-10 text-center text-xs font-bold text-[#1F1F1F] bg-transparent focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        title="Directly edit stock quantity"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleUpdateStockQty(addon, (addon.stockQuantity ?? 50) + 1)}
+                        className="w-5 h-5 flex items-center justify-center text-[#737373] hover:text-[#1F1F1F] hover:bg-[#E5E5E5] rounded text-xs font-bold cursor-pointer"
+                        title="Increase stock (+1)"
+                      >
+                        +
+                      </button>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => handleToggleStock(addon)}
+                      className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-bold transition-all cursor-pointer border ${
+                        isAvailable
+                          ? 'bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100'
+                          : 'bg-red-50 text-red-800 border-red-200 hover:bg-red-100'
+                      }`}
+                      title="Click to toggle availability"
+                    >
+                      {isAvailable ? 'In Stock' : 'Out'}
+                    </button>
+                  </div>
 
                   <div className="flex items-center gap-1">
                     <button

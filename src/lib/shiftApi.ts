@@ -20,6 +20,7 @@ export const mapShiftFromDB = (row: any): Shift => ({
   totalDiscount: Number(row.total_discount || 0),
   status: row.status as 'open' | 'closed',
   notes: row.notes || undefined,
+  initialFloatEdits: Array.isArray(row.initial_float_edits) ? row.initial_float_edits : [],
   createdAt: row.created_at,
   updatedAt: row.updated_at,
 });
@@ -218,6 +219,50 @@ export async function closeShift(params: {
 
   if (error) {
     console.error('Error closing shift:', error);
+    throw error;
+  }
+
+  return mapShiftFromDB(data);
+}
+
+/**
+ * Update the initial drawer / opening cash for a shift, with audit logging.
+ */
+export async function updateShiftOpeningCash(params: {
+  shiftId: string;
+  newOpeningCash: number;
+  changedBy: string;
+  reason?: string;
+}): Promise<Shift> {
+  const { data: existing } = await supabase
+    .from('shifts')
+    .select('opening_cash, initial_float_edits')
+    .eq('id', params.shiftId)
+    .single();
+
+  const prev = Number(existing?.opening_cash || 0);
+  const edits = Array.isArray(existing?.initial_float_edits) ? [...existing.initial_float_edits] : [];
+  edits.push({
+    previousAmount: prev,
+    newAmount: params.newOpeningCash,
+    changedBy: params.changedBy,
+    changedAt: new Date().toISOString(),
+    reason: params.reason || 'Manual drawer adjustment',
+  });
+
+  const { data, error } = await supabase
+    .from('shifts')
+    .update({
+      opening_cash: params.newOpeningCash,
+      initial_float_edits: edits,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', params.shiftId)
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error updating shift initial drawer:', error);
     throw error;
   }
 

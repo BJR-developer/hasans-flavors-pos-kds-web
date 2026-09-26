@@ -18,11 +18,14 @@ export function PosDishCard({
   onQuickAdd,
   onCustomize,
 }: PosDishCardProps) {
+  const stockQty = dish.stockQuantity !== undefined ? dish.stockQuantity : (dish.inStock ? 50 : 0);
+  const isAvailable = dish.inStock && stockQty > 0;
+
   return (
     <div
-      onClick={() => dish.inStock && onQuickAdd(dish)}
+      onClick={() => isAvailable && onQuickAdd(dish)}
       className={`group relative p-2.5 rounded-xl border bg-white cursor-pointer transition-all duration-150 flex flex-col justify-between ${
-        dish.inStock
+        isAvailable
           ? inCartQty > 0
             ? 'border-[#BA1A20] shadow-xs'
             : 'border-[#E5E5E5] hover:border-[#A3A3A3] hover:shadow-xs'
@@ -39,6 +42,19 @@ export function PosDishCard({
           sizes="(max-width: 768px) 50vw, 20vw"
         />
 
+        {/* Stock Count Badge for Cashier */}
+        {isAvailable && (
+          <div
+            className={`absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded text-[9px] font-bold backdrop-blur-xs ${
+              stockQty <= 5
+                ? 'bg-amber-500 text-white shadow-xs'
+                : 'bg-black/60 text-white'
+            }`}
+          >
+            {stockQty <= 5 ? `Low: ${stockQty}` : `${stockQty} left`}
+          </div>
+        )}
+
         {/* In-cart count badge */}
         {inCartQty > 0 && (
           <div className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-[#BA1A20] text-white flex items-center justify-center text-[10px] font-bold shadow-xs">
@@ -46,14 +62,14 @@ export function PosDishCard({
           </div>
         )}
 
-        {!dish.inStock && (
+        {!isAvailable && (
           <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-white text-[10px] font-bold tracking-wide uppercase">
             Out of Stock
           </div>
         )}
 
         {/* Small subtle customize trigger */}
-        {dish.inStock && (
+        {isAvailable && (
           <button
             type="button"
             onClick={(e) => {

@@ -32,6 +32,7 @@ import { isMobileOrder } from '@/lib/orderUtils';
 import { ShareOrderModal } from '@/components/orders/ShareOrderModal';
 import { ProfileDropdown } from './ProfileDropdown';
 import { OrderNotificationDropdown } from './OrderNotificationDropdown';
+import { NavbarDrawerWidget } from './NavbarDrawerWidget';
 import { Order } from '@/types';
 
 export function Navbar() {
@@ -196,8 +197,13 @@ export function Navbar() {
           </nav>
         )}
 
-        {/* Right Tools: Mobile Notifications Bell + Profile Dropdown */}
+        {/* Right Tools: Cash Drawer Float + Mobile Notifications Bell + Profile Dropdown */}
         <div className="flex items-center gap-2 shrink-0 relative">
+          {/* Drawer Float Widget on the left of Notification Bell */}
+          {!isSignInPage && user && isCashier && (
+            <NavbarDrawerWidget />
+          )}
+
           {/* Notifications: Mobile Orders Only (Delivery, Takeout, Mobile Dine-In) */}
           {!isSignInPage && user && isCashier && (
             <OrderNotificationDropdown orders={orders} onShareOrder={setShareOrder} />

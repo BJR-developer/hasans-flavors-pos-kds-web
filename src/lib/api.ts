@@ -36,7 +36,8 @@ export const mapDishFromDB = (row: any): Dish => {
     isHalal: row.is_halal ?? true,
     isChefSpecial: row.is_chef_special ?? false,
     isPopular: row.is_popular ?? false,
-    inStock: row.in_stock ?? true,
+    inStock: (row.in_stock ?? true) && (row.stock_quantity === undefined || row.stock_quantity === null || Number(row.stock_quantity) > 0),
+    stockQuantity: row.stock_quantity !== undefined && row.stock_quantity !== null ? Number(row.stock_quantity) : 50,
     preparationTime: row.preparation_time || '15-20 mins',
     calories: row.calories || '',
     rating: String(row.rating || '4.8'),
@@ -141,6 +142,10 @@ export const updateDishInDB = async (id: string, updates: Partial<Dish>): Promis
     }
   }
   if (updates.inStock !== undefined) dbPayload.in_stock = updates.inStock;
+  if (updates.stockQuantity !== undefined) {
+    dbPayload.stock_quantity = updates.stockQuantity;
+    dbPayload.in_stock = updates.stockQuantity > 0;
+  }
   if (updates.isChefSpecial !== undefined) dbPayload.is_chef_special = updates.isChefSpecial;
   if (updates.isPopular !== undefined) dbPayload.is_popular = updates.isPopular;
   if (updates.spiceLevel !== undefined) dbPayload.spice_level = updates.spiceLevel;
@@ -160,6 +165,7 @@ export const updateDishInDB = async (id: string, updates: Partial<Dish>): Promis
 export const createDishInDB = async (dish: Omit<Dish, 'id'>): Promise<Dish> => {
   const id = `dish_${Date.now()}`;
   const slug = dish.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+  const initialStock = dish.stockQuantity !== undefined ? Number(dish.stockQuantity) : 50;
   const dbPayload = {
     id,
     name: dish.name,
@@ -177,7 +183,8 @@ export const createDishInDB = async (dish: Omit<Dish, 'id'>): Promise<Dish> => {
     is_halal: dish.isHalal ?? true,
     is_chef_special: dish.isChefSpecial ?? false,
     is_popular: dish.isPopular ?? false,
-    in_stock: dish.inStock ?? true,
+    in_stock: initialStock > 0 ? (dish.inStock ?? true) : false,
+    stock_quantity: initialStock,
     preparation_time: dish.preparationTime || '15-20 mins',
     calories: dish.calories || '',
     rating: parseFloat(dish.rating) || 5.0,
@@ -835,7 +842,8 @@ export const mapAddonFromDB = (row: any): AddonOption => ({
   name: row.name,
   price: Number(row.price || 0),
   imageUrl: row.image_url || undefined,
-  inStock: row.in_stock ?? true,
+  inStock: (row.in_stock ?? true) && (row.stock_quantity === undefined || row.stock_quantity === null || Number(row.stock_quantity) > 0),
+  stockQuantity: row.stock_quantity !== undefined && row.stock_quantity !== null ? Number(row.stock_quantity) : 50,
   createdAt: row.created_at,
   updatedAt: row.updated_at,
 });
@@ -858,14 +866,17 @@ export const createAddonInDB = async ({
   price,
   imageUrl,
   inStock = true,
+  stockQuantity = 50,
 }: {
   name: string;
   price: number;
   imageUrl?: string;
   inStock?: boolean;
+  stockQuantity?: number;
 }): Promise<AddonOption> => {
   const id = `addon_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
   const cleanName = name.trim();
+  const initialStock = stockQuantity !== undefined ? Number(stockQuantity) : 50;
 
   const { data, error } = await supabase
     .from('addons')
@@ -874,7 +885,8 @@ export const createAddonInDB = async ({
       name: cleanName,
       price: Number(price) || 0,
       image_url: imageUrl || null,
-      in_stock: inStock,
+      in_stock: initialStock > 0 ? inStock : false,
+      stock_quantity: initialStock,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     })
@@ -890,13 +902,17 @@ export const createAddonInDB = async ({
 
 export const updateAddonInDB = async (
   id: string,
-  updates: { name?: string; price?: number; imageUrl?: string; inStock?: boolean }
+  updates: { name?: string; price?: number; imageUrl?: string; inStock?: boolean; stockQuantity?: number }
 ): Promise<AddonOption> => {
   const dbPayload: any = { updated_at: new Date().toISOString() };
   if (updates.name !== undefined) dbPayload.name = updates.name.trim();
   if (updates.price !== undefined) dbPayload.price = Number(updates.price) || 0;
   if (updates.imageUrl !== undefined) dbPayload.image_url = updates.imageUrl;
   if (updates.inStock !== undefined) dbPayload.in_stock = updates.inStock;
+  if (updates.stockQuantity !== undefined) {
+    dbPayload.stock_quantity = updates.stockQuantity;
+    dbPayload.in_stock = updates.stockQuantity > 0;
+  }
 
   const { data, error } = await supabase
     .from('addons')

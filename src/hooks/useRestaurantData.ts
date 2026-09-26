@@ -578,13 +578,15 @@ export function useCreateAddon() {
       price,
       imageUrl,
       inStock,
+      stockQuantity,
     }: {
       name: string;
       price: number;
       imageUrl?: string;
       inStock?: boolean;
+      stockQuantity?: number;
     }) => {
-      return createAddonInDB({ name, price, imageUrl, inStock });
+      return createAddonInDB({ name, price, imageUrl, inStock, stockQuantity });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.addons });
@@ -602,7 +604,7 @@ export function useUpdateAddon() {
       updates,
     }: {
       id: string;
-      updates: { name?: string; price?: number; imageUrl?: string; inStock?: boolean };
+      updates: { name?: string; price?: number; imageUrl?: string; inStock?: boolean; stockQuantity?: number };
     }) => {
       return updateAddonInDB(id, updates);
     },
@@ -633,6 +635,42 @@ export function useToggleAddonStock() {
   return useMutation({
     mutationFn: async ({ id, inStock }: { id: string; inStock: boolean }) => {
       return toggleAddonStockInDB(id, inStock);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.addons });
+    },
+  });
+}
+
+// Update Dish Stock Quantity
+export function useUpdateDishStockQuantity() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ dishId, quantity }: { dishId: string; quantity: number }) => {
+      const stockQty = Math.max(0, quantity);
+      return updateDishInDB(dishId, {
+        stockQuantity: stockQty,
+        inStock: stockQty > 0,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.dishes });
+    },
+  });
+}
+
+// Update Add-on Stock Quantity
+export function useUpdateAddonStockQuantity() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, quantity }: { id: string; quantity: number }) => {
+      const stockQty = Math.max(0, quantity);
+      return updateAddonInDB(id, {
+        stockQuantity: stockQty,
+        inStock: stockQty > 0,
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.addons });

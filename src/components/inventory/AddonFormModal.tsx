@@ -52,6 +52,9 @@ function AddonFormModalContent({
 
   const [name, setName] = useState(() => addonToEdit?.name || '');
   const [price, setPrice] = useState(() => (addonToEdit ? String(addonToEdit.price) : '40'));
+  const [stockQuantity, setStockQuantity] = useState(() =>
+    addonToEdit?.stockQuantity !== undefined ? String(addonToEdit.stockQuantity) : '50'
+  );
   const [imageUrl, setImageUrl] = useState(() => addonToEdit?.imageUrl || PRESET_ADDON_IMAGES[0].url);
   const [inStock, setInStock] = useState(() => (addonToEdit ? addonToEdit.inStock !== false : true));
   const [isUploading, setIsUploading] = useState(false);
@@ -118,6 +121,9 @@ function AddonFormModalContent({
     }
 
     const priceNum = Math.max(0, parseFloat(price) || 0);
+    const stockParsed = parseInt(stockQuantity, 10);
+    const effectiveStock = isNaN(stockParsed) ? 50 : Math.max(0, stockParsed);
+    const effectiveInStock = effectiveStock > 0 && inStock;
 
     setUploadError(null);
     try {
@@ -128,7 +134,8 @@ function AddonFormModalContent({
             name: cleanName,
             price: priceNum,
             imageUrl: imageUrl.trim() || undefined,
-            inStock,
+            stockQuantity: effectiveStock,
+            inStock: effectiveInStock,
           },
         });
       } else {
@@ -136,7 +143,8 @@ function AddonFormModalContent({
           name: cleanName,
           price: priceNum,
           imageUrl: imageUrl.trim() || undefined,
-          inStock,
+          stockQuantity: effectiveStock,
+          inStock: effectiveInStock,
         });
       }
       onClose();
@@ -193,24 +201,42 @@ function AddonFormModalContent({
             />
           </div>
 
-          {/* Price */}
-          <div>
-            <label className="block text-xs font-bold text-[#1F1F1F] mb-1">
-              Price (₱) *
-            </label>
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-[#737373]">
-                +₱
-              </span>
+          {/* Price & Stock in 2-Column Grid */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-bold text-[#1F1F1F] mb-1">
+                Price (₱) *
+              </label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-[#737373]">
+                  +₱
+                </span>
+                <input
+                  type="number"
+                  required
+                  min="0"
+                  step="1"
+                  value={price}
+                  onChange={(e) => setPrice(e.target.value)}
+                  placeholder="40"
+                  className="w-full pl-8 pr-3 py-2 text-xs font-semibold rounded-lg border border-[#E5E5E5] bg-[#FAFAFA] text-[#1F1F1F] focus:bg-white focus:outline-none focus:border-[#1F1F1F] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-[#1F1F1F] mb-1">
+                Stock (Units) *
+              </label>
               <input
                 type="number"
                 required
                 min="0"
                 step="1"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
-                placeholder="40"
-                className="w-full pl-8 pr-3 py-2 text-xs font-semibold rounded-lg border border-[#E5E5E5] bg-[#FAFAFA] text-[#1F1F1F] focus:bg-white focus:outline-none focus:border-[#1F1F1F] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                value={stockQuantity}
+                onChange={(e) => setStockQuantity(e.target.value)}
+                placeholder="50"
+                className="w-full px-3 py-2 text-xs font-semibold rounded-lg border border-[#E5E5E5] bg-[#FAFAFA] text-[#1F1F1F] focus:bg-white focus:outline-none focus:border-[#1F1F1F]"
               />
             </div>
           </div>
