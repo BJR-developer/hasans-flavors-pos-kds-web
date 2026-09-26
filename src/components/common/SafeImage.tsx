@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image, { ImageProps } from 'next/image';
 
 interface SafeImageProps extends Omit<ImageProps, 'onError'> {
@@ -18,6 +18,10 @@ export function SafeImage({
   ...rest
 }: SafeImageProps) {
   const [errorSrc, setErrorSrc] = useState<string | null>(null);
+
+  useEffect(() => {
+    setErrorSrc(null);
+  }, [src]);
 
   const displaySrc = errorSrc || src || fallbackSrc;
 

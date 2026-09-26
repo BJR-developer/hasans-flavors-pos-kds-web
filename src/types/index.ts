@@ -165,3 +165,15 @@ export interface DailyStats {
   avgPrepTimeMinutes: number;
   topSellingItems: { name: string; sold: number; revenue: number }[];
 }
+
+export type VatApplicability = 'all' | 'card_only';
+
+export interface PosSettings {
+  vatEnabled: boolean;
+  vatRate: number;
+  vatApplicability: VatApplicability;
+  paymentEnabled: boolean;
+  enabledPaymentMethods: PaymentMethod[];
+  defaultPaymentTiming: 'pay_now' | 'pay_later';
+}
+

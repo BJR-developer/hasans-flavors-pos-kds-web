@@ -30,6 +30,7 @@ import { useAuthStore } from '@/lib/auth';
 import { isMobileOrder } from '@/lib/orderUtils';
 import { useOrderNotifications } from '@/lib/orderNotifications';
 import { ShareOrderModal } from '@/components/orders/ShareOrderModal';
+import { ProfileDropdown } from './ProfileDropdown';
 import { Order } from '@/types';
 
 export function Navbar() {
@@ -41,7 +42,6 @@ export function Navbar() {
   const [showHistory, setShowHistory] = useState(false);
   const [shareOrder, setShareOrder] = useState<Order | null>(null);
   const notifRef = useRef<HTMLDivElement>(null);
-
   const { isRead, markAsRead, markAllAsRead } = useOrderNotifications();
 
   useEffect(() => {
@@ -238,7 +238,7 @@ export function Navbar() {
           </nav>
         )}
 
-        {/* Right Tools: Role Badge, Quick Role Switcher, Sign Out */}
+        {/* Right Tools: Mobile Notifications Bell + Profile Dropdown */}
         <div className="flex items-center gap-2 shrink-0 relative">
           {/* Notifications: Mobile Orders Only (Delivery, Takeout, Mobile Dine-In) */}
           {!isSignInPage && user && isCashier && (
@@ -464,33 +464,7 @@ export function Navbar() {
           )}
 
           {!isSignInPage && user ? (
-            <div className="flex items-center gap-1.5 sm:gap-2">
-              {/* Role Indicator Chip */}
-              <div className="hidden md:flex flex-col text-right leading-none">
-                <span className="text-xs font-bold text-[#1F1F1F]">{user.name}</span>
-                <span
-                  className={`text-[10px] font-extrabold mt-0.5 uppercase tracking-wider ${
-                    user.role === 'owner'
-                      ? 'text-[#B45309]'
-                      : user.role === 'cashier'
-                      ? 'text-[#BA1A20]'
-                      : 'text-[#2E7D32]'
-                  }`}
-                >
-                  {user.role}
-                </span>
-              </div>
-
-              <button
-                type="button"
-                onClick={handleSignOut}
-                title="Sign Out"
-                className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg border border-[#E5E5E5] bg-white hover:bg-[#FFF2F0] hover:border-[#FFDAD6] text-[#737373] hover:text-[#BA1A20] transition-colors text-xs font-medium flex items-center gap-1"
-              >
-                <LogOut className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline text-xs font-semibold">Sign Out</span>
-              </button>
-            </div>
+            <ProfileDropdown />
           ) : !isSignInPage ? (
             <Link
               href="/signin"

@@ -274,8 +274,8 @@ export function generateThermalReceiptHtml(order: Order): string {
       <span>₱${order.subtotal.toLocaleString()}</span>
     </div>
     <div class="total-row">
-      <span>Tax & VAT (5%):</span>
-      <span>₱${order.tax.toLocaleString()}</span>
+      <span>Value Added Tax (VAT):</span>
+      <span>${order.tax > 0 ? `₱${order.tax.toLocaleString()}` : 'Exempt (₱0)'}</span>
     </div>
     ${
       order.deliveryFee > 0

@@ -7,8 +7,23 @@ import { supabase } from '@/lib/supabase';
 import { playIncomingOrderBell } from '@/lib/audio';
 import { QUERY_KEYS } from '@/hooks/useRestaurantData';
 import { useRouter } from 'next/navigation';
-import { isMobileOrder } from '@/lib/orderUtils';
+import { isMobileOrder, isCashOrderPendingReview } from '@/lib/orderUtils';
 import { markNotificationAsRead } from '@/lib/orderNotifications';
+import { ShieldAlert, Bike, Utensils, ShoppingBag } from 'lucide-react';
+
+interface OrderPayloadRow {
+  id: string;
+  order_number?: string;
+  type?: string;
+  total?: number;
+  customer_name?: string;
+  table_number?: string;
+  notes?: string;
+  status?: string;
+  payment_method?: string;
+  payment_status?: string;
+  specialNotes?: string;
+}
 
 interface IncomingOrderToast {
   id: string;
@@ -18,6 +33,7 @@ interface IncomingOrderToast {
   customerName?: string;
   tableNumber?: string;
   notes?: string;
+  needsReview?: boolean;
 }
 
 export function OrderNotificationListener() {
@@ -33,8 +49,8 @@ export function OrderNotificationListener() {
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'orders' },
-        (payload: any) => {
-          const newRow = payload.new;
+        (payload) => {
+          const newRow = payload.new as unknown as OrderPayloadRow;
           if (!newRow) return;
 
           // Always invalidate orders cache so tables, KDS, & POS stay in background sync
@@ -59,6 +75,8 @@ export function OrderNotificationListener() {
             }
           }
 
+          const needsReview = isCashOrderPendingReview(newRow);
+
           // Show floating visual alert toast for incoming mobile order
           setActiveToast({
             id: String(newRow.id),
@@ -68,20 +86,21 @@ export function OrderNotificationListener() {
             customerName: newRow.customer_name || 'Mobile Customer',
             tableNumber: newRow.table_number || undefined,
             notes: newRow.notes || undefined,
+            needsReview,
           });
 
-          // Auto dismiss toast after 10 seconds
+          // Auto dismiss toast after 10 seconds (or 15 seconds if needs review)
           setTimeout(() => {
             setActiveToast((cur) => (cur?.id === String(newRow.id) ? null : cur));
-          }, 10000);
+          }, needsReview ? 15000 : 10000);
         }
       )
       .on(
         'postgres_changes',
         { event: 'UPDATE', schema: 'public', table: 'orders' },
-        (payload: any) => {
-          const newRow = payload.new;
-          const oldRow = payload.old;
+        (payload) => {
+          const newRow = payload.new as unknown as OrderPayloadRow;
+          const oldRow = payload.old as unknown as OrderPayloadRow;
           if (!newRow) return;
 
           // When an online checkout is paid, the webhook/verify transitions status from 'draft' to 'pending'
@@ -136,9 +155,20 @@ export function OrderNotificationListener() {
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between gap-1">
-            <span className="text-[11px] font-black uppercase tracking-wider text-amber-400 flex items-center gap-1">
-              <Smartphone className="w-3.5 h-3.5" />
-              <span>New Mobile Order!</span>
+            <span className={`text-[11px] font-black uppercase tracking-wider flex items-center gap-1 ${
+              activeToast.needsReview ? 'text-amber-400 animate-pulse' : 'text-amber-400'
+            }`}>
+              {activeToast.needsReview ? (
+                <>
+                  <ShieldAlert className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Cash Order • Review Required</span>
+                </>
+              ) : (
+                <>
+                  <Smartphone className="w-3.5 h-3.5" />
+                  <span>New Mobile Order!</span>
+                </>
+              )}
             </span>
             <button
               onClick={() => setActiveToast(null)}
@@ -153,13 +183,24 @@ export function OrderNotificationListener() {
             <h4 className="font-extrabold text-sm text-white truncate">
               {activeToast.orderNumber} • ₱{activeToast.total.toLocaleString()}
             </h4>
-            <p className="text-xs text-neutral-300 mt-0.5">
-              {activeToast.type === 'delivery'
-                ? `🛵 Delivery • ${activeToast.customerName}`
-                : activeToast.type === 'dine_in'
-                ? `🍽️ Mobile Dine-In • ${activeToast.tableNumber || 'Table'}`
-                : `🛍️ Mobile Takeout • ${activeToast.customerName}`}
-            </p>
+            <div className="flex items-center gap-1.5 text-xs text-neutral-300 mt-0.5">
+              {activeToast.type === 'delivery' ? (
+                <>
+                  <Bike className="w-3.5 h-3.5 text-red-400" />
+                  <span>Delivery • {activeToast.customerName}</span>
+                </>
+              ) : activeToast.type === 'dine_in' ? (
+                <>
+                  <Utensils className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Dine-In • {activeToast.tableNumber || 'Table'}</span>
+                </>
+              ) : (
+                <>
+                  <ShoppingBag className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>Takeout • {activeToast.customerName}</span>
+                </>
+              )}
+            </div>
             {activeToast.notes && (
               <p className="text-[11px] text-amber-300/90 italic truncate mt-0.5">
                 &ldquo;{activeToast.notes}&rdquo;
@@ -171,16 +212,22 @@ export function OrderNotificationListener() {
             <button
               onClick={() => {
                 markNotificationAsRead(activeToast.id);
-                if (activeToast.type === 'delivery') {
+                if (activeToast.needsReview) {
+                  router.push('/kds');
+                } else if (activeToast.type === 'delivery') {
                   router.push('/delivery');
                 } else {
                   router.push('/kds');
                 }
                 setActiveToast(null);
               }}
-              className="flex-1 py-1.5 px-3 bg-[#BA1A20] hover:bg-[#8B0000] text-white text-xs font-bold rounded-lg transition-colors flex items-center justify-center gap-1 shadow-sm"
+              className={`flex-1 py-1.5 px-3 text-white text-xs font-bold rounded-lg transition-colors flex items-center justify-center gap-1 shadow-sm ${
+                activeToast.needsReview
+                  ? 'bg-amber-600 hover:bg-amber-700'
+                  : 'bg-[#BA1A20] hover:bg-[#8B0000]'
+              }`}
             >
-              <span>View Order</span>
+              <span>{activeToast.needsReview ? 'Review in KDS' : 'View Order'}</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
             <button

@@ -201,8 +201,8 @@ function ThermalReceiptModalContent({
                 <span>₱{order.subtotal.toLocaleString()}</span>
               </div>
               <div className="flex justify-between text-gray-700">
-                <span>Value Added Tax (5% VAT):</span>
-                <span>₱{order.tax.toLocaleString()}</span>
+                <span>Value Added Tax (VAT):</span>
+                <span>{order.tax > 0 ? `₱${order.tax.toLocaleString()}` : 'Exempt (₱0)'}</span>
               </div>
               {order.deliveryFee > 0 && (
                 <div className="flex justify-between text-gray-700">

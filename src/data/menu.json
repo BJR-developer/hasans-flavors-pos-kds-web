@@ -7,7 +7,7 @@
     "formattedPrice": "₱30",
     "category": "Rice & Biryani",
     "description": "Steamed fragrant long-grain basmati rice.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/plain-basmati-rice-1-cup.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/plain-basmati-rice-1-cup.jpg",
     "spiceLevel": 0,
     "isHalal": true,
     "isChefSpecial": false,
@@ -18,7 +18,7 @@
     "rating": "4.8",
     "reviewCount": 24,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/plain-basmati-rice-1-cup.jpg"
+      "https://hasansflavours.vercel.app/dishes/plain-basmati-rice-1-cup.jpg"
     ]
   },
   {
@@ -29,7 +29,7 @@
     "formattedPrice": "₱50",
     "category": "Rice & Biryani",
     "description": "Full serving of steamed fragrant long-grain basmati rice.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/plain-basmati-rice-full.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/plain-basmati-rice-full.jpg",
     "spiceLevel": 0,
     "isHalal": true,
     "isChefSpecial": false,
@@ -40,7 +40,7 @@
     "rating": "4.8",
     "reviewCount": 25,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/plain-basmati-rice-full.jpg"
+      "https://hasansflavours.vercel.app/dishes/plain-basmati-rice-full.jpg"
     ]
   },
   {
@@ -51,7 +51,7 @@
     "formattedPrice": "₱50",
     "category": "Rice & Biryani",
     "description": "Basmati rice tempered with cumin seeds and whole fragrant spices.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/jeera-rice.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/jeera-rice.jpg",
     "spiceLevel": 0,
     "isHalal": true,
     "isChefSpecial": false,
@@ -62,7 +62,7 @@
     "rating": "4.8",
     "reviewCount": 26,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/jeera-rice.jpg"
+      "https://hasansflavours.vercel.app/dishes/jeera-rice.jpg"
     ]
   },
   {
@@ -73,7 +73,7 @@
     "formattedPrice": "₱50",
     "category": "Rice & Biryani",
     "description": "Wok-tossed fried rice with delicate seasoning and fresh veggies.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/chinese-fried-rice.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/chinese-fried-rice.jpg",
     "spiceLevel": 0,
     "isHalal": true,
     "isChefSpecial": false,
@@ -84,7 +84,7 @@
     "rating": "4.8",
     "reviewCount": 27,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/chinese-fried-rice.jpg"
+      "https://hasansflavours.vercel.app/dishes/chinese-fried-rice.jpg"
     ]
   },
   {
@@ -95,7 +95,7 @@
     "formattedPrice": "₱100",
     "category": "Rice & Biryani",
     "description": "Fiery wok-tossed fried rice infused with chilli oil and spices.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/chinese-spicy-fried-rice.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/chinese-spicy-fried-rice.jpg",
     "spiceLevel": 2,
     "isHalal": true,
     "isChefSpecial": false,
@@ -106,7 +106,7 @@
     "rating": "4.8",
     "reviewCount": 28,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/chinese-spicy-fried-rice.jpg"
+      "https://hasansflavours.vercel.app/dishes/chinese-spicy-fried-rice.jpg"
     ]
   },
   {
@@ -117,7 +117,7 @@
     "formattedPrice": "₱80",
     "category": "Rice & Biryani",
     "description": "Aromatic basmati rice cooked with sweet green peas and mild spices.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/peas-pulao.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/peas-pulao.jpg",
     "spiceLevel": 0,
     "isHalal": true,
     "isChefSpecial": false,
@@ -128,7 +128,7 @@
     "rating": "4.8",
     "reviewCount": 29,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/peas-pulao.jpg"
+      "https://hasansflavours.vercel.app/dishes/peas-pulao.jpg"
     ]
   },
   {
@@ -139,7 +139,7 @@
     "formattedPrice": "₱120",
     "category": "Rice & Biryani",
     "description": "Fragrant basmati rice gently simmered with garden-fresh vegetables.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/veg-pulao.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/veg-pulao.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": false,
@@ -150,7 +150,7 @@
     "rating": "4.8",
     "reviewCount": 30,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/veg-pulao.jpg"
+      "https://hasansflavours.vercel.app/dishes/veg-pulao.jpg"
     ]
   },
   {
@@ -161,7 +161,7 @@
     "formattedPrice": "₱180",
     "category": "Rice & Biryani",
     "description": "Aromatic basmati pulao enriched with fresh cottage cheese cubes.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/paneer-veg-pulao.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/paneer-veg-pulao.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": false,
@@ -172,7 +172,7 @@
     "rating": "4.8",
     "reviewCount": 31,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/paneer-veg-pulao.jpg"
+      "https://hasansflavours.vercel.app/dishes/paneer-veg-pulao.jpg"
     ]
   },
   {
@@ -183,7 +183,7 @@
     "formattedPrice": "₱120",
     "category": "Rice & Biryani",
     "description": "Scrambled egg and wok-tossed spicy basmati rice with chilli and garlic.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/egg-spicy-fried-rice.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/egg-spicy-fried-rice.jpg",
     "spiceLevel": 2,
     "isHalal": true,
     "isChefSpecial": false,
@@ -194,7 +194,7 @@
     "rating": "4.8",
     "reviewCount": 32,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/egg-spicy-fried-rice.jpg"
+      "https://hasansflavours.vercel.app/dishes/egg-spicy-fried-rice.jpg"
     ]
   },
   {
@@ -205,7 +205,7 @@
     "formattedPrice": "₱140",
     "category": "Rice & Biryani",
     "description": "Savory fried rice tossed with tender shredded chicken and spicy wok aroma.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/chicken-spicy-fried-rice.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/chicken-spicy-fried-rice.jpg",
     "spiceLevel": 2,
     "isHalal": true,
     "isChefSpecial": false,
@@ -216,7 +216,7 @@
     "rating": "4.8",
     "reviewCount": 33,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/chicken-spicy-fried-rice.jpg"
+      "https://hasansflavours.vercel.app/dishes/chicken-spicy-fried-rice.jpg"
     ]
   },
   {
@@ -227,7 +227,7 @@
     "formattedPrice": "₱160",
     "category": "Rice & Biryani",
     "description": "Ultimate combination of chicken, eggs, and fiery seasoned wok-fried rice.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/egg-chicken-spicy-fried-rice.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/egg-chicken-spicy-fried-rice.jpg",
     "spiceLevel": 2,
     "isHalal": true,
     "isChefSpecial": false,
@@ -238,7 +238,7 @@
     "rating": "4.8",
     "reviewCount": 34,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/egg-chicken-spicy-fried-rice.jpg"
+      "https://hasansflavours.vercel.app/dishes/egg-chicken-spicy-fried-rice.jpg"
     ]
   },
   {
@@ -249,7 +249,7 @@
     "formattedPrice": "₱140",
     "category": "Rice & Biryani",
     "description": "Authentic dum biryani layered with marinated chicken, saffron, and basmati rice.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/chicken-biryani.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/chicken-biryani.jpg",
     "spiceLevel": 2,
     "isHalal": true,
     "isChefSpecial": false,
@@ -260,7 +260,7 @@
     "rating": "4.8",
     "reviewCount": 35,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/chicken-biryani.jpg"
+      "https://hasansflavours.vercel.app/dishes/chicken-biryani.jpg"
     ]
   },
   {
@@ -271,7 +271,7 @@
     "formattedPrice": "₱200",
     "category": "Rice & Biryani",
     "description": "Aromatic biryani topped with crisp, deep-fried spicy South Indian chicken 65.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/chicken-65-biryani.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/chicken-65-biryani.jpg",
     "spiceLevel": 3,
     "isHalal": true,
     "isChefSpecial": false,
@@ -282,7 +282,7 @@
     "rating": "4.8",
     "reviewCount": 36,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/chicken-65-biryani.jpg"
+      "https://hasansflavours.vercel.app/dishes/chicken-65-biryani.jpg"
     ]
   },
   {
@@ -293,7 +293,7 @@
     "formattedPrice": "₱120",
     "category": "Rice & Biryani",
     "description": "Layered aromatic basmati rice cooked with spiced farm-fresh vegetables.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/veg-biryani.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/veg-biryani.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": false,
@@ -304,7 +304,7 @@
     "rating": "4.8",
     "reviewCount": 37,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/veg-biryani.jpg"
+      "https://hasansflavours.vercel.app/dishes/veg-biryani.jpg"
     ]
   },
   {
@@ -315,7 +315,7 @@
     "formattedPrice": "₱150",
     "category": "Rice & Biryani",
     "description": "Fragrant dum biryani paired with spicy, golden-fried vegetarian 65 bites.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/veg-65-biryani.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/veg-65-biryani.jpg",
     "spiceLevel": 2,
     "isHalal": true,
     "isChefSpecial": false,
@@ -326,7 +326,7 @@
     "rating": "4.8",
     "reviewCount": 38,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/veg-65-biryani.jpg"
+      "https://hasansflavours.vercel.app/dishes/veg-65-biryani.jpg"
     ]
   },
   {
@@ -337,7 +337,7 @@
     "formattedPrice": "₱300",
     "category": "Rice & Biryani",
     "description": "Rich royal biryani with tender bone-in mutton slow-cooked in dum style.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/mutton-biryani.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/mutton-biryani.jpg",
     "spiceLevel": 2,
     "isHalal": true,
     "isChefSpecial": false,
@@ -348,7 +348,7 @@
     "rating": "4.8",
     "reviewCount": 39,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/mutton-biryani.jpg"
+      "https://hasansflavours.vercel.app/dishes/mutton-biryani.jpg"
     ]
   },
   {
@@ -359,7 +359,7 @@
     "formattedPrice": "₱1,100",
     "category": "Rice & Biryani",
     "description": "Grand family feast bilao tray loaded with authentic chicken dum biryani.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/chicken-biryani-bilao-good-for-8-people.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/chicken-biryani-bilao-good-for-8-people.jpg",
     "spiceLevel": 2,
     "isHalal": true,
     "isChefSpecial": false,
@@ -370,7 +370,7 @@
     "rating": "4.8",
     "reviewCount": 40,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/chicken-biryani-bilao-good-for-8-people.jpg"
+      "https://hasansflavours.vercel.app/dishes/chicken-biryani-bilao-good-for-8-people.jpg"
     ]
   },
   {
@@ -381,7 +381,7 @@
     "formattedPrice": "₱200",
     "category": "Rice & Biryani",
     "description": "Flavorful aromatic yellow basmati rice with tender chicken, special creamy mayonnaise sauce and chili sauce.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/chicken-fiesta-rice.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/chicken-fiesta-rice.jpg",
     "spiceLevel": 2,
     "isHalal": true,
     "isChefSpecial": false,
@@ -392,7 +392,7 @@
     "rating": "4.8",
     "reviewCount": 41,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/chicken-fiesta-rice.jpg"
+      "https://hasansflavours.vercel.app/dishes/chicken-fiesta-rice.jpg"
     ]
   },
   {
@@ -403,7 +403,7 @@
     "formattedPrice": "₱180",
     "category": "Chicken & Non-Veg Specials",
     "description": "Slow-simmered rich stew infused with cracked wheat, lentils, and tender chicken.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/chicken-haleem.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/chicken-haleem.jpg",
     "spiceLevel": 2,
     "isHalal": true,
     "isChefSpecial": true,
@@ -414,7 +414,7 @@
     "rating": "4.8",
     "reviewCount": 42,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/chicken-haleem.jpg"
+      "https://hasansflavours.vercel.app/dishes/chicken-haleem.jpg"
     ]
   },
   {
@@ -425,7 +425,7 @@
     "formattedPrice": "₱150",
     "category": "Chicken & Non-Veg Specials",
     "description": "Traditional slow-cooked Mughlai chicken stew with a rich aromatic gravy.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/chicken-nihari.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/chicken-nihari.jpg",
     "spiceLevel": 2,
     "isHalal": true,
     "isChefSpecial": true,
@@ -436,7 +436,7 @@
     "rating": "4.8",
     "reviewCount": 43,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/chicken-nihari.jpg"
+      "https://hasansflavours.vercel.app/dishes/chicken-nihari.jpg"
     ]
   },
   {
@@ -447,7 +447,7 @@
     "formattedPrice": "₱100",
     "category": "Chicken & Non-Veg Specials",
     "description": "Tender chicken morsels in a velvety tomato, cream, and rich butter sauce.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/butter-chicken-malai-curry.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/butter-chicken-malai-curry.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": true,
@@ -458,7 +458,7 @@
     "rating": "4.8",
     "reviewCount": 44,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/butter-chicken-malai-curry.jpg"
+      "https://hasansflavours.vercel.app/dishes/butter-chicken-malai-curry.jpg"
     ]
   },
   {
@@ -469,7 +469,7 @@
     "formattedPrice": "₱180",
     "category": "Chicken & Non-Veg Specials",
     "description": "Classic Desi-style homestyle chicken curry simmered in robust spices.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/chicken-spicy-curry.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/chicken-spicy-curry.jpg",
     "spiceLevel": 3,
     "isHalal": true,
     "isChefSpecial": true,
@@ -480,7 +480,7 @@
     "rating": "4.8",
     "reviewCount": 45,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/chicken-spicy-curry.jpg"
+      "https://hasansflavours.vercel.app/dishes/chicken-spicy-curry.jpg"
     ]
   },
   {
@@ -491,7 +491,7 @@
     "formattedPrice": "₱250",
     "category": "Chicken & Non-Veg Specials",
     "description": "Royal Mughlai chicken curry prepared with yogurt, fried onions, and nuts.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/chicken-korma.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/chicken-korma.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": true,
@@ -502,7 +502,7 @@
     "rating": "4.8",
     "reviewCount": 46,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/chicken-korma.jpg"
+      "https://hasansflavours.vercel.app/dishes/chicken-korma.jpg"
     ]
   },
   {
@@ -513,7 +513,7 @@
     "formattedPrice": "₱300",
     "category": "Chicken & Non-Veg Specials",
     "description": "Mild, creamy chicken stew simmered with fresh cream and cardamom.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/chicken-malai-curry.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/chicken-malai-curry.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": true,
@@ -524,7 +524,7 @@
     "rating": "4.8",
     "reviewCount": 47,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/chicken-malai-curry.jpg"
+      "https://hasansflavours.vercel.app/dishes/chicken-malai-curry.jpg"
     ]
   },
   {
@@ -535,7 +535,7 @@
     "formattedPrice": "₱250",
     "category": "Chicken & Non-Veg Specials",
     "description": "Boneless chicken simmered in a luscious roasted garlic and white cream gravy.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/creamy-garlic-chicken.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/creamy-garlic-chicken.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": true,
@@ -546,7 +546,7 @@
     "rating": "4.8",
     "reviewCount": 48,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/creamy-garlic-chicken.jpg"
+      "https://hasansflavours.vercel.app/dishes/creamy-garlic-chicken.jpg"
     ]
   },
   {
@@ -557,7 +557,7 @@
     "formattedPrice": "₱150",
     "category": "Chicken & Non-Veg Specials",
     "description": "Mughlai roasted chicken in a tangy tomato, milk, and spicy curd gravy.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/chicken-changizi.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/chicken-changizi.jpg",
     "spiceLevel": 2,
     "isHalal": true,
     "isChefSpecial": true,
@@ -568,7 +568,7 @@
     "rating": "4.8",
     "reviewCount": 49,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/chicken-changizi.jpg"
+      "https://hasansflavours.vercel.app/dishes/chicken-changizi.jpg"
     ]
   },
   {
@@ -579,7 +579,7 @@
     "formattedPrice": "₱120",
     "category": "Chicken & Non-Veg Specials",
     "description": "Crisp, fiery spiced deep-fried chicken cubes tossed with curry leaves.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/chicken-65.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/chicken-65.jpg",
     "spiceLevel": 3,
     "isHalal": true,
     "isChefSpecial": true,
@@ -590,7 +590,7 @@
     "rating": "4.8",
     "reviewCount": 50,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/chicken-65.jpg"
+      "https://hasansflavours.vercel.app/dishes/chicken-65.jpg"
     ]
   },
   {
@@ -601,7 +601,7 @@
     "formattedPrice": "₱100",
     "category": "Chicken & Non-Veg Specials",
     "description": "Marinated chicken fritters dipped in seasoned gram flour and deep-fried.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/chicken-pakora.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/chicken-pakora.jpg",
     "spiceLevel": 2,
     "isHalal": true,
     "isChefSpecial": true,
@@ -612,7 +612,7 @@
     "rating": "4.8",
     "reviewCount": 51,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/chicken-pakora.jpg"
+      "https://hasansflavours.vercel.app/dishes/chicken-pakora.jpg"
     ]
   },
   {
@@ -623,7 +623,7 @@
     "formattedPrice": "₱120",
     "category": "Chicken & Non-Veg Specials",
     "description": "Charcoal flame-grilled chicken marinated in aromatic mint and coriander spices.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/bbq-chicken-solo-green-masala.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/bbq-chicken-solo-green-masala.jpg",
     "spiceLevel": 2,
     "isHalal": true,
     "isChefSpecial": true,
@@ -634,7 +634,7 @@
     "rating": "4.8",
     "reviewCount": 52,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/bbq-chicken-solo-green-masala.jpg"
+      "https://hasansflavours.vercel.app/dishes/bbq-chicken-solo-green-masala.jpg"
     ]
   },
   {
@@ -645,7 +645,7 @@
     "formattedPrice": "₱130",
     "category": "Chicken & Non-Veg Specials",
     "description": "A full spicy meal – one of Hasan's special favorites, crispy and seasoned.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/crunchy-bite.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/crunchy-bite.jpg",
     "spiceLevel": 3,
     "isHalal": true,
     "isChefSpecial": true,
@@ -656,7 +656,7 @@
     "rating": "4.8",
     "reviewCount": 53,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/crunchy-bite.jpg"
+      "https://hasansflavours.vercel.app/dishes/crunchy-bite.jpg"
     ]
   },
   {
@@ -667,7 +667,7 @@
     "formattedPrice": "₱150",
     "category": "Vegetarian Specials",
     "description": "Tender mushrooms sauteed in spicy crushed garlic and red chilli sauce.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/chilli-garlic-mushroom.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/chilli-garlic-mushroom.jpg",
     "spiceLevel": 2,
     "isHalal": true,
     "isChefSpecial": false,
@@ -678,7 +678,7 @@
     "rating": "4.8",
     "reviewCount": 24,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/chilli-garlic-mushroom.jpg"
+      "https://hasansflavours.vercel.app/dishes/chilli-garlic-mushroom.jpg"
     ]
   },
   {
@@ -689,7 +689,7 @@
     "formattedPrice": "₱200",
     "category": "Vegetarian Specials",
     "description": "Plump button mushrooms smothered in rich garlic white cream gravy.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/creamy-garlic-mushroom.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/creamy-garlic-mushroom.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": false,
@@ -700,7 +700,7 @@
     "rating": "4.8",
     "reviewCount": 25,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/creamy-garlic-mushroom.jpg"
+      "https://hasansflavours.vercel.app/dishes/creamy-garlic-mushroom.jpg"
     ]
   },
   {
@@ -711,7 +711,7 @@
     "formattedPrice": "₱250",
     "category": "Vegetarian Specials",
     "description": "Fresh cottage cheese in a silky, rich spiced tomato and butter gravy.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/paneer-butter-masala.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/paneer-butter-masala.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": false,
@@ -722,7 +722,7 @@
     "rating": "4.8",
     "reviewCount": 26,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/paneer-butter-masala.jpg"
+      "https://hasansflavours.vercel.app/dishes/paneer-butter-masala.jpg"
     ]
   },
   {
@@ -733,7 +733,7 @@
     "formattedPrice": "₱320",
     "category": "Vegetarian Specials",
     "description": "Cottage cheese cubes gently cooked in a rich, nut and yogurt-based korma sauce.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/paneer-korma.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/paneer-korma.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": false,
@@ -744,7 +744,7 @@
     "rating": "4.8",
     "reviewCount": 27,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/paneer-korma.jpg"
+      "https://hasansflavours.vercel.app/dishes/paneer-korma.jpg"
     ]
   },
   {
@@ -755,7 +755,7 @@
     "formattedPrice": "₱350",
     "category": "Vegetarian Specials",
     "description": "Delicate paneer stewed in an ultra-creamy, velvety white sauce.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/paneer-malai-curry.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/paneer-malai-curry.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": false,
@@ -766,7 +766,7 @@
     "rating": "4.8",
     "reviewCount": 28,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/paneer-malai-curry.jpg"
+      "https://hasansflavours.vercel.app/dishes/paneer-malai-curry.jpg"
     ]
   },
   {
@@ -777,7 +777,7 @@
     "formattedPrice": "₱130",
     "category": "Vegetarian Specials",
     "description": "Protein-rich soya chunks tossed with fiery chilli and roasted garlic.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/chilli-garlic-soya-chunk.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/chilli-garlic-soya-chunk.jpg",
     "spiceLevel": 2,
     "isHalal": true,
     "isChefSpecial": false,
@@ -788,7 +788,7 @@
     "rating": "4.8",
     "reviewCount": 29,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/chilli-garlic-soya-chunk.jpg"
+      "https://hasansflavours.vercel.app/dishes/chilli-garlic-soya-chunk.jpg"
     ]
   },
   {
@@ -799,7 +799,7 @@
     "formattedPrice": "₱150",
     "category": "Vegetarian Specials",
     "description": "Juicy soya chunks cooked in hearty onion-tomato masala gravy.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/spicy-soya-chunk-curry.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/spicy-soya-chunk-curry.jpg",
     "spiceLevel": 2,
     "isHalal": true,
     "isChefSpecial": false,
@@ -810,7 +810,7 @@
     "rating": "4.8",
     "reviewCount": 30,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/spicy-soya-chunk-curry.jpg"
+      "https://hasansflavours.vercel.app/dishes/spicy-soya-chunk-curry.jpg"
     ]
   },
   {
@@ -821,7 +821,7 @@
     "formattedPrice": "₱100",
     "category": "Vegetarian Specials",
     "description": "Fresh spinach puree blended with cream and tender paneer cubes.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/malai-paneer-palak.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/malai-paneer-palak.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": false,
@@ -832,7 +832,7 @@
     "rating": "4.8",
     "reviewCount": 31,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/malai-paneer-palak.jpg"
+      "https://hasansflavours.vercel.app/dishes/malai-paneer-palak.jpg"
     ]
   },
   {
@@ -843,7 +843,7 @@
     "formattedPrice": "₱70",
     "category": "Vegetarian Specials",
     "description": "Minced spiced vegetarian delicacy simmered with fresh herbs and tomatoes.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/veg-qeema.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/veg-qeema.jpg",
     "spiceLevel": 2,
     "isHalal": true,
     "isChefSpecial": false,
@@ -854,7 +854,7 @@
     "rating": "4.8",
     "reviewCount": 32,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/veg-qeema.jpg"
+      "https://hasansflavours.vercel.app/dishes/veg-qeema.jpg"
     ]
   },
   {
@@ -865,7 +865,7 @@
     "formattedPrice": "₱70",
     "category": "Vegetarian Specials",
     "description": "Homestyle black lentils slow-cooked with ginger, garlic, and butter.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/maa-dal.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/maa-dal.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": false,
@@ -876,7 +876,7 @@
     "rating": "4.8",
     "reviewCount": 33,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/maa-dal.jpg"
+      "https://hasansflavours.vercel.app/dishes/maa-dal.jpg"
     ]
   },
   {
@@ -887,7 +887,7 @@
     "formattedPrice": "₱60",
     "category": "Vegetarian Specials",
     "description": "Kidney beans cooked until tender in thick spiced onion-tomato gravy.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/rajma-veg.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/rajma-veg.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": false,
@@ -898,7 +898,7 @@
     "rating": "4.8",
     "reviewCount": 34,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/rajma-veg.jpg"
+      "https://hasansflavours.vercel.app/dishes/rajma-veg.jpg"
     ]
   },
   {
@@ -909,7 +909,7 @@
     "formattedPrice": "₱20",
     "category": "Vegetarian Specials",
     "description": "Flavorful side gravy made with aromatic herbs and spices.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/veg-gravy.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/veg-gravy.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": false,
@@ -920,7 +920,7 @@
     "rating": "4.8",
     "reviewCount": 35,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/veg-gravy.jpg"
+      "https://hasansflavours.vercel.app/dishes/veg-gravy.jpg"
     ]
   },
   {
@@ -931,7 +931,7 @@
     "formattedPrice": "₱100",
     "category": "Vegetarian Specials",
     "description": "Seasonal garden vegetables tossed with cumin and traditional masala.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/mix-vegetables.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/mix-vegetables.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": false,
@@ -942,7 +942,7 @@
     "rating": "4.8",
     "reviewCount": 36,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/mix-vegetables.jpg"
+      "https://hasansflavours.vercel.app/dishes/mix-vegetables.jpg"
     ]
   },
   {
@@ -953,7 +953,7 @@
     "formattedPrice": "₱100",
     "category": "Kothu · Paratha & Breads",
     "description": "Shredded flaky paratha stir-fried with chicken, egg, and spicy gravy.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/chicken-kothu-paratha.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/chicken-kothu-paratha.jpg",
     "spiceLevel": 2,
     "isHalal": true,
     "isChefSpecial": false,
@@ -964,7 +964,7 @@
     "rating": "4.8",
     "reviewCount": 37,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/chicken-kothu-paratha.jpg"
+      "https://hasansflavours.vercel.app/dishes/chicken-kothu-paratha.jpg"
     ]
   },
   {
@@ -975,7 +975,7 @@
     "formattedPrice": "₱90",
     "category": "Kothu · Paratha & Breads",
     "description": "Chopped flaky paratha tossed with crisp vegetables and rich spices.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/veg-kothu-paratha.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/veg-kothu-paratha.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": false,
@@ -986,7 +986,7 @@
     "rating": "4.8",
     "reviewCount": 38,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/veg-kothu-paratha.jpg"
+      "https://hasansflavours.vercel.app/dishes/veg-kothu-paratha.jpg"
     ]
   },
   {
@@ -997,7 +997,7 @@
     "formattedPrice": "₱120",
     "category": "Kothu · Paratha & Breads",
     "description": "Street-style kothu paratha tossed with cottage cheese and herbs.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/paneer-kothu-paratha.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/paneer-kothu-paratha.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1008,7 +1008,7 @@
     "rating": "4.8",
     "reviewCount": 39,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/paneer-kothu-paratha.jpg"
+      "https://hasansflavours.vercel.app/dishes/paneer-kothu-paratha.jpg"
     ]
   },
   {
@@ -1019,7 +1019,7 @@
     "formattedPrice": "₱120",
     "category": "Kothu · Paratha & Breads",
     "description": "Whole wheat flatbread stuffed with spiced minced chicken.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/chicken-paratha.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/chicken-paratha.jpg",
     "spiceLevel": 2,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1030,7 +1030,7 @@
     "rating": "4.8",
     "reviewCount": 40,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/chicken-paratha.jpg"
+      "https://hasansflavours.vercel.app/dishes/chicken-paratha.jpg"
     ]
   },
   {
@@ -1041,7 +1041,7 @@
     "formattedPrice": "₱70",
     "category": "Kothu · Paratha & Breads",
     "description": "Signature golden crispy layered paratha made with authentic recipe.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/hasan-special-paratha.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/hasan-special-paratha.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1052,7 +1052,7 @@
     "rating": "4.8",
     "reviewCount": 41,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/hasan-special-paratha.jpg"
+      "https://hasansflavours.vercel.app/dishes/hasan-special-paratha.jpg"
     ]
   },
   {
@@ -1063,7 +1063,7 @@
     "formattedPrice": "₱70",
     "category": "Kothu · Paratha & Breads",
     "description": "Tandoori flatbread stuffed with spiced mashed potatoes and green herbs.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/aloo-paratha.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/aloo-paratha.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1074,7 +1074,7 @@
     "rating": "4.8",
     "reviewCount": 42,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/aloo-paratha.jpg"
+      "https://hasansflavours.vercel.app/dishes/aloo-paratha.jpg"
     ]
   },
   {
@@ -1085,7 +1085,7 @@
     "formattedPrice": "₱50",
     "category": "Kothu · Paratha & Breads",
     "description": "Flaky, multi-layered golden paratha made with wheat dough.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/lacha-kerala-paratha.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/lacha-kerala-paratha.jpg",
     "spiceLevel": 0,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1096,7 +1096,7 @@
     "rating": "4.8",
     "reviewCount": 43,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/lacha-kerala-paratha.jpg"
+      "https://hasansflavours.vercel.app/dishes/lacha-kerala-paratha.jpg"
     ]
   },
   {
@@ -1107,7 +1107,7 @@
     "formattedPrice": "₱60",
     "category": "Kothu · Paratha & Breads",
     "description": "Pan-fried layered flatbread stuffed with finely chopped spiced onions.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/onion-paratha.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/onion-paratha.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1118,7 +1118,7 @@
     "rating": "4.8",
     "reviewCount": 44,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/onion-paratha.jpg"
+      "https://hasansflavours.vercel.app/dishes/onion-paratha.jpg"
     ]
   },
   {
@@ -1129,7 +1129,7 @@
     "formattedPrice": "₱70",
     "category": "Kothu · Paratha & Breads",
     "description": "Crispy flatbread stuffed with grated white radish, carom seeds, and herbs.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/moli-paratha.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/moli-paratha.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1140,7 +1140,7 @@
     "rating": "4.8",
     "reviewCount": 45,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/moli-paratha.jpg"
+      "https://hasansflavours.vercel.app/dishes/moli-paratha.jpg"
     ]
   },
   {
@@ -1151,7 +1151,7 @@
     "formattedPrice": "₱80",
     "category": "Kothu · Paratha & Breads",
     "description": "Sweet, leavened Persian-Mughlai bread baked with saffron and milk.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/taftan.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/taftan.jpg",
     "spiceLevel": 0,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1162,7 +1162,7 @@
     "rating": "4.8",
     "reviewCount": 46,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/taftan.jpg"
+      "https://hasansflavours.vercel.app/dishes/taftan.jpg"
     ]
   },
   {
@@ -1173,7 +1173,7 @@
     "formattedPrice": "₱60",
     "category": "Kothu · Paratha & Breads",
     "description": "Classic soft, pillowy leavened flatbread freshly baked in tandoor.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/naan.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/naan.jpg",
     "spiceLevel": 0,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1184,7 +1184,7 @@
     "rating": "4.8",
     "reviewCount": 47,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/naan.jpg"
+      "https://hasansflavours.vercel.app/dishes/naan.jpg"
     ]
   },
   {
@@ -1195,7 +1195,7 @@
     "formattedPrice": "₱70",
     "category": "Kothu · Paratha & Breads",
     "description": "Traditional royal naan topped with sesame seeds and brushed with butter.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/roghni-naan.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/roghni-naan.jpg",
     "spiceLevel": 0,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1206,7 +1206,7 @@
     "rating": "4.8",
     "reviewCount": 48,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/roghni-naan.jpg"
+      "https://hasansflavours.vercel.app/dishes/roghni-naan.jpg"
     ]
   },
   {
@@ -1217,7 +1217,7 @@
     "formattedPrice": "₱15",
     "category": "Kothu · Paratha & Breads",
     "description": "Warm, unleavened whole wheat flatbread prepared fresh on the tawa.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/chapati.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/chapati.jpg",
     "spiceLevel": 0,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1228,7 +1228,7 @@
     "rating": "4.8",
     "reviewCount": 49,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/chapati.jpg"
+      "https://hasansflavours.vercel.app/dishes/chapati.jpg"
     ]
   },
   {
@@ -1239,7 +1239,7 @@
     "formattedPrice": "₱100",
     "category": "Snacks & Street Bites",
     "description": "Crispy assorted vegetable and onion fritters spiced with signature seasonings.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/hasan-special-pakora.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/hasan-special-pakora.jpg",
     "spiceLevel": 2,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1250,7 +1250,7 @@
     "rating": "4.8",
     "reviewCount": 50,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/hasan-special-pakora.jpg"
+      "https://hasansflavours.vercel.app/dishes/hasan-special-pakora.jpg"
     ]
   },
   {
@@ -1261,7 +1261,7 @@
     "formattedPrice": "₱50",
     "category": "Snacks & Street Bites",
     "description": "Spiced potato stuffed bread slices coated in chickpea batter and golden fried.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/bread-pakora.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/bread-pakora.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1272,7 +1272,7 @@
     "rating": "4.8",
     "reviewCount": 51,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/bread-pakora.jpg"
+      "https://hasansflavours.vercel.app/dishes/bread-pakora.jpg"
     ]
   },
   {
@@ -1283,7 +1283,7 @@
     "formattedPrice": "₱60",
     "category": "Snacks & Street Bites",
     "description": "Classic street-style double egg omelette wrapped around toasted bread.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/bread-omelette.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/bread-omelette.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1294,7 +1294,7 @@
     "rating": "4.8",
     "reviewCount": 52,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/bread-omelette.jpg"
+      "https://hasansflavours.vercel.app/dishes/bread-omelette.jpg"
     ]
   },
   {
@@ -1305,7 +1305,7 @@
     "formattedPrice": "₱60",
     "category": "Snacks & Street Bites",
     "description": "Fluffy two-egg omelette beaten with onions, tomatoes, and green chillies.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/egg-omelette.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/egg-omelette.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1316,7 +1316,7 @@
     "rating": "4.8",
     "reviewCount": 53,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/egg-omelette.jpg"
+      "https://hasansflavours.vercel.app/dishes/egg-omelette.jpg"
     ]
   },
   {
@@ -1327,7 +1327,7 @@
     "formattedPrice": "₱100",
     "category": "Snacks & Street Bites",
     "description": "Hearty omelette loaded with savory spiced potato hash.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/aloo-omelette.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/aloo-omelette.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1338,7 +1338,7 @@
     "rating": "4.8",
     "reviewCount": 24,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/aloo-omelette.jpg"
+      "https://hasansflavours.vercel.app/dishes/aloo-omelette.jpg"
     ]
   },
   {
@@ -1349,7 +1349,7 @@
     "formattedPrice": "₱100",
     "category": "Snacks & Street Bites",
     "description": "Crispy vegetable patty in a toasted bun with house sauces and fresh veggies.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/veg-burger.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/veg-burger.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1360,7 +1360,7 @@
     "rating": "4.8",
     "reviewCount": 25,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/veg-burger.jpg"
+      "https://hasansflavours.vercel.app/dishes/veg-burger.jpg"
     ]
   },
   {
@@ -1371,7 +1371,7 @@
     "formattedPrice": "₱100",
     "category": "Snacks & Street Bites",
     "description": "Crisp hollow puris served with spiced potato filling and tangy mint water.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/pani-puri.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/pani-puri.jpg",
     "spiceLevel": 2,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1382,7 +1382,7 @@
     "rating": "4.8",
     "reviewCount": 26,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/pani-puri.jpg"
+      "https://hasansflavours.vercel.app/dishes/pani-puri.jpg"
     ]
   },
   {
@@ -1393,7 +1393,7 @@
     "formattedPrice": "₱150",
     "category": "Snacks & Street Bites",
     "description": "Smoky grilled chicken pieces wrapped inside a warm, flaky paratha with chutney.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/bbq-paratha-roll.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/bbq-paratha-roll.jpg",
     "spiceLevel": 2,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1404,7 +1404,7 @@
     "rating": "4.8",
     "reviewCount": 27,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/bbq-paratha-roll.jpg"
+      "https://hasansflavours.vercel.app/dishes/bbq-paratha-roll.jpg"
     ]
   },
   {
@@ -1415,7 +1415,7 @@
     "formattedPrice": "₱120",
     "category": "Snacks & Street Bites",
     "description": "Thinly sliced spiced roasted chicken wrapped in flatbread with garlic sauce.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/chicken-shawarma.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/chicken-shawarma.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1426,7 +1426,7 @@
     "rating": "4.8",
     "reviewCount": 28,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/chicken-shawarma.jpg"
+      "https://hasansflavours.vercel.app/dishes/chicken-shawarma.jpg"
     ]
   },
   {
@@ -1437,7 +1437,7 @@
     "formattedPrice": "₱100",
     "category": "Snacks & Street Bites",
     "description": "Spiced grilled veggies and pickles wrapped in soft flatbread.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/veg-shawarma.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/veg-shawarma.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1448,7 +1448,7 @@
     "rating": "4.8",
     "reviewCount": 29,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/veg-shawarma.jpg"
+      "https://hasansflavours.vercel.app/dishes/veg-shawarma.jpg"
     ]
   },
   {
@@ -1459,7 +1459,7 @@
     "formattedPrice": "₱30",
     "category": "Snacks & Street Bites",
     "description": "Crisp golden pastry triangle filled with spiced potatoes and peas.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/aloo-samosa.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/aloo-samosa.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1470,7 +1470,7 @@
     "rating": "4.8",
     "reviewCount": 30,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/aloo-samosa.jpg"
+      "https://hasansflavours.vercel.app/dishes/aloo-samosa.jpg"
     ]
   },
   {
@@ -1481,7 +1481,7 @@
     "formattedPrice": "₱30",
     "category": "Snacks & Street Bites",
     "description": "Shallow-fried patties made with seasoned shredded chicken and potatoes.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/chicken-cutlets.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/chicken-cutlets.jpg",
     "spiceLevel": 2,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1492,7 +1492,7 @@
     "rating": "4.8",
     "reviewCount": 31,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/chicken-cutlets.jpg"
+      "https://hasansflavours.vercel.app/dishes/chicken-cutlets.jpg"
     ]
   },
   {
@@ -1503,7 +1503,7 @@
     "formattedPrice": "₱120",
     "category": "Snacks & Street Bites",
     "description": "Crushed samosas topped with spicy chana masala, sweet chutney, yogurt and sev.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/samosa-chaat.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/samosa-chaat.jpg",
     "spiceLevel": 2,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1514,7 +1514,7 @@
     "rating": "4.8",
     "reviewCount": 32,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/samosa-chaat.jpg"
+      "https://hasansflavours.vercel.app/dishes/samosa-chaat.jpg"
     ]
   },
   {
@@ -1525,7 +1525,7 @@
     "formattedPrice": "₱90",
     "category": "Student Meals",
     "description": "Budget-friendly student plate with chicken curry and fragrant basmati rice.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/chicken-meal.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/chicken-meal.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1536,7 +1536,7 @@
     "rating": "4.8",
     "reviewCount": 33,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/chicken-meal.jpg"
+      "https://hasansflavours.vercel.app/dishes/chicken-meal.jpg"
     ]
   },
   {
@@ -1547,7 +1547,7 @@
     "formattedPrice": "₱90",
     "category": "Student Meals",
     "description": "Homestyle chicken curry served with steamed basmati rice.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/chicken-curry-meal.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/chicken-curry-meal.jpg",
     "spiceLevel": 2,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1558,7 +1558,7 @@
     "rating": "4.8",
     "reviewCount": 34,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/chicken-curry-meal.jpg"
+      "https://hasansflavours.vercel.app/dishes/chicken-curry-meal.jpg"
     ]
   },
   {
@@ -1569,7 +1569,7 @@
     "formattedPrice": "₱90",
     "category": "Student Meals",
     "description": "Spicy chicken 65 bites paired with a generous portion of basmati rice.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/chicken-65-meal.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/chicken-65-meal.jpg",
     "spiceLevel": 2,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1580,7 +1580,7 @@
     "rating": "4.8",
     "reviewCount": 35,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/chicken-65-meal.jpg"
+      "https://hasansflavours.vercel.app/dishes/chicken-65-meal.jpg"
     ]
   },
   {
@@ -1591,7 +1591,7 @@
     "formattedPrice": "₱90",
     "category": "Student Meals",
     "description": "Healthy vegetable curry served hot with fluffy basmati rice.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/vegetable-meal.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/vegetable-meal.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1602,7 +1602,7 @@
     "rating": "4.8",
     "reviewCount": 36,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/vegetable-meal.jpg"
+      "https://hasansflavours.vercel.app/dishes/vegetable-meal.jpg"
     ]
   },
   {
@@ -1613,7 +1613,7 @@
     "formattedPrice": "₱90",
     "category": "Student Meals",
     "description": "Complete comfort student meal with seasoned dal, 2 chapatis, and basmati rice.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/dal-2-chapati-basmati-rice.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/dal-2-chapati-basmati-rice.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1624,7 +1624,7 @@
     "rating": "4.8",
     "reviewCount": 37,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/dal-2-chapati-basmati-rice.jpg"
+      "https://hasansflavours.vercel.app/dishes/dal-2-chapati-basmati-rice.jpg"
     ]
   },
   {
@@ -1635,7 +1635,7 @@
     "formattedPrice": "₱90",
     "category": "Student Meals",
     "description": "Hearty North-Indian rajma kidney beans with 2 soft chapatis and basmati rice.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/rajma-2-chapati-basmati-rice.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/rajma-2-chapati-basmati-rice.jpg",
     "spiceLevel": 1,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1646,7 +1646,7 @@
     "rating": "4.8",
     "reviewCount": 38,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/rajma-2-chapati-basmati-rice.jpg"
+      "https://hasansflavours.vercel.app/dishes/rajma-2-chapati-basmati-rice.jpg"
     ]
   },
   {
@@ -1657,7 +1657,7 @@
     "formattedPrice": "₱90",
     "category": "Student Meals",
     "description": "Flavorful slow-cooked chicken nihari with fresh basmati rice.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/chicken-nihari-meal.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/chicken-nihari-meal.jpg",
     "spiceLevel": 2,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1668,7 +1668,7 @@
     "rating": "4.8",
     "reviewCount": 39,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/chicken-nihari-meal.jpg"
+      "https://hasansflavours.vercel.app/dishes/chicken-nihari-meal.jpg"
     ]
   },
   {
@@ -1679,7 +1679,7 @@
     "formattedPrice": "₱1,100",
     "category": "Family / Sharing Meals",
     "description": "Good for 8 people – Grand feast bilao of layered aromatic dum biryani.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/chicken-biryani-bilao-good-for-8-people.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/chicken-biryani-bilao-good-for-8-people.jpg",
     "spiceLevel": 2,
     "isHalal": true,
     "isChefSpecial": true,
@@ -1690,7 +1690,7 @@
     "rating": "4.8",
     "reviewCount": 40,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/chicken-biryani-bilao-good-for-8-people.jpg"
+      "https://hasansflavours.vercel.app/dishes/chicken-biryani-bilao-good-for-8-people.jpg"
     ]
   },
   {
@@ -1701,7 +1701,7 @@
     "formattedPrice": "₱600",
     "category": "Family / Sharing Meals",
     "description": "Good for 4-5 people – Yellow basmati rice loaded with chicken and signature sauces.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/chicken-fiesta-rice-family-size.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/chicken-fiesta-rice-family-size.jpg",
     "spiceLevel": 2,
     "isHalal": true,
     "isChefSpecial": true,
@@ -1712,7 +1712,7 @@
     "rating": "4.8",
     "reviewCount": 41,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/chicken-fiesta-rice-family-size.jpg"
+      "https://hasansflavours.vercel.app/dishes/chicken-fiesta-rice-family-size.jpg"
     ]
   },
   {
@@ -1723,7 +1723,7 @@
     "formattedPrice": "₱110",
     "category": "BBQ Combos",
     "description": "Flame-grilled spiced BBQ chicken quarter served with wok veg fried rice.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/1-pc-bbq-chicken-1-cup-veg-fried-rice.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/1-pc-bbq-chicken-1-cup-veg-fried-rice.jpg",
     "spiceLevel": 2,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1734,7 +1734,7 @@
     "rating": "4.8",
     "reviewCount": 42,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/1-pc-bbq-chicken-1-cup-veg-fried-rice.jpg"
+      "https://hasansflavours.vercel.app/dishes/1-pc-bbq-chicken-1-cup-veg-fried-rice.jpg"
     ]
   },
   {
@@ -1745,7 +1745,7 @@
     "formattedPrice": "₱200",
     "category": "BBQ Combos",
     "description": "Two pieces of smoky BBQ chicken served with two servings of veg fried rice.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/2-pcs-bbq-chicken-2-cups-veg-fried-rice.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/2-pcs-bbq-chicken-2-cups-veg-fried-rice.jpg",
     "spiceLevel": 2,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1756,7 +1756,7 @@
     "rating": "4.8",
     "reviewCount": 43,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/2-pcs-bbq-chicken-2-cups-veg-fried-rice.jpg"
+      "https://hasansflavours.vercel.app/dishes/2-pcs-bbq-chicken-2-cups-veg-fried-rice.jpg"
     ]
   },
   {
@@ -1767,7 +1767,7 @@
     "formattedPrice": "₱550",
     "category": "Fresh Indo-Pak Sweets",
     "description": "Traditional rich condensed milk fudge delicacy sold per kilogram.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/topin-khoya-per-kg.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/topin-khoya-per-kg.jpg",
     "spiceLevel": 0,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1778,7 +1778,7 @@
     "rating": "4.8",
     "reviewCount": 44,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/topin-khoya-per-kg.jpg"
+      "https://hasansflavours.vercel.app/dishes/topin-khoya-per-kg.jpg"
     ]
   },
   {
@@ -1789,7 +1789,7 @@
     "formattedPrice": "₱750",
     "category": "Fresh Indo-Pak Sweets",
     "description": "Spongy, delicate pink cottage cheese balls steeped in rose sugar syrup.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/pink-rasgulla-per-kg.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/pink-rasgulla-per-kg.jpg",
     "spiceLevel": 0,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1800,7 +1800,7 @@
     "rating": "4.8",
     "reviewCount": 45,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/pink-rasgulla-per-kg.jpg"
+      "https://hasansflavours.vercel.app/dishes/pink-rasgulla-per-kg.jpg"
     ]
   },
   {
@@ -1811,7 +1811,7 @@
     "formattedPrice": "₱650",
     "category": "Fresh Indo-Pak Sweets",
     "description": "Classic soft, melt-in-mouth cottage cheese spheres soaked in cardamom syrup.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/white-rasgulla-per-kg.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/white-rasgulla-per-kg.jpg",
     "spiceLevel": 0,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1822,7 +1822,7 @@
     "rating": "4.8",
     "reviewCount": 46,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/white-rasgulla-per-kg.jpg"
+      "https://hasansflavours.vercel.app/dishes/white-rasgulla-per-kg.jpg"
     ]
   },
   {
@@ -1833,7 +1833,7 @@
     "formattedPrice": "₱400",
     "category": "Fresh Indo-Pak Sweets",
     "description": "Warm golden-brown milk solid dumplings drenched in fragrant syrup.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/gulab-jamun-per-kg.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/gulab-jamun-per-kg.jpg",
     "spiceLevel": 0,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1844,7 +1844,7 @@
     "rating": "4.8",
     "reviewCount": 47,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/gulab-jamun-per-kg.jpg"
+      "https://hasansflavours.vercel.app/dishes/gulab-jamun-per-kg.jpg"
     ]
   },
   {
@@ -1855,7 +1855,7 @@
     "formattedPrice": "₱400",
     "category": "Fresh Indo-Pak Sweets",
     "description": "Traditional festive sweet roundels made from chickpea flour, ghee, and sugar.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/laddu-per-kg.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/laddu-per-kg.jpg",
     "spiceLevel": 0,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1866,7 +1866,7 @@
     "rating": "4.8",
     "reviewCount": 48,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/laddu-per-kg.jpg"
+      "https://hasansflavours.vercel.app/dishes/laddu-per-kg.jpg"
     ]
   },
   {
@@ -1877,7 +1877,7 @@
     "formattedPrice": "₱650",
     "category": "Fresh Indo-Pak Sweets",
     "description": "Rich carrot-and-khoya confection garnished with roasted nuts.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/gajrela-barfi-per-kg.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/gajrela-barfi-per-kg.jpg",
     "spiceLevel": 0,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1888,7 +1888,7 @@
     "rating": "4.8",
     "reviewCount": 49,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/gajrela-barfi-per-kg.jpg"
+      "https://hasansflavours.vercel.app/dishes/gajrela-barfi-per-kg.jpg"
     ]
   },
   {
@@ -1899,7 +1899,7 @@
     "formattedPrice": "₱750",
     "category": "Fresh Indo-Pak Sweets",
     "description": "Fresh, unaged, pure homemade cottage cheese block sold per kilogram.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/paneer-per-kg.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/paneer-per-kg.jpg",
     "spiceLevel": 0,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1910,7 +1910,7 @@
     "rating": "4.8",
     "reviewCount": 50,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/paneer-per-kg.jpg"
+      "https://hasansflavours.vercel.app/dishes/paneer-per-kg.jpg"
     ]
   },
   {
@@ -1921,7 +1921,7 @@
     "formattedPrice": "₱550",
     "category": "Fresh Indo-Pak Sweets",
     "description": "Traditional flaky glazed pastry with a crisp shell and soft center.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/balushahi-per-kg.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/balushahi-per-kg.jpg",
     "spiceLevel": 0,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1932,7 +1932,7 @@
     "rating": "4.8",
     "reviewCount": 51,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/balushahi-per-kg.jpg"
+      "https://hasansflavours.vercel.app/dishes/balushahi-per-kg.jpg"
     ]
   },
   {
@@ -1943,7 +1943,7 @@
     "formattedPrice": "₱1,000",
     "category": "Fresh Indo-Pak Sweets",
     "description": "Caramelized grainy milk sweet prepared with pure milk and clarified butter.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/milk-cake-per-kg.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/milk-cake-per-kg.jpg",
     "spiceLevel": 0,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1954,7 +1954,7 @@
     "rating": "4.8",
     "reviewCount": 52,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/milk-cake-per-kg.jpg"
+      "https://hasansflavours.vercel.app/dishes/milk-cake-per-kg.jpg"
     ]
   },
   {
@@ -1965,7 +1965,7 @@
     "formattedPrice": "₱500",
     "category": "Fresh Indo-Pak Sweets",
     "description": "Toasted gram flour fudge infused with cardamom and topped with pistachios.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/besan-barfi-per-kg.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/besan-barfi-per-kg.jpg",
     "spiceLevel": 0,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1976,7 +1976,7 @@
     "rating": "4.8",
     "reviewCount": 53,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/besan-barfi-per-kg.jpg"
+      "https://hasansflavours.vercel.app/dishes/besan-barfi-per-kg.jpg"
     ]
   },
   {
@@ -1987,7 +1987,7 @@
     "formattedPrice": "₱120",
     "category": "Fresh Indo-Pak Sweets",
     "description": "Warm aromatic semolina halwa cooked with pure ghee, sugar, and almonds.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/halwa.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/halwa.jpg",
     "spiceLevel": 0,
     "isHalal": true,
     "isChefSpecial": false,
@@ -1998,7 +1998,7 @@
     "rating": "4.8",
     "reviewCount": 24,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/halwa.jpg"
+      "https://hasansflavours.vercel.app/dishes/halwa.jpg"
     ]
   },
   {
@@ -2009,7 +2009,7 @@
     "formattedPrice": "₱50",
     "category": "Shakes & Lassi",
     "description": "Thick, creamy blended shake made with ripe bananas and chilled milk.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/banana-shake.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/banana-shake.jpg",
     "spiceLevel": 0,
     "isHalal": true,
     "isChefSpecial": false,
@@ -2020,7 +2020,7 @@
     "rating": "4.8",
     "reviewCount": 25,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/banana-shake.jpg"
+      "https://hasansflavours.vercel.app/dishes/banana-shake.jpg"
     ]
   },
   {
@@ -2031,7 +2031,7 @@
     "formattedPrice": "₱60",
     "category": "Shakes & Lassi",
     "description": "Sweet, luscious shake prepared with real tropical mango pulp.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/mango-shake.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/mango-shake.jpg",
     "spiceLevel": 0,
     "isHalal": true,
     "isChefSpecial": false,
@@ -2042,7 +2042,7 @@
     "rating": "4.8",
     "reviewCount": 26,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/mango-shake.jpg"
+      "https://hasansflavours.vercel.app/dishes/mango-shake.jpg"
     ]
   },
   {
@@ -2053,7 +2053,7 @@
     "formattedPrice": "₱60",
     "category": "Shakes & Lassi",
     "description": "Refreshing summer shake made with chilled watermelon.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/watermelon-shake.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/watermelon-shake.jpg",
     "spiceLevel": 0,
     "isHalal": true,
     "isChefSpecial": false,
@@ -2064,7 +2064,7 @@
     "rating": "4.8",
     "reviewCount": 27,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/watermelon-shake.jpg"
+      "https://hasansflavours.vercel.app/dishes/watermelon-shake.jpg"
     ]
   },
   {
@@ -2075,7 +2075,7 @@
     "formattedPrice": "₱100",
     "category": "Shakes & Lassi",
     "description": "Nutritious powerhouse shake blended with premium Arabic dates and milk.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/dates-shake.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/dates-shake.jpg",
     "spiceLevel": 0,
     "isHalal": true,
     "isChefSpecial": false,
@@ -2086,7 +2086,7 @@
     "rating": "4.8",
     "reviewCount": 28,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/dates-shake.jpg"
+      "https://hasansflavours.vercel.app/dishes/dates-shake.jpg"
     ]
   },
   {
@@ -2097,7 +2097,7 @@
     "formattedPrice": "₱60",
     "category": "Shakes & Lassi",
     "description": "Creamy pink shake bursting with fresh strawberry sweetness.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/strawberry-shake.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/strawberry-shake.jpg",
     "spiceLevel": 0,
     "isHalal": true,
     "isChefSpecial": false,
@@ -2108,7 +2108,7 @@
     "rating": "4.8",
     "reviewCount": 29,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/strawberry-shake.jpg"
+      "https://hasansflavours.vercel.app/dishes/strawberry-shake.jpg"
     ]
   },
   {
@@ -2119,7 +2119,7 @@
     "formattedPrice": "₱60",
     "category": "Shakes & Lassi",
     "description": "Traditional thick churned yogurt beverage flavored with strawberry.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/strawberry-lassi.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/strawberry-lassi.jpg",
     "spiceLevel": 0,
     "isHalal": true,
     "isChefSpecial": false,
@@ -2130,7 +2130,7 @@
     "rating": "4.8",
     "reviewCount": 30,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/strawberry-lassi.jpg"
+      "https://hasansflavours.vercel.app/dishes/strawberry-lassi.jpg"
     ]
   },
   {
@@ -2141,7 +2141,7 @@
     "formattedPrice": "₱60",
     "category": "Shakes & Lassi",
     "description": "Classic Punjabi sweet churned yogurt drink served ice-cold.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/sweet-lassi.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/sweet-lassi.jpg",
     "spiceLevel": 0,
     "isHalal": true,
     "isChefSpecial": false,
@@ -2152,7 +2152,7 @@
     "rating": "4.8",
     "reviewCount": 31,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/sweet-lassi.jpg"
+      "https://hasansflavours.vercel.app/dishes/sweet-lassi.jpg"
     ]
   },
   {
@@ -2163,7 +2163,7 @@
     "formattedPrice": "₱60",
     "category": "Shakes & Lassi",
     "description": "Savory cooling yogurt lassi seasoned with roasted cumin and black salt.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/salt-lassi.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/salt-lassi.jpg",
     "spiceLevel": 0,
     "isHalal": true,
     "isChefSpecial": false,
@@ -2174,7 +2174,7 @@
     "rating": "4.8",
     "reviewCount": 32,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/salt-lassi.jpg"
+      "https://hasansflavours.vercel.app/dishes/salt-lassi.jpg"
     ]
   },
   {
@@ -2185,7 +2185,7 @@
     "formattedPrice": "₱60",
     "category": "Shakes & Lassi",
     "description": "Crisp and zesty freshly squeezed lemon refresher.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/lemonade.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/lemonade.jpg",
     "spiceLevel": 0,
     "isHalal": true,
     "isChefSpecial": false,
@@ -2196,7 +2196,7 @@
     "rating": "4.8",
     "reviewCount": 33,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/lemonade.jpg"
+      "https://hasansflavours.vercel.app/dishes/lemonade.jpg"
     ]
   },
   {
@@ -2207,7 +2207,7 @@
     "formattedPrice": "₱20",
     "category": "Shakes & Lassi",
     "description": "Classic Coca-Cola 295ml bottle.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/coke-mismo.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/coke-mismo.jpg",
     "spiceLevel": 0,
     "isHalal": true,
     "isChefSpecial": false,
@@ -2218,7 +2218,7 @@
     "rating": "4.8",
     "reviewCount": 34,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/coke-mismo.jpg"
+      "https://hasansflavours.vercel.app/dishes/coke-mismo.jpg"
     ]
   },
   {
@@ -2229,7 +2229,7 @@
     "formattedPrice": "₱250",
     "category": "Shisha Lounge",
     "description": "Ask our staff for today's available shisha flavors and charcoal service.",
-    "imageUrl": "https://restaurant.aura-predictions.site/dishes/shisha-flavors.jpg",
+    "imageUrl": "https://hasansflavours.vercel.app/dishes/shisha-flavors.jpg",
     "spiceLevel": 0,
     "isHalal": true,
     "isChefSpecial": false,
@@ -2240,7 +2240,7 @@
     "rating": "4.8",
     "reviewCount": 35,
     "imageUrls": [
-      "https://restaurant.aura-predictions.site/dishes/shisha-flavors.jpg"
+      "https://hasansflavours.vercel.app/dishes/shisha-flavors.jpg"
     ]
   }
 ]

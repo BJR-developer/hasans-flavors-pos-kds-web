@@ -1,32 +1,50 @@
 import { supabase } from './supabase';
 import { Dish, Order, TableSession, Category, AddonOption } from '@/types';
+import { parseOrderNotes, formatOrderNotes } from './orderUtils';
+
+// Normalize dish image URLs to local /dishes/ path when referring to dishes directory
+export const normalizeDishImageUrl = (url?: string): string => {
+  if (!url) return '';
+  if (url.includes('/dishes/')) {
+    const filename = url.split('/dishes/').pop();
+    if (filename) return `/dishes/${filename}`;
+  }
+  return url;
+};
 
 // Map database snake_case row to TypeScript Dish
-export const mapDishFromDB = (row: any): Dish => ({
-  id: String(row.id),
-  name: row.name,
-  slug: row.slug,
-  price: Number(row.price),
-  formattedPrice: row.formatted_price || `₱${Number(row.price).toLocaleString()}`,
-  category: row.category_name,
-  description: row.description || '',
-  imageUrl: row.image_url || '',
-  imageUrls: Array.isArray(row.image_urls) && row.image_urls.length > 0
+export const mapDishFromDB = (row: any): Dish => {
+  const rawImageUrl = row.image_url || '';
+  const imageUrl = normalizeDishImageUrl(rawImageUrl);
+  const rawImageUrls: string[] = Array.isArray(row.image_urls) && row.image_urls.length > 0
     ? row.image_urls
-    : (row.image_url ? [row.image_url] : []),
-  spiceLevel: Number(row.spice_level || 0),
-  variants: Array.isArray(row.variants) ? row.variants : [],
-  isHalal: row.is_halal ?? true,
-  isChefSpecial: row.is_chef_special ?? false,
-  isPopular: row.is_popular ?? false,
-  inStock: row.in_stock ?? true,
-  preparationTime: row.preparation_time || '15-20 mins',
-  calories: row.calories || '',
-  rating: String(row.rating || '4.8'),
-  reviewCount: Number(row.review_count || 10),
-  createdAt: row.created_at,
-  updatedAt: row.updated_at || row.created_at,
-});
+    : (rawImageUrl ? [rawImageUrl] : []);
+  const imageUrls = rawImageUrls.map(normalizeDishImageUrl);
+
+  return {
+    id: String(row.id),
+    name: row.name,
+    slug: row.slug,
+    price: Number(row.price),
+    formattedPrice: row.formatted_price || `₱${Number(row.price).toLocaleString()}`,
+    category: row.category_name,
+    description: row.description || '',
+    imageUrl,
+    imageUrls,
+    spiceLevel: Number(row.spice_level || 0),
+    variants: Array.isArray(row.variants) ? row.variants : [],
+    isHalal: row.is_halal ?? true,
+    isChefSpecial: row.is_chef_special ?? false,
+    isPopular: row.is_popular ?? false,
+    inStock: row.in_stock ?? true,
+    preparationTime: row.preparation_time || '15-20 mins',
+    calories: row.calories || '',
+    rating: String(row.rating || '4.8'),
+    reviewCount: Number(row.review_count || 10),
+    createdAt: row.created_at,
+    updatedAt: row.updated_at || row.created_at,
+  };
+};
 
 // Map database snake_case row to TypeScript Order
 export const mapOrderFromDB = (row: any): Order => {
@@ -43,6 +61,7 @@ export const mapOrderFromDB = (row: any): Order => {
       : 0
   );
   const balanceDue = Math.max(0, total - amountPaid);
+  const { deliveryAddress, specialNotes } = parseOrderNotes(row.notes, row.type);
 
   return {
     id: row.id,
@@ -63,7 +82,8 @@ export const mapOrderFromDB = (row: any): Order => {
     amountPaid,
     balanceDue,
     paymentHistory: Array.isArray(row.payment_history) ? row.payment_history : [],
-    specialNotes: row.notes || undefined,
+    deliveryAddress,
+    specialNotes,
     items: Array.isArray(row.items) ? row.items : [],
     createdAt: row.created_at,
     estimatedMinutes: Number(
@@ -362,7 +382,7 @@ export const createOrderInDB = async (order: Order): Promise<Order> => {
         note: 'Initial payment',
       }
     ] : []),
-    notes: order.specialNotes || null,
+    notes: formatOrderNotes(order.deliveryAddress, order.specialNotes, order.type),
     items: order.items,
     estimated_minutes: order.estimatedMinutes || (order.type === 'delivery' ? 25 : 10),
     created_at: order.createdAt,
@@ -459,6 +479,8 @@ export const updateOrderPaymentInDB = async (
     amountPaid?: number;
     paymentHistory?: any[];
     closeOrder?: boolean;
+    tax?: number;
+    total?: number;
   }
 ): Promise<void> => {
   const dbUpdates: any = {
@@ -470,6 +492,8 @@ export const updateOrderPaymentInDB = async (
   if (updates.amountPaid !== undefined) dbUpdates.amount_paid = updates.amountPaid;
   if (updates.paymentHistory !== undefined) dbUpdates.payment_history = updates.paymentHistory;
   if (updates.closeOrder) dbUpdates.status = 'completed';
+  if (updates.tax !== undefined) dbUpdates.tax = updates.tax;
+  if (updates.total !== undefined) dbUpdates.total = updates.total;
 
   const { data, error } = await supabase
     .from('orders')

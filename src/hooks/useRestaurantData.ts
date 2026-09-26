@@ -242,6 +242,8 @@ export function useUpdateOrderPayment() {
       amountPaid,
       paymentHistory,
       closeOrder,
+      tax,
+      total,
     }: {
       orderId: string;
       paymentStatus: PaymentStatus;
@@ -251,6 +253,8 @@ export function useUpdateOrderPayment() {
       cashTendered?: number;
       changeDue?: number;
       closeOrder?: boolean;
+      tax?: number;
+      total?: number;
     }) => {
       return updateOrderPaymentInDB(orderId, {
         paymentStatus,
@@ -258,6 +262,8 @@ export function useUpdateOrderPayment() {
         amountPaid,
         paymentHistory,
         closeOrder,
+        tax,
+        total,
       });
     },
     onSuccess: () => {

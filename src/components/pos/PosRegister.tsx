@@ -2,10 +2,13 @@
 
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import { Search, X, SlidersHorizontal, AlertCircle, Keyboard } from 'lucide-react';
 import { Dish, CartItem, Order } from '@/types';
 import { useDishes, useCategories, useOrders } from '@/hooks/useRestaurantData';
+import { usePosSettings } from '@/hooks/usePosSettings';
 import { PosCartPane } from './PosCartPane';
+import { PosDishCard } from './PosDishCard';
 import { DishCustomizerModal } from './DishCustomizerModal';
 import { ThermalReceiptModal } from './ThermalReceiptModal';
 import { KeyboardShortcutsModal } from './KeyboardShortcutsModal';
@@ -32,6 +35,7 @@ export function PosRegister() {
   const [isShortcutsModalOpen, setIsShortcutsModalOpen] = useState<boolean>(false);
   const [loadedOrder, setLoadedOrder] = useState<Order | null>(null);
 
+  const { vatEnabled, vatRate } = usePosSettings();
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   // Sync loadedOrder with URL search params
@@ -91,7 +95,7 @@ export function PosRegister() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isShortcutsModalOpen, customizingDish, receiptOrder]);
+  }, [isShortcutsModalOpen, customizingDish, receiptOrder, detailOrder]);
 
   // Compute live dish counts dynamically directly from dishes database
   const categoriesWithCounts = useMemo(() => {
@@ -324,6 +328,16 @@ export function PosRegister() {
               )}
             </div>
 
+            {/* Cashier POS Settings Trigger Button */}
+            <Link
+              href="/settings?tab=pos"
+              title="Register & Financial Settings (VAT & Payment)"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-[#E5E5E5] bg-white text-[#525252] hover:text-[#1F1F1F] hover:bg-[#F5F5F5] transition-colors text-xs font-semibold"
+            >
+              <SlidersHorizontal className="w-3.5 h-3.5 text-[#BA1A20]" />
+              <span className="hidden sm:inline text-[11px]">Settings</span>
+            </Link>
+
             {/* Keyboard Shortcuts Trigger Button */}
             <button
               type="button"
@@ -353,72 +367,13 @@ export function PosRegister() {
                   .reduce((sum, i) => sum + i.quantity, 0);
 
                 return (
-                  <div
+                  <PosDishCard
                     key={dish.id}
-                    onClick={() => handleFastAdd(dish)}
-                    className={`group relative bg-white rounded-xl border p-2 sm:p-2.5 flex flex-col justify-between transition-all cursor-pointer select-none ${
-                      dish.inStock
-                        ? inCartQty > 0
-                          ? 'border-[#BA1A20] shadow-xs'
-                          : 'border-[#E5E5E5] hover:border-[#A3A3A3] hover:shadow-xs'
-                        : 'border-[#E5E5E5] opacity-50 cursor-not-allowed'
-                    }`}
-                  >
-                    {/* Item Thumbnail */}
-                    <div className="relative h-24 sm:h-28 w-full rounded-lg overflow-hidden bg-[#F5F5F5] mb-2">
-                      <SafeImage
-                        src={dish.imageUrl}
-                        alt={dish.name}
-                        fill
-                        className="object-cover group-hover:scale-103 transition-transform duration-200"
-                        sizes="(max-width: 768px) 50vw, 20vw"
-                      />
-
-                      {/* In-cart count badge */}
-                      {inCartQty > 0 && (
-                        <div className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-[#BA1A20] text-white flex items-center justify-center text-[10px] font-bold shadow-xs">
-                          {inCartQty}
-                        </div>
-                      )}
-
-                      {!dish.inStock && (
-                        <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-white text-[10px] font-bold tracking-wide uppercase">
-                          Out of Stock
-                        </div>
-                      )}
-
-                      {/* Small subtle customize trigger */}
-                      {dish.inStock && (
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setCustomizingDish(dish);
-                          }}
-                          title="Customize portion / spice"
-                          className="absolute bottom-1.5 right-1.5 p-1 rounded-md bg-white/90 hover:bg-white text-[#525252] hover:text-[#1F1F1F] shadow-xs opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
-                          <SlidersHorizontal className="w-3 h-3" />
-                        </button>
-                      )}
-                    </div>
-
-                    {/* Content */}
-                    <div>
-                      <h4 className="font-semibold text-xs text-[#1F1F1F] line-clamp-2 leading-tight">
-                        {dish.name}
-                      </h4>
-                    </div>
-
-                    <div className="flex items-center justify-between mt-2 pt-1 border-t border-[#F5F5F5]">
-                      <span className="text-xs font-bold text-[#BA1A20]">
-                        ₱{dish.price.toLocaleString()}
-                      </span>
-                      <span className="text-[10px] text-[#A3A3A3] font-medium">
-                        + Add
-                      </span>
-                    </div>
-                  </div>
+                    dish={dish}
+                    inCartQty={inCartQty}
+                    onQuickAdd={handleFastAdd}
+                    onCustomize={(d) => setCustomizingDish(d)}
+                  />
                 );
               })}
             </div>
@@ -460,7 +415,9 @@ export function PosRegister() {
                 ₱{cartItems.reduce((s, i) => s + i.totalPrice, 0).toLocaleString()}
               </span>
             </div>
-            <span className="text-[10px] text-[#737373]">+5% VAT included</span>
+            <span className="text-[10px] text-[#737373]">
+              {vatEnabled ? `+${vatRate}% VAT included` : 'VAT Exempt (0%)'}
+            </span>
           </div>
 
           <button

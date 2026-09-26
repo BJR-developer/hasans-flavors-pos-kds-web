@@ -8,10 +8,8 @@ import {
   RotateCcw,
   Printer,
   Edit3,
-  XCircle,
   ArrowRightLeft,
   GripVertical,
-  Sparkles,
   Clock,
   MapPin,
   ExternalLink,
@@ -28,6 +26,8 @@ import { ChangeTableModal } from '../tables/ChangeTableModal';
 import { ShareOrderModal } from '../orders/ShareOrderModal';
 import { getOrderColorTheme } from '@/lib/orderColors';
 import { getOrderMapsUrl } from '@/lib/shareOrder';
+import { isCashOrderPendingReview } from '@/lib/orderUtils';
+import { KdsCashReviewBanner } from './KdsCashReviewBanner';
 
 interface KdsTicketCardProps {
   order: Order;
@@ -60,7 +60,7 @@ export function KdsTicketCard({
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [isChangeTableOpen, setIsChangeTableOpen] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
-  const [animatingDirection, setAnimatingDirection] = useState<'forward' | 'backward' | null>(null);
+  const [animatingDirection] = useState<'forward' | 'backward' | null>(null);
 
   const mapsUrl = useMemo(() => getOrderMapsUrl(order), [order]);
   const hasDeliveryLocation = order.type === 'delivery' || !!order.deliveryAddress || !!mapsUrl;
@@ -215,12 +215,19 @@ export function KdsTicketCard({
           )}
 
           <span
-            className={`text-[9.5px] font-extrabold uppercase px-1.5 py-0.5 rounded ${order.paymentStatus === 'paid'
+            className={`text-[9.5px] font-extrabold uppercase px-1.5 py-0.5 rounded ${
+              order.paymentStatus === 'paid'
                 ? 'bg-emerald-950/70 text-emerald-200 border border-emerald-400/40'
+                : isCashOrderPendingReview(order)
+                ? 'bg-amber-400 text-amber-950 border border-amber-600 font-black animate-pulse'
                 : 'bg-black/25 text-inherit border border-current/20'
-              }`}
+            }`}
           >
-            {order.paymentStatus === 'paid' ? '★ PAID' : 'UNPAID'}
+            {order.paymentStatus === 'paid'
+              ? '★ PAID'
+              : isCashOrderPendingReview(order)
+              ? 'COD REVIEW'
+              : 'UNPAID'}
           </span>
         </div>
 
@@ -348,6 +355,15 @@ export function KdsTicketCard({
           <span className="text-amber-700 uppercase text-[10px] tracking-wide font-black">Instruction:</span>
           <span>{order.specialNotes}</span>
         </div>
+      )}
+
+      {/* Cash on Delivery / Mobile Cash Approval Gate */}
+      {isCashOrderPendingReview(order) && (
+        <KdsCashReviewBanner
+          order={order}
+          onAccept={handleBumpNext}
+          onReject={handleCancelOrder}
+        />
       )}
 
       {/* Items List */}
@@ -500,20 +516,30 @@ export function KdsTicketCard({
         <button
           type="button"
           onClick={handleBumpNext}
-          className={`flex items-center justify-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold text-white transition-colors shadow-2xs ${order.status === 'pending' || order.status === 'sent_to_kitchen'
+          className={`flex items-center justify-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold text-white transition-colors shadow-2xs ${
+            isCashOrderPendingReview(order)
+              ? 'bg-emerald-600 hover:bg-emerald-700'
+              : order.status === 'pending' || order.status === 'sent_to_kitchen'
               ? 'bg-red-600 hover:bg-red-700'
               : order.status === 'preparing'
-                ? 'bg-neutral-900 hover:bg-black'
-                : order.status === 'ready'
-                  ? 'bg-blue-600 hover:bg-blue-700'
-                  : 'bg-emerald-600 hover:bg-emerald-700'
-            }`}
+              ? 'bg-neutral-900 hover:bg-black'
+              : order.status === 'ready'
+              ? 'bg-blue-600 hover:bg-blue-700'
+              : 'bg-emerald-600 hover:bg-emerald-700'
+          }`}
         >
-          {(order.status === 'pending' || order.status === 'sent_to_kitchen') && (
+          {isCashOrderPendingReview(order) ? (
             <>
-              <span>Cook</span>
-              <ArrowRight className="w-3 h-3" />
+              <span>Accept & Cook</span>
+              <Check className="w-3 h-3 stroke-[3]" />
             </>
+          ) : (
+            (order.status === 'pending' || order.status === 'sent_to_kitchen') && (
+              <>
+                <span>Cook</span>
+                <ArrowRight className="w-3 h-3" />
+              </>
+            )
           )}
           {order.status === 'preparing' && (
             <>

@@ -17,6 +17,7 @@ import { ThermalReceiptModal } from '../pos/ThermalReceiptModal';
 import { Order, OrderStatus } from '@/types';
 import { playBumpChime } from '@/lib/audio';
 import { motion, AnimatePresence } from 'framer-motion';
+import { isCashOrderPendingReview } from '@/lib/orderUtils';
 
 export function KdsBoard() {
   const { data: orders = [] } = useOrders();
@@ -152,11 +153,12 @@ export function KdsBoard() {
     [draggingOrderId, orders, markOrderAsJustMoved, updateStatusMutation]
   );
 
-  // Scope: Last 24 hours only
+  // Scope: Last 24 hours only (using mountTime to preserve hook purity)
+  const [mountTime] = useState(() => Date.now());
   const recent24hOrders = useMemo(() => {
-    const cutoff = Date.now() - 24 * 60 * 60 * 1000;
+    const cutoff = mountTime - 24 * 60 * 60 * 1000;
     return orders.filter((o) => new Date(o.createdAt).getTime() >= cutoff);
-  }, [orders]);
+  }, [orders, mountTime]);
 
   // Search filter across order #, table, customer, dish names
   const filteredOrders = useMemo(() => {
@@ -172,12 +174,22 @@ export function KdsBoard() {
     });
   }, [recent24hOrders, searchQuery]);
 
-  // Active Kanban Columns - Newest orders at the top, older orders at the bottom
+  // Active Kanban Columns - COD review orders prioritized first, followed by newest orders
   const pendingOrders = useMemo(() => {
     return filteredOrders
       .filter((o) => o.status === 'pending' || o.status === 'sent_to_kitchen')
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      .sort((a, b) => {
+        const aReview = isCashOrderPendingReview(a);
+        const bReview = isCashOrderPendingReview(b);
+        if (aReview && !bReview) return -1;
+        if (!aReview && bReview) return 1;
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      });
   }, [filteredOrders]);
+
+  const pendingReviewCount = useMemo(() => {
+    return pendingOrders.filter(isCashOrderPendingReview).length;
+  }, [pendingOrders]);
 
   const preparingOrders = useMemo(() => {
     return filteredOrders
@@ -314,9 +326,16 @@ export function KdsBoard() {
               }`}
             >
               <div className="flex items-center justify-between pb-2 mb-2 border-b border-neutral-300/70">
-                <span className="text-xs font-bold text-neutral-900 uppercase tracking-wide">
-                  Received ({pendingOrders.length})
-                </span>
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <span className="text-xs font-bold text-neutral-900 uppercase tracking-wide">
+                    Received ({pendingOrders.length})
+                  </span>
+                  {pendingReviewCount > 0 && (
+                    <span className="text-[10px] font-black px-1.5 py-0.5 rounded bg-amber-400 text-amber-950 border border-amber-500 animate-pulse">
+                      {pendingReviewCount} COD REVIEW
+                    </span>
+                  )}
+                </div>
                 {dragOverColumn === 'pending' && (
                   <span className="text-[10px] font-bold text-amber-800 animate-pulse flex items-center gap-1">
                     <ArrowDown className="w-3 h-3" /> Drop here
