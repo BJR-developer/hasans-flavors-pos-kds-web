@@ -134,6 +134,43 @@ export interface Order {
   specialNotes?: string;
   cashTendered?: number;
   changeDue?: number;
+  cashierId?: string;
+  cashierName?: string;
+  shiftId?: string;
+}
+
+export interface Shift {
+  id: string;
+  cashierId?: string;
+  cashierName: string;
+  startTime: string;
+  endTime?: string;
+  openingCash: number;
+  closingCash?: number;
+  expectedCash?: number;
+  cashDifference?: number;
+  totalOrders: number;
+  totalItemsSold?: number;
+  grossSales: number;
+  cashSales: number;
+  cardSales: number;
+  onlineSales: number;
+  totalDiscount: number;
+  status: 'open' | 'closed';
+  notes?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface StaffUser {
+  id: string;
+  email: string;
+  username?: string;
+  fullName: string;
+  phone?: string;
+  role: 'owner' | 'cashier' | 'customer';
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface TableSession {
@@ -176,4 +213,5 @@ export interface PosSettings {
   enabledPaymentMethods: PaymentMethod[];
   defaultPaymentTiming: 'pay_now' | 'pay_later';
 }
+
 

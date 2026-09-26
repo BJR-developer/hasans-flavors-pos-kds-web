@@ -19,6 +19,7 @@ interface AuthState {
   initialize: () => Promise<void>;
   signInWithPassword: (email: string, pass: string) => Promise<{ success: boolean; error?: string; role?: UserRole }>;
   sendPasswordResetEmail: (email: string) => Promise<{ success: boolean; message?: string; error?: string }>;
+  resetPasswordDirectly: (usernameOrEmail: string, newPass: string) => Promise<{ success: boolean; message?: string; error?: string }>;
   signOut: () => Promise<void>;
 }
 
@@ -80,11 +81,28 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
   },
 
-  signInWithPassword: async (email: string, pass: string) => {
+  signInWithPassword: async (identifier: string, pass: string) => {
     try {
       set({ isLoading: true, error: null });
+      const cleanInput = identifier.trim().toLowerCase().replace(/\s+/g, '');
+      let email = cleanInput;
+
+      if (!cleanInput.includes('@')) {
+        const { data: profileMatch } = await supabase
+          .from('profiles')
+          .select('email')
+          .eq('username', cleanInput)
+          .maybeSingle();
+
+        if (profileMatch?.email) {
+          email = profileMatch.email;
+        } else {
+          email = `${cleanInput}@hasan.com`;
+        }
+      }
+
       const { data, error } = await supabase.auth.signInWithPassword({
-        email: email.trim().toLowerCase(),
+        email,
         password: pass,
       });
 
@@ -143,6 +161,47 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     } catch (err: any) {
       set({ isLoading: false, error: err?.message || 'Failed to send reset email' });
       return { success: false, error: err?.message || 'Failed to send reset email' };
+    }
+  },
+
+  resetPasswordDirectly: async (usernameOrEmail: string, newPass: string) => {
+    try {
+      set({ isLoading: true, error: null });
+      const cleanInput = usernameOrEmail.trim().toLowerCase().replace(/\s+/g, '');
+      let email = cleanInput;
+
+      if (!cleanInput.includes('@')) {
+        const { data: profileMatch } = await supabase
+          .from('profiles')
+          .select('email')
+          .eq('username', cleanInput)
+          .maybeSingle();
+
+        if (profileMatch?.email) {
+          email = profileMatch.email;
+        } else {
+          email = `${cleanInput}@hasan.com`;
+        }
+      }
+
+      const { data, error } = await supabase.rpc('admin_reset_user_password', {
+        p_email: email,
+        p_new_password: newPass,
+      });
+
+      set({ isLoading: false });
+      if (error) {
+        set({ error: error.message });
+        return { success: false, error: error.message };
+      }
+
+      return {
+        success: true,
+        message: data?.message || 'Password updated successfully without email verification.',
+      };
+    } catch (err: any) {
+      set({ isLoading: false, error: err?.message || 'Failed to reset password directly' });
+      return { success: false, error: err?.message || 'Failed to reset password directly' };
     }
   },
 

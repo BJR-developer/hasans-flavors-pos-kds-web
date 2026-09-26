@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import {
@@ -14,10 +14,12 @@ import {
   KeyRound,
 } from 'lucide-react';
 import { useAuthStore } from '@/lib/auth';
+import { OwnerPasswordResetModal } from './OwnerPasswordResetModal';
 
 export function AccountSettingsTab() {
   const router = useRouter();
   const { user, signOut } = useAuthStore();
+  const [isResetOpen, setIsResetOpen] = useState(false);
 
   const handleSignOut = async () => {
     await signOut();
@@ -145,6 +147,15 @@ export function AccountSettingsTab() {
         <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
           <button
             type="button"
+            onClick={() => setIsResetOpen(true)}
+            className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-neutral-900 hover:bg-black text-white text-xs font-bold transition-all shadow-xs cursor-pointer"
+          >
+            <KeyRound className="w-3.5 h-3.5" />
+            <span>Reset My Password (Instant)</span>
+          </button>
+
+          <button
+            type="button"
             onClick={handleSignOut}
             className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold transition-colors"
           >
@@ -153,6 +164,15 @@ export function AccountSettingsTab() {
           </button>
         </div>
       </div>
+
+      {user && (
+        <OwnerPasswordResetModal
+          isOpen={isResetOpen}
+          onClose={() => setIsResetOpen(false)}
+          targetUserEmail={user.email}
+          targetUserName={user.name}
+        />
+      )}
     </motion.div>
   );
 }

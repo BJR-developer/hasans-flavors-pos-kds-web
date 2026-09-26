@@ -8,11 +8,12 @@ import { useAuthStore, UserRole } from '@/lib/auth';
 
 export default function SignInPage() {
   const router = useRouter();
-  const { signInWithPassword, sendPasswordResetEmail, isLoading, error } = useAuthStore();
+  const { signInWithPassword, sendPasswordResetEmail, resetPasswordDirectly, isLoading, error } = useAuthStore();
 
   const [mode, setMode] = useState<'signin' | 'forgot_password'>('signin');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
   const [localError, setLocalError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -24,16 +25,22 @@ export default function SignInPage() {
 
     if (mode === 'forgot_password') {
       if (!email.trim()) {
-        setLocalError('Please enter your email address to receive password reset instructions.');
+        setLocalError('Please enter your username or email address.');
+        return;
+      }
+      if (!newPassword || newPassword.length < 6) {
+        setLocalError('Please enter a new password (min. 6 characters).');
         return;
       }
       setSubmitting(true);
-      const res = await sendPasswordResetEmail(email);
+      const res = await resetPasswordDirectly(email, newPassword);
       setSubmitting(false);
       if (res.success) {
-        setSuccessMsg(res.message || 'Password reset email sent. Please check your inbox.');
+        setSuccessMsg('Password updated successfully! You can now sign in with your new password.');
+        setPassword(newPassword);
+        setMode('signin');
       } else {
-        setLocalError(res.error || 'Failed to send password reset email.');
+        setLocalError(res.error || res.message || 'Failed to update password.');
       }
       return;
     }
@@ -146,13 +153,28 @@ export default function SignInPage() {
             </>
           ) : (
             <>
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-[#1F1F1F]">New Password</label>
+                <input
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="Enter new password (min. 6 chars)"
+                  required
+                  className="w-full px-3 py-2 text-xs rounded-lg border border-[#E5E5E5] bg-[#FAFAFA] text-[#1F1F1F] focus:bg-white focus:outline-none focus:border-[#1F1F1F]"
+                />
+                <span className="text-[10px] text-[#737373]">
+                  Direct reset without requiring email links or verification codes.
+                </span>
+              </div>
+
               <button
                 type="submit"
                 disabled={submitting || isLoading}
-                className="w-full py-2.5 px-4 rounded-lg bg-[#FC8019] hover:bg-[#E57212] text-white text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
+                className="w-full py-2.5 px-4 rounded-lg bg-[#1F1F1F] hover:bg-black text-white text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
               >
-                <Mail className="w-3.5 h-3.5" />
-                <span>{submitting ? 'Sending Recovery Email...' : 'Send Password Reset Email'}</span>
+                <KeyRound className="w-3.5 h-3.5" />
+                <span>{submitting ? 'Updating Password...' : 'Set New Password Immediately'}</span>
               </button>
 
               <button

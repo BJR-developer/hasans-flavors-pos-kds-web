@@ -3,6 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
+import { useAuthStore } from '@/lib/auth';
 import {
   fetchDishesFromDB,
   updateDishInDB,
@@ -197,10 +198,16 @@ export function useCreateOrder() {
 
       const orderNumber = `#${nextSeq}`;
 
+      const currentUser = useAuthStore.getState().user;
+      const cashierId = orderData.cashierId || (currentUser ? currentUser.id : undefined);
+      const cashierName = orderData.cashierName || (currentUser ? (currentUser.name || currentUser.email) : undefined);
+
       const fullOrder: Order = {
         ...orderData,
         id,
         orderNumber,
+        cashierId,
+        cashierName,
         createdAt: now.toISOString(),
       };
 

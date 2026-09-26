@@ -8,6 +8,7 @@ import {
   SlidersHorizontal,
   LogOut,
   ChevronDown,
+  Clock,
 } from 'lucide-react';
 import { useAuthStore } from '@/lib/auth';
 
@@ -53,6 +54,7 @@ export function ProfileDropdown() {
     : 'U';
 
   const isSettingsActive = pathname.startsWith('/settings');
+  const isShiftsActive = pathname.startsWith('/shifts');
 
   return (
     <div className="relative shrink-0" ref={dropdownRef}>
@@ -64,7 +66,7 @@ export function ProfileDropdown() {
         className={`flex items-center gap-1.5 p-1 sm:pl-1 sm:pr-2 rounded-xl border transition-all cursor-pointer ${
           isOpen
             ? 'bg-neutral-100 border-neutral-400 shadow-xs'
-            : isSettingsActive
+            : isSettingsActive || isShiftsActive
             ? 'border-neutral-900 bg-neutral-50 shadow-xs'
             : 'border-[#E5E5E5] bg-white hover:bg-neutral-50 hover:border-neutral-300'
         }`}
@@ -126,6 +128,35 @@ export function ProfileDropdown() {
 
             {/* Menu Items */}
             <div className="p-1.5 space-y-0.5">
+              {/* Sessions Link */}
+              <Link
+                href="/shifts"
+                onClick={() => setIsOpen(false)}
+                className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${
+                  isShiftsActive
+                    ? 'bg-neutral-900 text-white'
+                    : 'text-neutral-700 hover:bg-neutral-100 hover:text-neutral-900'
+                }`}
+              >
+                <Clock
+                  className={`w-4 h-4 ${
+                    isShiftsActive ? 'text-white' : 'text-[#BA1A20]'
+                  }`}
+                />
+                <div className="flex-1">
+                  <span className="block leading-tight">
+                    {user.role === 'owner' ? 'Staff Sessions' : 'My Session'}
+                  </span>
+                  <span
+                    className={`text-[10px] block ${
+                      isShiftsActive ? 'text-neutral-300' : 'text-neutral-400'
+                    }`}
+                  >
+                    {user.role === 'owner' ? 'Audit cashier work & sales' : 'Today’s orders & activity'}
+                  </span>
+                </div>
+              </Link>
+
               {/* Settings Link */}
               <Link
                 href="/settings"

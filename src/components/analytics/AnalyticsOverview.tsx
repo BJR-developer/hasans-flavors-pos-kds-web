@@ -10,16 +10,20 @@ import {
   TrendingUp,
   Calendar,
   ShoppingBag,
+  Clock,
+  User,
 } from 'lucide-react';
 import { useOrders, useTableSessions } from '@/hooks/useRestaurantData';
+import { useStaffUsers } from '@/hooks/useStaffData';
 
-type DatePreset = 'this_month' | 'today' | 'yesterday' | 'last_7_days' | 'last_30_days' | 'last_month' | 'custom';
+type DatePreset = 'today' | 'yesterday' | 'last_7_days' | 'this_month' | 'custom';
 
 export function AnalyticsOverview() {
   const { data: orders = [] } = useOrders();
   const { data: tables = [] } = useTableSessions();
+  const { data: staffList = [] } = useStaffUsers();
 
-  // Helper to get local YYYY-MM-DD string
+  // Helper to format local YYYY-MM-DD string
   const toDateInputString = (d: Date): string => {
     const year = d.getFullYear();
     const month = String(d.getMonth() + 1).padStart(2, '0');
@@ -27,91 +31,97 @@ export function AnalyticsOverview() {
     return `${year}-${month}-${day}`;
   };
 
-  // Compute Initial "This Month" default dates (e.g. Sept 1 to Sept 30)
-  const defaultRange = useMemo(() => {
-    const now = new Date();
-    const start = new Date(now.getFullYear(), now.getMonth(), 1);
-    const end = new Date(now.getFullYear(), now.getMonth() + 1, 0); // Last day of current month
-    return {
-      start: toDateInputString(start),
-      end: toDateInputString(end),
-    };
-  }, []);
+  const todayStr = useMemo(() => toDateInputString(new Date()), []);
 
-  const [datePreset, setDatePreset] = useState<DatePreset>('this_month');
-  const [customStartDate, setCustomStartDate] = useState<string>(defaultRange.start);
-  const [customEndDate, setCustomEndDate] = useState<string>(defaultRange.end);
+  const [datePreset, setDatePreset] = useState<DatePreset>('today');
+  const [customStartDate, setCustomStartDate] = useState<string>(todayStr);
+  const [customEndDate, setCustomEndDate] = useState<string>(todayStr);
+  const [selectedStaffId, setSelectedStaffId] = useState<string>('all');
+
+  // Filter staff list to cashiers and owners only
+  const activeStaffMembers = useMemo(() => {
+    return staffList.filter((s) => s.role === 'cashier' || s.role === 'owner');
+  }, [staffList]);
 
   // Quick Preset Handlers
   const handleSelectPreset = (preset: DatePreset) => {
     setDatePreset(preset);
     const now = new Date();
 
-    if (preset === 'this_month') {
-      const start = new Date(now.getFullYear(), now.getMonth(), 1);
-      const end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-      setCustomStartDate(toDateInputString(start));
-      setCustomEndDate(toDateInputString(end));
-    } else if (preset === 'today') {
-      const todayStr = toDateInputString(now);
-      setCustomStartDate(todayStr);
-      setCustomEndDate(todayStr);
+    if (preset === 'today') {
+      const str = toDateInputString(now);
+      setCustomStartDate(str);
+      setCustomEndDate(str);
     } else if (preset === 'yesterday') {
       const yest = new Date(now);
       yest.setDate(yest.getDate() - 1);
-      const yestStr = toDateInputString(yest);
-      setCustomStartDate(yestStr);
-      setCustomEndDate(yestStr);
+      const str = toDateInputString(yest);
+      setCustomStartDate(str);
+      setCustomEndDate(str);
     } else if (preset === 'last_7_days') {
       const start = new Date(now);
       start.setDate(start.getDate() - 6);
       setCustomStartDate(toDateInputString(start));
       setCustomEndDate(toDateInputString(now));
-    } else if (preset === 'last_30_days') {
-      const start = new Date(now);
-      start.setDate(start.getDate() - 29);
-      setCustomStartDate(toDateInputString(start));
-      setCustomEndDate(toDateInputString(now));
-    } else if (preset === 'last_month') {
-      const start = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-      const end = new Date(now.getFullYear(), now.getMonth(), 0);
+    } else if (preset === 'this_month') {
+      const start = new Date(now.getFullYear(), now.getMonth(), 1);
+      const end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
       setCustomStartDate(toDateInputString(start));
       setCustomEndDate(toDateInputString(end));
     }
   };
 
-  // Filter orders strictly by the chosen date range
+  const selectedStaff = useMemo(() => {
+    if (selectedStaffId === 'all') return null;
+    return activeStaffMembers.find((s) => s.id === selectedStaffId) || null;
+  }, [selectedStaffId, activeStaffMembers]);
+
+  // Filter orders strictly by chosen date range and selected cashier account
   const { filteredOrders, rangeLabel } = useMemo(() => {
-    if (!customStartDate || !customEndDate) {
-      return { filteredOrders: orders, rangeLabel: 'All Time' };
+    let filtered = orders;
+
+    if (customStartDate && customEndDate) {
+      const start = new Date(`${customStartDate}T00:00:00`);
+      const end = new Date(`${customEndDate}T23:59:59.999`);
+      filtered = filtered.filter((o) => {
+        const orderTime = new Date(o.createdAt).getTime();
+        return orderTime >= start.getTime() && orderTime <= end.getTime();
+      });
     }
 
-    const start = new Date(`${customStartDate}T00:00:00`);
-    const end = new Date(`${customEndDate}T23:59:59.999`);
+    if (selectedStaffId !== 'all') {
+      filtered = filtered.filter((o) => {
+        if (o.cashierId === selectedStaffId) return true;
+        if (selectedStaff) {
+          const matchName = o.cashierName && selectedStaff.fullName &&
+            o.cashierName.toLowerCase() === selectedStaff.fullName.toLowerCase();
+          const matchUsername = o.cashierName && selectedStaff.username &&
+            o.cashierName.toLowerCase() === selectedStaff.username.toLowerCase();
+          return matchName || matchUsername;
+        }
+        return false;
+      });
+    }
 
-    const filtered = orders.filter((o) => {
-      const orderTime = new Date(o.createdAt).getTime();
-      return orderTime >= start.getTime() && orderTime <= end.getTime();
-    });
-
-    const startFormatted = start.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
-    const endFormatted = end.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
-
-    const label =
-      customStartDate === customEndDate
-        ? startFormatted
-        : `${startFormatted} – ${endFormatted}`;
+    let label = 'Today';
+    if (customStartDate && customEndDate) {
+      const start = new Date(`${customStartDate}T00:00:00`);
+      const end = new Date(`${customEndDate}T23:59:59.999`);
+      const startFormatted = start.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+      });
+      const endFormatted = end.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+      });
+      label = customStartDate === customEndDate ? startFormatted : `${startFormatted} – ${endFormatted}`;
+    }
 
     return { filteredOrders: filtered, rangeLabel: label };
-  }, [orders, customStartDate, customEndDate]);
+  }, [orders, customStartDate, customEndDate, selectedStaffId, selectedStaff]);
 
   // Aggregate Range Metrics
   const paidOrders = useMemo(
@@ -120,143 +130,98 @@ export function AnalyticsOverview() {
   );
 
   const totalRevenue = useMemo(
-    () => paidOrders.reduce((sum, o) => sum + o.total, 0),
+    () => paidOrders.reduce((sum, o) => sum + (o.total || 0), 0),
     [paidOrders]
   );
 
+  const completedCount = useMemo(
+    () => filteredOrders.filter((o) => o.status === 'completed').length,
+    [filteredOrders]
+  );
+
   const totalOrdersCount = filteredOrders.length;
-  const completedCount = filteredOrders.filter((o) => o.status === 'completed').length;
-  const avgTicket = totalOrdersCount > 0 ? Math.round(totalRevenue / totalOrdersCount) : 0;
+  const avgTicket = paidOrders.length > 0 ? Math.round(totalRevenue / paidOrders.length) : 0;
   const activeTablesCount = tables.filter((t) => t.status !== 'available').length;
 
-  // Channel breakdown (Dine-In & Takeout)
-  const dineInOrders = filteredOrders.filter((o) => o.type === 'dine_in');
-  const takeoutOrders = filteredOrders.filter((o) => o.type === 'takeout');
+  // Channel Breakdown
+  const dineInOrders = useMemo(
+    () => paidOrders.filter((o) => o.type === 'dine_in'),
+    [paidOrders]
+  );
+  const takeoutOrders = useMemo(
+    () => paidOrders.filter((o) => o.type === 'takeout'),
+    [paidOrders]
+  );
 
-  const dineInRevenue = dineInOrders.reduce((sum, o) => sum + o.total, 0);
-  const takeoutRevenue = takeoutOrders.reduce((sum, o) => sum + o.total, 0);
-
-  // Payment Breakdown (Cash & Card)
-  const cashCount = filteredOrders.filter((o) => o.paymentMethod === 'cash').length;
-  const cardCount = filteredOrders.filter((o) => o.paymentMethod === 'card').length;
-
-  // Top Selling Items in Range
-  const topSellingItems = useMemo(() => {
-    const itemMap: Record<string, { name: string; sold: number; revenue: number }> = {};
-    filteredOrders.forEach((o) => {
-      if (o.status === 'cancelled') return;
-      o.items.forEach((item) => {
-        const key = item.dish.name;
-        if (!itemMap[key]) {
-          itemMap[key] = { name: key, sold: 0, revenue: 0 };
-        }
-        itemMap[key].sold += item.quantity;
-        itemMap[key].revenue += item.totalPrice;
-      });
-    });
-
-    return Object.values(itemMap)
-      .sort((a, b) => b.sold - a.sold)
-      .slice(0, 6);
-  }, [filteredOrders]);
-
-  // Day by Day Revenue Breakdown for the Range
-  const dailyBreakdown = useMemo(() => {
-    const dayMap: Record<string, { dateStr: string; label: string; revenue: number; ordersCount: number }> = {};
-
-    paidOrders.forEach((o) => {
-      const d = new Date(o.createdAt);
-      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(
-        d.getDate()
-      ).padStart(2, '0')}`;
-      const label = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', weekday: 'short' });
-
-      if (!dayMap[key]) {
-        dayMap[key] = { dateStr: key, label, revenue: 0, ordersCount: 0 };
-      }
-      dayMap[key].revenue += o.total;
-      dayMap[key].ordersCount += 1;
-    });
-
-    return Object.values(dayMap).sort((a, b) => a.dateStr.localeCompare(b.dateStr));
-  }, [paidOrders]);
+  const dineInRevenue = dineInOrders.reduce((sum, o) => sum + (o.total || 0), 0);
+  const takeoutRevenue = takeoutOrders.reduce((sum, o) => sum + (o.total || 0), 0);
 
   return (
-    <div className="flex-1 flex flex-col p-4 sm:p-6 lg:p-8 max-w-[1400px] mx-auto w-full space-y-6">
-      {/* 1. Header with Title & Quick Navigation */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+    <div className="max-w-[1720px] mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
+      {/* 1. Header Bar with Quick Navigation to Shifts */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-[#1F1F1F]">Owner Operations Overview</h1>
+          <h1 className="text-xl sm:text-2xl font-black text-[#1F1F1F] tracking-tight">
+            Owner Financial Dashboard
+          </h1>
           <p className="text-xs text-[#737373] mt-0.5">
-            Default view calculates full month-to-month range • Custom date filterable
+            Real-time sales revenue, verified orders, and cashier account performance
           </p>
         </div>
 
         <div className="flex items-center gap-2">
           <Link
-            href="/orders"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#E5E5E5] bg-white text-xs font-semibold text-[#525252] hover:text-[#1F1F1F] hover:bg-[#F5F5F5] transition-colors"
+            href="/shifts"
+            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-neutral-900 hover:bg-black text-white text-xs font-bold transition-all shadow-xs"
           >
-            <span>Orders Table</span>
-            <ArrowRight className="w-3 h-3" />
-          </Link>
-          <Link
-            href="/pos"
-            className="px-3.5 py-1.5 rounded-lg bg-[#BA1A20] hover:bg-[#8B0000] text-white text-xs font-bold transition-colors shadow-xs"
-          >
-            Open POS
+            <Clock className="w-3.5 h-3.5 text-amber-400" />
+            <span>Cashier Shifts &amp; Logs</span>
+            <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
       </div>
 
-      {/* 2. Date Range Filter Controls Bar */}
-      <div className="p-4 bg-white rounded-xl border border-[#E5E5E5] space-y-3.5 shadow-2xs">
+      {/* 2. Simplified Controls: Timeline Selection, Exact Dates & Staff Account Filter */}
+      <div className="bg-white rounded-2xl border border-[#E5E5E5] p-4 sm:p-5 shadow-2xs space-y-4">
+        {/* Timeline Presets & Exact Dates */}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
-          {/* Quick Preset Buttons */}
-          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
-            {[
-              { id: 'this_month', label: 'This Month (Default)' },
-              { id: 'today', label: 'Today' },
-              { id: 'yesterday', label: 'Yesterday' },
-              { id: 'last_7_days', label: 'Last 7 Days' },
-              { id: 'last_30_days', label: 'Last 30 Days' },
-              { id: 'last_month', label: 'Last Month' },
-              { id: 'custom', label: 'Custom Range' },
-            ].map((preset) => {
-              const isSelected = datePreset === preset.id;
-              return (
-                <button
-                  key={preset.id}
-                  type="button"
-                  onClick={() => handleSelectPreset(preset.id as DatePreset)}
-                  className={`px-3 py-1.5 rounded-md text-xs font-semibold whitespace-nowrap transition-colors ${
-                    isSelected
-                      ? 'bg-[#1F1F1F] text-white shadow-xs'
-                      : 'bg-[#FAFAFA] text-[#525252] hover:bg-[#F5F5F5] hover:text-[#1F1F1F] border border-[#E5E5E5]'
-                  }`}
-                >
-                  {preset.label}
-                </button>
-              );
-            })}
+          <div className="flex items-center gap-1.5 flex-wrap">
+            {(
+              [
+                { id: 'today', label: 'Today (Default)' },
+                { id: 'yesterday', label: 'Yesterday' },
+                { id: 'last_7_days', label: 'Last 7 Days' },
+                { id: 'this_month', label: 'This Month' },
+                { id: 'custom', label: 'Custom Range' },
+              ] as const
+            ).map((preset) => (
+              <button
+                key={preset.id}
+                onClick={() => handleSelectPreset(preset.id)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                  datePreset === preset.id
+                    ? 'bg-[#1F1F1F] text-white shadow-xs'
+                    : 'bg-[#FAFAFA] text-[#525252] hover:bg-[#F5F5F5] border border-[#E5E5E5]'
+                }`}
+              >
+                {preset.label}
+              </button>
+            ))}
           </div>
 
-          {/* Active Range Display Badge */}
-          <div className="flex items-center gap-2 text-xs font-semibold text-[#525252] bg-[#FAFAFA] px-3 py-1.5 rounded-lg border border-[#E5E5E5] shrink-0">
+          <div className="flex items-center gap-2 text-xs text-[#737373] font-medium bg-[#FAFAFA] px-3 py-1.5 rounded-lg border border-[#E5E5E5]">
             <Calendar className="w-3.5 h-3.5 text-[#BA1A20]" />
-            <span>Range:</span>
-            <span className="font-bold text-[#1F1F1F]">{rangeLabel}</span>
+            <span>Period: <strong>{rangeLabel}</strong></span>
           </div>
         </div>
 
-        {/* Custom Date Pickers (Visible when custom range or for fine-tuning) */}
-        <div className="pt-2 border-t border-[#F5F5F5] flex flex-wrap items-center gap-3 text-xs">
-          <span className="text-[11px] font-bold text-[#737373] uppercase tracking-wider">
-            Select Exact Dates:
-          </span>
-
+        {/* Date Inputs & Cashier Account Filter */}
+        <div className="pt-3 border-t border-[#F5F5F5] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
+          {/* Exact Date From / To */}
           <div className="flex items-center gap-2">
-            <label className="text-[#525252] text-[11px] font-medium">From:</label>
+            <span className="text-[11px] font-bold text-[#737373] uppercase tracking-wider shrink-0">
+              Dates:
+            </span>
             <input
               type="date"
               value={customStartDate}
@@ -264,12 +229,9 @@ export function AnalyticsOverview() {
                 setCustomStartDate(e.target.value);
                 setDatePreset('custom');
               }}
-              className="px-2.5 py-1 text-xs rounded-md border border-[#E5E5E5] bg-[#FAFAFA] text-[#1F1F1F] focus:bg-white focus:outline-none focus:border-[#1F1F1F]"
+              className="px-2.5 py-1.5 text-xs rounded-lg border border-[#E5E5E5] bg-[#FAFAFA] text-[#1F1F1F] focus:bg-white focus:outline-none focus:border-[#1F1F1F]"
             />
-          </div>
-
-          <div className="flex items-center gap-2">
-            <label className="text-[#525252] text-[11px] font-medium">To:</label>
+            <span className="text-[#A3A3A3]">to</span>
             <input
               type="date"
               value={customEndDate}
@@ -277,19 +239,42 @@ export function AnalyticsOverview() {
                 setCustomEndDate(e.target.value);
                 setDatePreset('custom');
               }}
-              className="px-2.5 py-1 text-xs rounded-md border border-[#E5E5E5] bg-[#FAFAFA] text-[#1F1F1F] focus:bg-white focus:outline-none focus:border-[#1F1F1F]"
+              className="px-2.5 py-1.5 text-xs rounded-lg border border-[#E5E5E5] bg-[#FAFAFA] text-[#1F1F1F] focus:bg-white focus:outline-none focus:border-[#1F1F1F]"
             />
           </div>
 
-          <span className="text-[11px] text-[#A3A3A3] ml-auto">
-            {filteredOrders.length} orders found in this period
-          </span>
+          {/* Staff Account Selector */}
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] font-bold text-[#737373] uppercase tracking-wider shrink-0 flex items-center gap-1">
+              <User className="w-3.5 h-3.5 text-neutral-500" />
+              <span>Staff:</span>
+            </span>
+            <select
+              value={selectedStaffId}
+              onChange={(e) => setSelectedStaffId(e.target.value)}
+              className="flex-1 px-3 py-1.5 text-xs rounded-lg border border-[#E5E5E5] bg-[#FAFAFA] text-[#1F1F1F] font-semibold focus:bg-white focus:outline-none focus:border-[#1F1F1F]"
+            >
+              <option value="all">All Cashier Accounts (Default)</option>
+              {activeStaffMembers.map((staff) => (
+                <option key={staff.id} value={staff.id}>
+                  {staff.fullName} {staff.username ? `(@${staff.username})` : `(${staff.role})`}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Orders Count Summary */}
+          <div className="flex items-center justify-start lg:justify-end text-xs text-[#737373]">
+            <span>
+              Showing <strong>{filteredOrders.length}</strong> orders {selectedStaff ? `for ${selectedStaff.fullName}` : 'across all staff'}
+            </span>
+          </div>
         </div>
       </div>
 
-      {/* 3. Primary KPI Cards for Selected Date Range */}
+      {/* 3. Primary KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        {/* Gross Revenue in Range */}
+        {/* Gross Revenue */}
         <div className="p-4 sm:p-5 bg-white rounded-xl border border-[#E5E5E5] space-y-2 shadow-2xs">
           <div className="flex items-center justify-between text-xs text-[#737373]">
             <span>Gross Revenue</span>
@@ -304,7 +289,7 @@ export function AnalyticsOverview() {
           </p>
         </div>
 
-        {/* Total Orders Logged in Range */}
+        {/* Total Orders */}
         <div className="p-4 sm:p-5 bg-white rounded-xl border border-[#E5E5E5] space-y-2 shadow-2xs">
           <div className="flex items-center justify-between text-xs text-[#737373]">
             <span>Total Orders</span>
@@ -318,7 +303,7 @@ export function AnalyticsOverview() {
           </p>
         </div>
 
-        {/* Average Order Value in Range */}
+        {/* Average Order Value */}
         <div className="p-4 sm:p-5 bg-white rounded-xl border border-[#E5E5E5] space-y-2 shadow-2xs">
           <div className="flex items-center justify-between text-xs text-[#737373]">
             <span>Average Order Value</span>
@@ -330,7 +315,7 @@ export function AnalyticsOverview() {
           <p className="text-[11px] text-[#737373]">Per guest transaction</p>
         </div>
 
-        {/* Live Tables Status */}
+        {/* Floor Tables Now */}
         <div className="p-4 sm:p-5 bg-white rounded-xl border border-[#E5E5E5] space-y-2 shadow-2xs">
           <div className="flex items-center justify-between text-xs text-[#737373]">
             <span>Floor Tables Now</span>
@@ -345,8 +330,8 @@ export function AnalyticsOverview() {
         </div>
       </div>
 
-      {/* 4. Sales by Channel & Payment Breakdown */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      {/* 4. Sales Channel Breakdown & Floor Table Map */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Sales by Channel */}
         <div className="bg-white rounded-xl border border-[#E5E5E5] p-5 space-y-4 shadow-2xs">
           <h3 className="text-xs font-bold text-[#1F1F1F] uppercase tracking-wider">
@@ -392,37 +377,6 @@ export function AnalyticsOverview() {
           </div>
         </div>
 
-        {/* Payment Methods */}
-        <div className="bg-white rounded-xl border border-[#E5E5E5] p-5 space-y-4 shadow-2xs">
-          <h3 className="text-xs font-bold text-[#1F1F1F] uppercase tracking-wider">
-            Tender Share ({rangeLabel})
-          </h3>
-
-          <div className="grid grid-cols-2 gap-2.5">
-            <div className="p-3.5 rounded-xl bg-[#FAFAFA] border border-[#E5E5E5] text-center">
-              <span className="text-[10px] font-bold text-[#737373] uppercase">Cash</span>
-              <p className="text-xl font-black text-[#1F1F1F] mt-1">{cashCount}</p>
-              <p className="text-[10px] text-[#737373] mt-0.5">
-                {totalOrdersCount > 0 ? Math.round((cashCount / totalOrdersCount) * 100) : 0}% share
-              </p>
-            </div>
-
-            <div className="p-3.5 rounded-xl bg-[#FAFAFA] border border-[#E5E5E5] text-center">
-              <span className="text-[10px] font-bold text-[#737373] uppercase">Card</span>
-              <p className="text-xl font-black text-[#BA1A20] mt-1">{cardCount}</p>
-              <p className="text-[10px] text-[#737373] mt-0.5">
-                {totalOrdersCount > 0 ? Math.round((cardCount / totalOrdersCount) * 100) : 0}% share
-              </p>
-            </div>
-          </div>
-
-          <div className="pt-2 border-t border-[#F5F5F5] text-xs text-[#525252]">
-            <p className="text-[11px] text-[#737373]">
-              All POS transactions reflect verified register totals.
-            </p>
-          </div>
-        </div>
-
         {/* Live Dining Room Table Map */}
         <div className="bg-white rounded-xl border border-[#E5E5E5] p-5 space-y-3 shadow-2xs">
           <div className="flex items-center justify-between">
@@ -455,84 +409,6 @@ export function AnalyticsOverview() {
               </div>
             ))}
           </div>
-        </div>
-      </div>
-
-      {/* 5. Daily Revenue Breakdown List for Selected Month / Range */}
-      {dailyBreakdown.length > 0 && (
-        <div className="bg-white rounded-xl border border-[#E5E5E5] p-5 space-y-3 shadow-2xs">
-          <div className="flex items-center justify-between">
-            <h3 className="text-xs font-bold text-[#1F1F1F] uppercase tracking-wider">
-              Daily Revenue Timeline in Selected Period
-            </h3>
-            <span className="text-[11px] text-[#737373] font-medium">
-              {dailyBreakdown.length} active sales days
-            </span>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5">
-            {dailyBreakdown.map((day) => (
-              <div
-                key={day.dateStr}
-                className="p-3 rounded-lg bg-[#FAFAFA] border border-[#E5E5E5] space-y-1"
-              >
-                <span className="text-[10px] font-bold text-[#737373] uppercase block truncate">
-                  {day.label}
-                </span>
-                <span className="text-sm font-black text-[#1F1F1F] block">
-                  ₱{day.revenue.toLocaleString()}
-                </span>
-                <span className="text-[10px] text-[#737373] block">
-                  {day.ordersCount} orders
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* 6. Top Selling Dishes in Selected Range */}
-      <div className="bg-white rounded-xl border border-[#E5E5E5] p-5 space-y-3 shadow-2xs">
-        <div className="flex items-center justify-between">
-          <h3 className="text-xs font-bold text-[#1F1F1F] uppercase tracking-wider">
-            Top Selling Dishes in Selected Range
-          </h3>
-          <span className="text-xs text-[#737373]">
-            {topSellingItems.length} top performing dishes
-          </span>
-        </div>
-
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs border-collapse">
-            <thead>
-              <tr className="border-b border-[#E5E5E5] text-[11px] text-[#737373] font-bold">
-                <th className="py-2.5 px-3">Rank</th>
-                <th className="py-2.5 px-3">Dish</th>
-                <th className="py-2.5 px-3">Plates Sold</th>
-                <th className="py-2.5 px-3 text-right">Revenue Generated</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[#F5F5F5]">
-              {topSellingItems.length === 0 ? (
-                <tr>
-                  <td colSpan={4} className="py-6 text-center text-[#A3A3A3]">
-                    No dishes sold in this date range.
-                  </td>
-                </tr>
-              ) : (
-                topSellingItems.map((item, index) => (
-                  <tr key={item.name} className="hover:bg-[#FAFAFA] transition-colors">
-                    <td className="py-2.5 px-3 font-semibold text-[#737373]">#{index + 1}</td>
-                    <td className="py-2.5 px-3 font-bold text-[#1F1F1F]">{item.name}</td>
-                    <td className="py-2.5 px-3 text-[#525252]">{item.sold} plates</td>
-                    <td className="py-2.5 px-3 text-right font-black text-[#BA1A20]">
-                      ₱{item.revenue.toLocaleString()}
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
         </div>
       </div>
     </div>

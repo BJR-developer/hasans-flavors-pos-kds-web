@@ -13,6 +13,7 @@ import { DishCustomizerModal } from './DishCustomizerModal';
 import { ThermalReceiptModal } from './ThermalReceiptModal';
 import { KeyboardShortcutsModal } from './KeyboardShortcutsModal';
 import { OrderDetailsModal } from '../orders/OrderDetailsModal';
+import { PosShiftButton } from './PosShiftButton';
 import { SafeImage } from '@/components/common/SafeImage';
 import { PORTION_OPTIONS } from '@/data/options';
 
@@ -327,6 +328,9 @@ export function PosRegister() {
                 </button>
               )}
             </div>
+
+            {/* Cashier Shift Handover & Calculations Button */}
+            <PosShiftButton />
 
             {/* Cashier POS Settings Trigger Button */}
             <Link

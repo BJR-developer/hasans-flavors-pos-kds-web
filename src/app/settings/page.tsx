@@ -10,12 +10,14 @@ import {
   ArrowLeft,
   ShieldCheck,
   ChevronRight,
+  Users,
 } from 'lucide-react';
 import { useAuthStore } from '@/lib/auth';
 import { AccountSettingsTab } from '@/components/settings/AccountSettingsTab';
 import { PosSettingsTab } from '@/components/settings/PosSettingsTab';
+import { StaffManagementTab } from '@/components/settings/StaffManagementTab';
 
-type SettingsTab = 'account' | 'pos';
+type SettingsTab = 'account' | 'staff' | 'pos';
 
 function SettingsContent() {
   const router = useRouter();
@@ -24,11 +26,11 @@ function SettingsContent() {
 
   const tabParam = searchParams.get('tab') as SettingsTab | null;
   const [activeTab, setActiveTab] = useState<SettingsTab>(
-    tabParam === 'pos' ? 'pos' : 'account'
+    tabParam === 'staff' ? 'staff' : tabParam === 'pos' ? 'pos' : 'account'
   );
 
   useEffect(() => {
-    if (tabParam === 'pos' || tabParam === 'account') {
+    if (tabParam === 'pos' || tabParam === 'account' || tabParam === 'staff') {
       setActiveTab(tabParam);
     }
   }, [tabParam]);
@@ -120,6 +122,46 @@ function SettingsContent() {
               />
             </button>
 
+            {/* Staff Management Tab Link (Owner only) */}
+            {user?.role === 'owner' && (
+              <button
+                type="button"
+                onClick={() => handleTabChange('staff')}
+                className={`w-full flex items-center justify-between p-3 rounded-xl transition-all text-left ${
+                  activeTab === 'staff'
+                    ? 'bg-neutral-900 text-white shadow-xs font-bold'
+                    : 'text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900 font-semibold'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <div
+                    className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
+                      activeTab === 'staff'
+                        ? 'bg-white/20 text-white'
+                        : 'bg-neutral-100 text-neutral-700'
+                    }`}
+                  >
+                    <Users className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <span className="text-xs block">Staff &amp; Cashiers</span>
+                    <span
+                      className={`text-[10px] block ${
+                        activeTab === 'staff' ? 'text-neutral-300' : 'text-neutral-400'
+                      }`}
+                    >
+                      Accounts &amp; passwords
+                    </span>
+                  </div>
+                </div>
+                <ChevronRight
+                  className={`w-4 h-4 ${
+                    activeTab === 'staff' ? 'text-white' : 'text-neutral-400'
+                  }`}
+                />
+              </button>
+            )}
+
             {/* POS Settings Tab Link */}
             <button
               type="button"
@@ -164,6 +206,8 @@ function SettingsContent() {
             <AnimatePresence mode="wait">
               {activeTab === 'account' ? (
                 <AccountSettingsTab key="account" />
+              ) : activeTab === 'staff' ? (
+                <StaffManagementTab key="staff" />
               ) : (
                 <PosSettingsTab key="pos" />
               )}
