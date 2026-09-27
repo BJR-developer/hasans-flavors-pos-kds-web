@@ -7,6 +7,7 @@ import {
   startShift,
   closeShift,
   updateShiftOpeningCash,
+  reviewShift,
 } from '@/lib/shiftApi';
 import { Shift } from '@/types';
 
@@ -27,6 +28,7 @@ export function useActiveShift(cashierId?: string) {
   return useQuery<Shift | null>({
     queryKey: SHIFT_QUERY_KEYS.activeShift(cashierId),
     queryFn: () => fetchActiveShift(cashierId),
+    enabled: !!cashierId,
     staleTime: 1000 * 15,
   });
 }
@@ -64,6 +66,7 @@ export function useCloseShift() {
       onlineSales: number;
       totalDiscount: number;
       notes?: string;
+      closedBy?: string;
     }) => closeShift(params),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: SHIFT_QUERY_KEYS.shifts });
@@ -82,10 +85,25 @@ export function useUpdateShiftOpeningCash() {
       changedBy: string;
       reason?: string;
     }) => updateShiftOpeningCash(params),
-    onSuccess: (updatedShift) => {
-      queryClient.setQueriesData({ queryKey: ['activeShift'] }, updatedShift);
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: SHIFT_QUERY_KEYS.shifts });
       queryClient.invalidateQueries({ queryKey: ['activeShift'] });
+    },
+  });
+}
+
+export function useReviewShift() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (params: {
+      shiftId: string;
+      status: 'approved' | 'flagged' | 'pending';
+      note?: string;
+      reviewerId: string;
+    }) => reviewShift(params),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: SHIFT_QUERY_KEYS.shifts });
     },
   });
 }

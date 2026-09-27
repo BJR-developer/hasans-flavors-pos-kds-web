@@ -76,8 +76,8 @@ export function PosNewOrderActions({
           onClick={() => setPaymentTiming('pay_later')}
           className={`flex-1 py-1.5 rounded-md flex items-center justify-center gap-1 transition-all ${
             paymentTiming === 'pay_later'
-              ? 'bg-white text-[#1F1F1F] shadow-xs'
-              : 'text-[#737373] hover:text-[#1F1F1F]'
+              ? 'bg-white text-ink shadow-xs'
+              : 'text-muted hover:text-ink'
           }`}
         >
           <span>
@@ -89,8 +89,8 @@ export function PosNewOrderActions({
           onClick={() => setPaymentTiming('pay_now')}
           className={`flex-1 py-1.5 rounded-md flex items-center justify-center gap-1 transition-all ${
             paymentTiming === 'pay_now'
-              ? 'bg-white text-[#1F1F1F] shadow-xs'
-              : 'text-[#737373] hover:text-[#1F1F1F]'
+              ? 'bg-white text-ink shadow-xs'
+              : 'text-muted hover:text-ink'
           }`}
         >
           <span>Pay Now</span>
@@ -163,7 +163,7 @@ export function PosNewOrderActions({
               {/* Clear Header Label */}
               <div className="flex items-center justify-between text-xs">
                 <span className="font-bold text-neutral-800">Cash Received from Customer</span>
-                <span className="text-[11px] font-mono text-neutral-500">Bill: ₱{total.toLocaleString()}</span>
+                <span className="text-xs font-mono text-neutral-500">Bill: ₱{total.toLocaleString()}</span>
               </div>
 
               {/* Quick Cash Presets */}
@@ -199,7 +199,7 @@ export function PosNewOrderActions({
 
               {/* Custom Cash Tendered Input with clear label */}
               <div>
-                <label className="block text-[11px] font-medium text-neutral-600 mb-1">
+                <label className="block text-xs font-medium text-neutral-600 mb-1">
                   Amount Tendered (₱)
                 </label>
                 <div className="relative">
@@ -221,10 +221,10 @@ export function PosNewOrderActions({
                 tenderedNum >= total ? (
                   <div className="p-2.5 rounded-lg bg-emerald-50 border border-emerald-300 text-emerald-900 flex items-center justify-between">
                     <div>
-                      <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-800 block">
+                      <span className="text-xs font-extrabold uppercase tracking-wider text-emerald-800 block">
                         Cash Return / Change Due
                       </span>
-                      <span className="text-[11px] text-emerald-700">
+                      <span className="text-xs text-emerald-700">
                         ₱{tenderedNum.toLocaleString()} received − ₱{total.toLocaleString()} bill
                       </span>
                     </div>
@@ -235,10 +235,10 @@ export function PosNewOrderActions({
                 ) : (
                   <div className="p-2.5 rounded-lg bg-rose-50 border border-rose-300 text-rose-900 flex items-center justify-between">
                     <div>
-                      <span className="text-[10px] font-extrabold uppercase tracking-wider text-rose-800 block">
+                      <span className="text-xs font-extrabold uppercase tracking-wider text-rose-800 block">
                         Insufficient Cash Tendered
                       </span>
-                      <span className="text-[11px] text-rose-700">
+                      <span className="text-xs text-rose-700">
                         Customer owes remaining balance
                       </span>
                     </div>
@@ -258,7 +258,7 @@ export function PosNewOrderActions({
         <div className="flex items-center justify-between px-1 py-1 text-xs border border-neutral-100 bg-neutral-50/70 rounded-lg">
           <div className="flex items-center gap-1.5 text-neutral-500 font-medium">
             <Clock className="w-3.5 h-3.5 text-neutral-600" />
-            <span className="text-[11px] font-semibold text-neutral-700">Kitchen Prep ETA:</span>
+            <span className="text-xs font-semibold text-neutral-700">Kitchen Prep ETA:</span>
           </div>
           <div className="flex items-center gap-1">
             {[10, 15, 20, 30].map((mins) => (
@@ -266,7 +266,7 @@ export function PosNewOrderActions({
                 key={mins}
                 type="button"
                 onClick={() => setPrepTimeMinutes(mins)}
-                className={`px-2 py-0.5 rounded text-[11px] font-bold border transition-colors ${
+                className={`px-2 py-0.5 rounded text-xs font-bold border transition-colors ${
                   prepTimeMinutes === mins
                     ? 'bg-neutral-900 text-white border-neutral-900'
                     : 'bg-white text-neutral-600 border-neutral-200 hover:bg-neutral-100'
@@ -285,7 +285,7 @@ export function PosNewOrderActions({
           type="button"
           onClick={onSubmit}
           disabled={itemsCount === 0 || isPending}
-          className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-[#BA1A20] hover:bg-[#8B0000] text-white text-xs font-bold transition-colors disabled:opacity-40 disabled:cursor-not-allowed shadow-xs"
+          className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-brand hover:bg-brand-dark text-white text-xs font-bold transition-colors disabled:opacity-40 disabled:cursor-not-allowed shadow-xs"
         >
           <Send className="w-3.5 h-3.5" />
           <span>
@@ -304,7 +304,7 @@ export function PosNewOrderActions({
           className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl text-white text-xs font-bold transition-colors disabled:opacity-40 disabled:cursor-not-allowed shadow-xs ${
             isCashInsufficient
               ? 'bg-neutral-400'
-              : 'bg-[#2E7D32] hover:bg-[#1B5E20]'
+              : 'bg-money hover:bg-[#1B5E20]'
           }`}
         >
           <Printer className="w-3.5 h-3.5" />

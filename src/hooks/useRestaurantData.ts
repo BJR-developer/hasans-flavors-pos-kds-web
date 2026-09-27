@@ -34,7 +34,30 @@ import {
   deleteAddonInDB,
   toggleAddonStockInDB,
 } from '@/lib/api';
+import { fetchActiveShift } from '@/lib/shiftApi';
 import { Category, Dish, Order, OrderStatus, PaymentMethod, PaymentStatus, TableSession, CartItem, AddonOption } from '@/types';
+
+export interface PaymentCollector {
+  cashierId?: string;
+  cashierName?: string;
+  shiftId?: string;
+  role?: string;
+}
+
+// Who is taking this sale/payment right now, and in which open shift.
+async function resolveCollector(): Promise<PaymentCollector> {
+  const user = useAuthStore.getState().user;
+  if (!user) return {};
+  const shift = user.role === 'cashier' || user.role === 'owner' ? await fetchActiveShift(user.id) : null;
+  return {
+    cashierId: user.id,
+    cashierName: user.name || user.email,
+    shiftId: shift?.id,
+    role: user.role,
+  };
+}
+
+const NO_SHIFT_MESSAGE = 'Start your shift first (top bar → Start Shift) before taking orders or payments.';
 
 export const QUERY_KEYS = {
   orders: ['orders'] as const,
@@ -62,7 +85,7 @@ export function useOrders() {
   });
 }
 
-// 2. Dishes Query (useDishes and useMenu alias) - 100% Live from Supabase
+// 2. Dishes Query - live from Supabase
 export function useDishes() {
   return useQuery<Dish[]>({
     queryKey: QUERY_KEYS.dishes,
@@ -79,7 +102,6 @@ export function useDishes() {
   });
 }
 
-export const useMenu = useDishes;
 
 // 3. Categories Query - 100% Live from Supabase
 export function useCategories() {
@@ -124,39 +146,6 @@ export function useTableSessions() {
   });
 }
 
-// 5. Daily Stats Query - 100% Computed Dynamically from Supabase Data
-export function useDailyStats() {
-  const { data: orders = [] } = useOrders();
-  const { data: tables = [] } = useTableSessions();
-
-  return useQuery({
-    queryKey: [...QUERY_KEYS.dailyStats, orders.length, tables.length],
-    queryFn: async () => {
-      const now = new Date();
-      const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(
-        now.getDate()
-      ).padStart(2, '0')}`;
-
-      const todayOrders = orders.filter((o) => (o.createdAt || '').startsWith(todayStr));
-      const totalSales = todayOrders
-        .filter((o) => o.paymentStatus === 'paid' && o.status !== 'cancelled')
-        .reduce((sum, o) => sum + o.total, 0);
-
-      const activeTables = tables.filter((t) => t.status !== 'available').length;
-
-      return {
-        todayRevenue: totalSales,
-        orderCount: todayOrders.length,
-        avgTicket: todayOrders.length > 0 ? Math.round(totalSales / todayOrders.length) : 0,
-        activeTables,
-        totalTables: tables.length,
-        avgPrepTimeMinutes: 18,
-        topSellingItems: [],
-      };
-    },
-  });
-}
-
 // --- MUTATIONS (Direct Supabase Queries) ---
 
 // Create Order
@@ -198,16 +187,42 @@ export function useCreateOrder() {
 
       const orderNumber = `#${nextSeq}`;
 
-      const currentUser = useAuthStore.getState().user;
-      const cashierId = orderData.cashierId || (currentUser ? currentUser.id : undefined);
-      const cashierName = orderData.cashierName || (currentUser ? (currentUser.name || currentUser.email) : undefined);
+      const collector = await resolveCollector();
+      const cashierId = orderData.cashierId || collector.cashierId;
+      const cashierName = orderData.cashierName || collector.cashierName;
 
+      if (!cashierId) {
+        throw new Error(
+          'Could not identify the logged-in cashier for this sale. Please refresh the page and sign in again before taking payment.'
+        );
+      }
+      if (collector.role === 'cashier' && !collector.shiftId) {
+        throw new Error(NO_SHIFT_MESSAGE);
+      }
+
+      const initialPaid = Number(orderData.amountPaid || 0);
       const fullOrder: Order = {
         ...orderData,
         id,
         orderNumber,
         cashierId,
         cashierName,
+        shiftId: collector.shiftId,
+        paymentHistory:
+          initialPaid > 0
+            ? [
+                {
+                  id: `pay_${Date.now()}`,
+                  amount: initialPaid,
+                  method: orderData.paymentMethod,
+                  timestamp: now.toISOString(),
+                  note: 'Paid at order',
+                  cashierId,
+                  cashierName,
+                  shiftId: collector.shiftId,
+                },
+              ]
+            : [],
         createdAt: now.toISOString(),
       };
 
@@ -217,6 +232,7 @@ export function useCreateOrder() {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.orders });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.tables });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.dailyStats });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.dishes });
     },
   });
 }
@@ -227,6 +243,15 @@ export function useUpdateOrderStatus() {
 
   return useMutation({
     mutationFn: async ({ orderId, status, tableNumber }: { orderId: string; status: OrderStatus; tableNumber?: string }) => {
+      if (status === 'completed') {
+        // Completing a served order means the customer has paid: collect any balance now,
+        // attributed to whoever pressed Complete and their open shift.
+        const collector = await resolveCollector();
+        if (collector.role === 'cashier' && !collector.shiftId) {
+          throw new Error(NO_SHIFT_MESSAGE);
+        }
+        return updateOrderPaymentInDB(orderId, { paymentStatus: 'paid', closeOrder: true, collector });
+      }
       return updateOrderStatusInDB(orderId, status, tableNumber);
     },
     onSuccess: () => {
@@ -263,6 +288,11 @@ export function useUpdateOrderPayment() {
       tax?: number;
       total?: number;
     }) => {
+      const collector = await resolveCollector();
+      const takesMoney = paymentStatus === 'paid' || paymentStatus === 'partially_paid';
+      if (takesMoney && collector.role === 'cashier' && !collector.shiftId) {
+        throw new Error(NO_SHIFT_MESSAGE);
+      }
       return updateOrderPaymentInDB(orderId, {
         paymentStatus,
         paymentMethod,
@@ -271,6 +301,7 @@ export function useUpdateOrderPayment() {
         closeOrder,
         tax,
         total,
+        collector,
       });
     },
     onSuccess: () => {

@@ -1,5 +1,5 @@
 import { supabase } from './supabase';
-import { Shift, Order } from '@/types';
+import { Shift } from '@/types';
 
 export const mapShiftFromDB = (row: any): Shift => ({
   id: row.id,
@@ -20,6 +20,10 @@ export const mapShiftFromDB = (row: any): Shift => ({
   totalDiscount: Number(row.total_discount || 0),
   status: row.status as 'open' | 'closed',
   notes: row.notes || undefined,
+  reviewStatus: row.review_status || 'pending',
+  reviewNote: row.review_note || undefined,
+  reviewedBy: row.reviewed_by || undefined,
+  reviewedAt: row.reviewed_at || undefined,
   initialFloatEdits: Array.isArray(row.initial_float_edits) ? row.initial_float_edits : [],
   createdAt: row.created_at,
   updatedAt: row.updated_at,
@@ -46,18 +50,14 @@ export async function fetchShifts(): Promise<Shift[]> {
  * Fetch the currently active open shift for a cashier or the register.
  */
 export async function fetchActiveShift(cashierId?: string): Promise<Shift | null> {
-  let query = supabase
+  if (!cashierId) return null;
+  const { data, error } = await supabase
     .from('shifts')
     .select('*')
     .eq('status', 'open')
+    .eq('cashier_id', cashierId)
     .order('start_time', { ascending: false })
     .limit(1);
-
-  if (cashierId) {
-    query = query.eq('cashier_id', cashierId);
-  }
-
-  const { data, error } = await query;
   if (error) {
     console.error('Error fetching active shift:', error);
     return null;
@@ -100,83 +100,6 @@ export async function startShift(params: {
 }
 
 /**
- * Calculate live shift metrics based on orders placed during a time window.
- */
-export function calculateShiftMetrics(params: {
-  startTime: string;
-  endTime?: string;
-  cashierId?: string;
-  cashierName?: string;
-  openingCash?: number;
-  orders: Order[];
-}) {
-  const { startTime, endTime, cashierId, cashierName, openingCash = 0, orders } = params;
-  const startTs = new Date(startTime).getTime();
-  const endTs = endTime ? new Date(endTime).getTime() : Date.now();
-
-  const matchingOrders = orders.filter((order) => {
-    if (order.status === 'draft' || order.status === 'cancelled') return false;
-    const orderTs = new Date(order.createdAt).getTime();
-    if (orderTs < startTs || orderTs > endTs) return false;
-
-    // If specific cashier filter is provided, match order cashier
-    if (cashierId && order.cashierId && order.cashierId !== cashierId) {
-      return false;
-    }
-    if (cashierName && cashierName !== 'All Staff' && order.cashierName && order.cashierName.toLowerCase() !== cashierName.toLowerCase()) {
-      return false;
-    }
-
-    return true;
-  });
-
-  let totalOrders = 0;
-  let totalItemsSold = 0;
-  let grossSales = 0;
-  let cashSales = 0;
-  let cardSales = 0;
-  let onlineSales = 0;
-  let totalDiscount = 0;
-
-  matchingOrders.forEach((order) => {
-    totalOrders += 1;
-    grossSales += Number(order.total || 0);
-    totalDiscount += Number(order.discount || 0);
-
-    // Count individual items/products sold in this order
-    (order.items || []).forEach((item) => {
-      totalItemsSold += Number(item.quantity || 1);
-    });
-
-    const method = (order.paymentMethod || '').toLowerCase();
-    const paid = Number(order.amountPaid || order.total || 0);
-
-    if (method === 'cash') {
-      cashSales += paid;
-    } else if (method === 'card') {
-      cardSales += paid;
-    } else {
-      onlineSales += paid;
-    }
-  });
-
-  const expectedCash = openingCash + cashSales;
-
-  return {
-    matchingOrders,
-    totalOrders,
-    totalItemsSold,
-    grossSales: Math.round(grossSales * 100) / 100,
-    cashSales: Math.round(cashSales * 100) / 100,
-    cardSales: Math.round(cardSales * 100) / 100,
-    onlineSales: Math.round(onlineSales * 100) / 100,
-    totalDiscount: Math.round(totalDiscount * 100) / 100,
-    openingCash,
-    expectedCash: Math.round(expectedCash * 100) / 100,
-  };
-}
-
-/**
  * Close/end an open shift with final cash drawer count and calculations.
  */
 export async function closeShift(params: {
@@ -192,8 +115,10 @@ export async function closeShift(params: {
   onlineSales: number;
   totalDiscount: number;
   notes?: string;
+  closedBy?: string;
 }): Promise<Shift> {
   const payload = {
+    closed_by: params.closedBy || null,
     end_time: new Date().toISOString(),
     status: 'closed',
     closing_cash: params.closingCash,
@@ -266,5 +191,31 @@ export async function updateShiftOpeningCash(params: {
     throw error;
   }
 
+  return mapShiftFromDB(data);
+}
+
+/**
+ * Owner review of a closed shift handover.
+ */
+export async function reviewShift(params: {
+  shiftId: string;
+  status: 'approved' | 'flagged' | 'pending';
+  note?: string;
+  reviewerId: string;
+}): Promise<Shift> {
+  const { data, error } = await supabase
+    .from('shifts')
+    .update({
+      review_status: params.status,
+      review_note: params.note?.trim() || null,
+      reviewed_by: params.reviewerId,
+      reviewed_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', params.shiftId)
+    .select()
+    .single();
+
+  if (error) throw error;
   return mapShiftFromDB(data);
 }

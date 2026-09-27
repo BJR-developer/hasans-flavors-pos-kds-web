@@ -1,5 +1,6 @@
 'use client';
 
+import { NumberPromptDialog } from '@/components/common/NumberPromptDialog';
 import React, { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import {
@@ -131,37 +132,27 @@ export default function DeliveryPage() {
     });
   };
 
-  const handleAdjustEta = (orderId: string, currentEta?: number) => {
-    const nextVal = window.prompt(
-      'Update rider delivery arrival time (minutes):',
-      String(currentEta || 25)
-    );
-    if (nextVal !== null) {
-      const parsed = parseInt(nextVal.trim(), 10);
-      if (!isNaN(parsed) && parsed > 0 && parsed <= 180) {
-        updateEstimatedMinutes.mutate({ orderId, estimatedMinutes: parsed });
-      }
-    }
-  };
+  const [etaEdit, setEtaEdit] = useState<{ orderId: string; eta: number } | null>(null);
+  const handleAdjustEta = (orderId: string, currentEta?: number) => setEtaEdit({ orderId, eta: currentEta || 25 });
 
   if (authLoading || ordersLoading) {
     return (
-      <div className="flex-1 flex items-center justify-center p-6 bg-[#FAFAFA] min-h-[calc(100vh-56px)]">
-        <div className="w-6 h-6 border-2 border-[#BA1A20] border-t-transparent rounded-full animate-spin" />
+      <div className="flex-1 flex items-center justify-center p-6 bg-canvas min-h-[calc(100vh-56px)]">
+        <div className="w-6 h-6 border-2 border-brand border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   if (!user || user.role === 'customer') {
     return (
-      <div className="flex-1 flex items-center justify-center p-6 bg-[#FAFAFA] min-h-[calc(100vh-56px)]">
-        <div className="max-w-md w-full p-6 bg-white border border-[#E5E5E5] rounded-xl shadow-2xs text-center space-y-4">
-          <div className="w-12 h-12 rounded-full bg-[#FFF2F0] text-[#BA1A20] flex items-center justify-center mx-auto">
+      <div className="flex-1 flex items-center justify-center p-6 bg-canvas min-h-[calc(100vh-56px)]">
+        <div className="max-w-md w-full p-6 bg-white border border-line rounded-xl shadow-2xs text-center space-y-4">
+          <div className="w-12 h-12 rounded-full bg-brand-soft text-brand flex items-center justify-center mx-auto">
             <ShieldAlert className="w-6 h-6" />
           </div>
           <div>
-            <h2 className="text-base font-extrabold text-[#1F1F1F]">Staff Operations Only</h2>
-            <p className="text-xs text-[#737373] mt-1">
+            <h2 className="text-base font-extrabold text-ink">Staff Operations Only</h2>
+            <p className="text-xs text-muted mt-1">
               Delivery dispatch is restricted to Cashier and Restaurant Staff.
             </p>
           </div>
@@ -171,9 +162,10 @@ export default function DeliveryPage() {
   }
 
   return (
+    <>
     <div className="flex-1 flex flex-col bg-[#FAF9F8] min-h-[calc(100vh-56px)]">
       {/* Top Banner with Stats */}
-      <div className="bg-white border-b border-[#E5E5E5] px-4 sm:px-6 py-4">
+      <div className="bg-white border-b border-line px-4 sm:px-6 py-4">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-neutral-900 text-white flex items-center justify-center shadow-xs">
@@ -183,7 +175,7 @@ export default function DeliveryPage() {
               <h1 className="text-base sm:text-lg font-black text-neutral-900 tracking-tight flex items-center gap-2">
                 <span>Delivery Dispatch &amp; Tracking</span>
                 {stats.activeCount > 0 && (
-                  <span className="bg-[#BA1A20] text-white text-[11px] font-bold px-2 py-0.5 rounded-full">
+                  <span className="bg-brand text-white text-xs font-bold px-2 py-0.5 rounded-full">
                     {stats.activeCount} Running
                   </span>
                 )}
@@ -197,19 +189,19 @@ export default function DeliveryPage() {
           {/* Quick Metrics Bar */}
           <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
             <div className="bg-neutral-50 border border-neutral-200 px-3 py-1.5 rounded-lg text-center">
-              <span className="text-[10px] uppercase font-bold text-neutral-500 block">Pending Prep</span>
+              <span className="text-xs uppercase font-bold text-neutral-500 block">Pending Prep</span>
               <span className="text-sm font-black text-amber-700 font-mono">{stats.pendingCount}</span>
             </div>
             <div className="bg-neutral-50 border border-neutral-200 px-3 py-1.5 rounded-lg text-center">
-              <span className="text-[10px] uppercase font-bold text-neutral-500 block">On The Way</span>
+              <span className="text-xs uppercase font-bold text-neutral-500 block">On The Way</span>
               <span className="text-sm font-black text-blue-700 font-mono">{stats.inTransitCount}</span>
             </div>
             <div className="bg-neutral-50 border border-neutral-200 px-3 py-1.5 rounded-lg text-center">
-              <span className="text-[10px] uppercase font-bold text-neutral-500 block">Delivered</span>
+              <span className="text-xs uppercase font-bold text-neutral-500 block">Delivered</span>
               <span className="text-sm font-black text-emerald-700 font-mono">{stats.completedCount}</span>
             </div>
             <div className="bg-neutral-900 text-white px-3 py-1.5 rounded-lg text-center">
-              <span className="text-[10px] uppercase font-bold text-white/70 block">Active Value</span>
+              <span className="text-xs uppercase font-bold text-white/70 block">Active Value</span>
               <span className="text-sm font-black text-white font-mono">₱{stats.activeTotal.toLocaleString()}</span>
             </div>
           </div>
@@ -316,7 +308,7 @@ export default function DeliveryPage() {
                         {order.orderNumber}
                       </span>
                       <span
-                        className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${
+                        className={`text-xs font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${
                           isInTransit
                             ? 'bg-blue-100 text-blue-800'
                             : isDelivered
@@ -329,7 +321,7 @@ export default function DeliveryPage() {
                     </div>
 
                     <div className="flex items-center gap-1">
-                      <span className="text-[11px] font-mono text-neutral-500 flex items-center gap-0.5">
+                      <span className="text-xs font-mono text-neutral-500 flex items-center gap-0.5">
                         <Clock className="w-3 h-3 text-neutral-400" />
                         {elapsedMins}m ago
                       </span>
@@ -359,7 +351,7 @@ export default function DeliveryPage() {
                       {order.customerPhone && (
                         <a
                           href={`tel:${order.customerPhone}`}
-                          className="inline-flex items-center gap-1 text-[11px] font-bold text-[#BA1A20] hover:underline bg-red-50 px-2 py-0.5 rounded border border-red-100 shrink-0"
+                          className="inline-flex items-center gap-1 text-xs font-bold text-brand hover:underline bg-red-50 px-2 py-0.5 rounded border border-red-100 shrink-0"
                         >
                           <Phone className="w-3 h-3" />
                           <span>{order.customerPhone}</span>
@@ -390,7 +382,7 @@ export default function DeliveryPage() {
                                 target="_blank"
                                 rel="noreferrer"
                                 title="Open location in Google Maps"
-                                className="inline-flex items-center gap-1 text-[10.5px] font-bold text-emerald-700 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 px-2 py-0.5 rounded border border-emerald-200 transition-colors"
+                                className="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 px-2 py-0.5 rounded border border-emerald-200 transition-colors"
                               >
                                 <ExternalLink className="w-3 h-3" />
                                 <span>Google Maps</span>
@@ -402,7 +394,7 @@ export default function DeliveryPage() {
                             type="button"
                             onClick={() => setShareOrder(order)}
                             title="Share Address anywhere (Messenger, Instagram, SMS...)"
-                            className="inline-flex items-center gap-1 text-[10.5px] font-bold text-white bg-[#BA1A20] hover:bg-[#8B0000] px-2 py-0.5 rounded shadow-2xs transition-colors cursor-pointer"
+                            className="inline-flex items-center gap-1 text-xs font-bold text-white bg-brand hover:bg-brand-dark px-2 py-0.5 rounded shadow-2xs transition-colors cursor-pointer"
                           >
                             <Share2 className="w-3 h-3" />
                             <span>Share</span>
@@ -410,7 +402,7 @@ export default function DeliveryPage() {
                         </div>
                       </div>
                       {order.specialNotes && (
-                        <div className="text-[10.5px] text-amber-900 bg-amber-50/80 px-2 py-1 rounded border border-amber-200/60 mt-1 italic">
+                        <div className="text-xs text-amber-900 bg-amber-50/80 px-2 py-1 rounded border border-amber-200/60 mt-1 italic">
                           <span className="font-bold text-amber-800">Note: </span>
                           <span>{order.specialNotes}</span>
                         </div>
@@ -419,7 +411,7 @@ export default function DeliveryPage() {
 
                     {/* Ordered Items Preview */}
                     <div className="space-y-1 pt-1">
-                      <span className="text-[10px] uppercase font-bold text-neutral-400 tracking-wider block">
+                      <span className="text-xs uppercase font-bold text-neutral-400 tracking-wider block">
                         Order Items ({order.items.reduce((s, i) => s + i.quantity, 0)})
                       </span>
                       <div className="space-y-0.5 max-h-24 overflow-y-auto">
@@ -441,7 +433,7 @@ export default function DeliveryPage() {
                   <div className="p-3.5 border-t border-neutral-100 bg-neutral-50/50 space-y-2.5">
                     <div className="flex items-center justify-between text-xs">
                       <div>
-                        <span className="text-neutral-500 text-[11px] block">Total Bill</span>
+                        <span className="text-neutral-500 text-xs block">Total Bill</span>
                         <span className="text-base font-black text-neutral-900 font-mono">
                           ₱{order.total.toLocaleString()}
                         </span>
@@ -450,28 +442,28 @@ export default function DeliveryPage() {
                       <div className="text-right">
                         {isPaid ? (
                           <>
-                            <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 border border-emerald-200 inline-block">
+                            <span className="text-xs font-extrabold uppercase px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 border border-emerald-200 inline-block">
                               ★ Paid via {order.paymentMethod === 'gcash' ? 'GCash' : order.paymentMethod === 'card' ? 'Card' : order.paymentMethod === 'inr_qr' ? 'INR UPI' : 'Cash'}
                             </span>
-                            <span className="text-[10px] text-emerald-700 font-semibold block mt-0.5">
+                            <span className="text-xs text-emerald-700 font-semibold block mt-0.5">
                               Payment Verified
                             </span>
                           </>
                         ) : order.paymentMethod === 'cash' ? (
                           <>
-                            <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md bg-amber-100 text-amber-800 border border-amber-200 inline-block">
+                            <span className="text-xs font-extrabold uppercase px-2 py-0.5 rounded-md bg-amber-100 text-amber-800 border border-amber-200 inline-block">
                               Cash on Delivery
                             </span>
-                            <span className="text-[10px] text-amber-900 font-medium block mt-0.5 font-mono">
+                            <span className="text-xs text-amber-900 font-medium block mt-0.5 font-mono">
                               Collect ₱{order.total.toLocaleString()}
                             </span>
                           </>
                         ) : (
                           <>
-                            <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md bg-orange-100 text-orange-800 border border-orange-200 inline-block">
+                            <span className="text-xs font-extrabold uppercase px-2 py-0.5 rounded-md bg-orange-100 text-orange-800 border border-orange-200 inline-block">
                               {order.paymentMethod === 'gcash' ? 'GCash' : order.paymentMethod === 'card' ? 'Card' : 'UPI/INR'} (Unpaid)
                             </span>
-                            <span className="text-[10px] text-orange-700 font-medium block mt-0.5">
+                            <span className="text-xs text-orange-700 font-medium block mt-0.5">
                               Payment Pending
                             </span>
                           </>
@@ -548,5 +540,18 @@ export default function DeliveryPage() {
         />
       )}
     </div>
+      <NumberPromptDialog
+        open={!!etaEdit}
+        title="Rider arrival time"
+        label="Minutes until delivery"
+        suffix="min"
+        initialValue={etaEdit?.eta || 25}
+        onCancel={() => setEtaEdit(null)}
+        onSubmit={(v) => {
+          if (etaEdit) updateEstimatedMinutes.mutate({ orderId: etaEdit.orderId, estimatedMinutes: v });
+          setEtaEdit(null);
+        }}
+      />
+    </>
   );
 }

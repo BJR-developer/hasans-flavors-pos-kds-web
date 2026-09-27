@@ -80,7 +80,7 @@ export function PosSettingsModal({ isOpen, onClose }: PosSettingsModalProps) {
                   <h3 className="text-sm font-extrabold text-neutral-900 leading-tight">
                     Register &amp; Financial Settings
                   </h3>
-                  <p className="text-[11px] text-neutral-500">
+                  <p className="text-xs text-neutral-500">
                     Configure cashier VAT rules and POS payment behaviors
                   </p>
                 </div>
@@ -121,7 +121,7 @@ export function PosSettingsModal({ isOpen, onClose }: PosSettingsModalProps) {
                 }`}>
                   <div className="flex items-center justify-between text-xs font-semibold text-neutral-800 mb-2">
                     <span>VAT Calculation</span>
-                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                    <span className={`px-2 py-0.5 rounded text-xs font-bold ${
                       vatEnabled ? 'bg-emerald-100 text-emerald-800' : 'bg-neutral-200 text-neutral-600'
                     }`}>
                       {vatEnabled ? 'Active' : 'Disabled'}
@@ -132,7 +132,7 @@ export function PosSettingsModal({ isOpen, onClose }: PosSettingsModalProps) {
                     <div className="space-y-3 pt-1">
                       {/* VAT Applicability Rule */}
                       <div>
-                        <label className="text-[11px] font-medium text-neutral-600 block mb-1.5">
+                        <label className="text-xs font-medium text-neutral-600 block mb-1.5">
                           VAT Applicability Target:
                         </label>
                         <div className="grid grid-cols-2 gap-2">
@@ -151,7 +151,7 @@ export function PosSettingsModal({ isOpen, onClose }: PosSettingsModalProps) {
                                 <CheckCircle2 className="w-3.5 h-3.5 text-neutral-900" />
                               )}
                             </div>
-                            <span className="text-[10px] text-neutral-500 mt-0.5">
+                            <span className="text-xs text-neutral-500 mt-0.5">
                               VAT applied only when paying via Card. Cash is 0% exempt.
                             </span>
                           </button>
@@ -171,7 +171,7 @@ export function PosSettingsModal({ isOpen, onClose }: PosSettingsModalProps) {
                                 <CheckCircle2 className="w-3.5 h-3.5 text-neutral-900" />
                               )}
                             </div>
-                            <span className="text-[10px] text-neutral-500 mt-0.5">
+                            <span className="text-xs text-neutral-500 mt-0.5">
                               VAT applied uniformly regardless of payment method.
                             </span>
                           </button>
@@ -182,7 +182,7 @@ export function PosSettingsModal({ isOpen, onClose }: PosSettingsModalProps) {
                       <div className="flex items-center justify-between pt-2 border-t border-neutral-200/80">
                         <div>
                           <span className="text-xs font-semibold text-neutral-800 block">VAT Percentage Rate</span>
-                          <span className="text-[10px] text-neutral-500">Calculated on order subtotal</span>
+                          <span className="text-xs text-neutral-500">Calculated on order subtotal</span>
                         </div>
                         <div className="relative w-24">
                           <input
@@ -226,13 +226,13 @@ export function PosSettingsModal({ isOpen, onClose }: PosSettingsModalProps) {
                   <div className="flex items-center justify-between text-xs">
                     <div>
                       <span className="font-semibold text-neutral-800 block">Payment Mandatory at POS</span>
-                      <span className="text-[10px] text-neutral-500">
+                      <span className="text-xs text-neutral-500">
                         {paymentEnabled
                           ? 'Cashier requires tender or settlement'
                           : 'Bypass tender: 1-click fire to KDS without payment'}
                       </span>
                     </div>
-                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                    <span className={`px-2 py-0.5 rounded text-xs font-bold ${
                       paymentEnabled ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'
                     }`}>
                       {paymentEnabled ? 'Enabled' : 'Bypassed'}
@@ -241,7 +241,7 @@ export function PosSettingsModal({ isOpen, onClose }: PosSettingsModalProps) {
 
                   {paymentEnabled && (
                     <div className="space-y-2 pt-2 border-t border-neutral-200/80">
-                      <label className="text-[11px] font-medium text-neutral-600 block">
+                      <label className="text-xs font-medium text-neutral-600 block">
                         Accepted POS Payment Methods:
                       </label>
                       <div className="grid grid-cols-2 gap-2">
@@ -294,7 +294,7 @@ export function PosSettingsModal({ isOpen, onClose }: PosSettingsModalProps) {
                     }`}
                   >
                     <span className="text-xs font-bold block">Pay Later (Dine-in Tab)</span>
-                    <span className={`text-[10px] block mt-0.5 ${
+                    <span className={`text-xs block mt-0.5 ${
                       defaultPaymentTiming === 'pay_later' ? 'text-neutral-300' : 'text-neutral-500'
                     }`}>
                       Order fired directly to kitchen; settled later
@@ -310,7 +310,7 @@ export function PosSettingsModal({ isOpen, onClose }: PosSettingsModalProps) {
                     }`}
                   >
                     <span className="text-xs font-bold block">Pay Now (Immediate)</span>
-                    <span className={`text-[10px] block mt-0.5 ${
+                    <span className={`text-xs block mt-0.5 ${
                       defaultPaymentTiming === 'pay_now' ? 'text-neutral-300' : 'text-neutral-500'
                     }`}>
                       Collect cash/card tender upfront

@@ -26,6 +26,7 @@ import { ChangeTableModal } from '../tables/ChangeTableModal';
 import { ShareOrderModal } from '../orders/ShareOrderModal';
 import { getOrderColorTheme } from '@/lib/orderColors';
 import { getOrderMapsUrl } from '@/lib/shareOrder';
+import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 import { isCashOrderPendingReview } from '@/lib/orderUtils';
 import { KdsCashReviewBanner } from './KdsCashReviewBanner';
 
@@ -58,6 +59,7 @@ export function KdsTicketCard({
   const updateEstimatedMinutes = useUpdateOrderEstimatedMinutes();
 
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  const [confirmCancelOpen, setConfirmCancelOpen] = React.useState(false);
   const [isChangeTableOpen, setIsChangeTableOpen] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [animatingDirection] = useState<'forward' | 'backward' | null>(null);
@@ -154,10 +156,10 @@ export function KdsTicketCard({
     }
   };
 
-  const handleCancelOrder = () => {
-    if (window.confirm(`Are you sure you want to cancel ${order.orderNumber}? This will free the table.`)) {
-      updateStatus.mutate({ orderId: order.id, status: 'cancelled', tableNumber: order.tableNumber });
-    }
+  const handleCancelOrder = () => setConfirmCancelOpen(true);
+  const confirmCancel = () => {
+    setConfirmCancelOpen(false);
+    updateStatus.mutate({ orderId: order.id, status: 'cancelled', tableNumber: order.tableNumber });
   };
 
   const handleToggleItem = (cartItemId: string) => {
@@ -166,6 +168,7 @@ export function KdsTicketCard({
   };
 
   return (
+    <>
     <div
       id={`kds-ticket-${order.id}`}
       draggable={!animatingDirection && !isFlyingOrigin}
@@ -198,7 +201,7 @@ export function KdsTicketCard({
             <button
               type="button"
               onClick={() => setIsChangeTableOpen(true)}
-              className={`flex items-center gap-1 text-[10.5px] font-extrabold px-2 py-0.5 rounded-md transition-all cursor-pointer shadow-2xs ${colorTheme.badgeBg
+              className={`flex items-center gap-1 text-xs font-extrabold px-2 py-0.5 rounded-md transition-all cursor-pointer shadow-2xs ${colorTheme.badgeBg
                 }`}
               title="Click to move to another available table"
             >
@@ -207,7 +210,7 @@ export function KdsTicketCard({
             </button>
           ) : (
             <span
-              className={`text-[10.5px] font-bold px-2 py-0.5 rounded-md ${colorTheme.badgeBg
+              className={`text-xs font-bold px-2 py-0.5 rounded-md ${colorTheme.badgeBg
                 }`}
             >
               {order.type === 'delivery' ? 'Delivery' : 'Takeout'}
@@ -215,7 +218,7 @@ export function KdsTicketCard({
           )}
 
           <span
-            className={`text-[9.5px] font-extrabold uppercase px-1.5 py-0.5 rounded ${
+            className={`text-xs font-extrabold uppercase px-1.5 py-0.5 rounded ${
               order.paymentStatus === 'paid'
                 ? 'bg-emerald-950/70 text-emerald-200 border border-emerald-400/40'
                 : isCashOrderPendingReview(order)
@@ -233,28 +236,16 @@ export function KdsTicketCard({
 
         <div className="flex items-center gap-1.5 shrink-0">
           <span
-            className={`text-[11px] font-mono font-bold ${colorTheme.subText}`}
+            className={`text-xs font-mono font-bold ${colorTheme.subText}`}
           >
             {elapsedMinutes}m
           </span>
 
           {/* Quick Staff ETA Control (Live syncs to mobile app) */}
           <div
-            className="flex items-center gap-1 bg-black/20 hover:bg-black/30 px-1.5 py-0.5 rounded text-[10.5px] font-bold transition-colors cursor-pointer"
-            title="Click to adjust estimated arrival time for mobile app"
-            onClick={(e) => {
-              e.stopPropagation();
-              const nextVal = window.prompt(
-                'Update estimated cooking/delivery time (minutes):',
-                String(order.estimatedMinutes || 20)
-              );
-              if (nextVal !== null) {
-                const parsed = parseInt(nextVal.trim(), 10);
-                if (!isNaN(parsed) && parsed > 0 && parsed <= 180) {
-                  updateEstimatedMinutes.mutate({ orderId: order.id, estimatedMinutes: parsed });
-                }
-              }
-            }}
+            className="flex items-center gap-1 bg-black/20 hover:bg-black/30 px-1.5 py-0.5 rounded text-xs font-bold transition-colors cursor-pointer"
+            title="Estimated time shown in the mobile app"
+            onClick={(e) => e.stopPropagation()}
           >
             <Clock className="w-3 h-3 opacity-80 shrink-0" />
             <span>ETA: {order.estimatedMinutes || 20}m</span>
@@ -269,7 +260,7 @@ export function KdsTicketCard({
                   }
                 }}
                 title="Decrease ETA by 5m"
-                className="w-3.5 h-3.5 rounded bg-black/30 hover:bg-black/50 flex items-center justify-center text-[10px] font-bold"
+                className="w-3.5 h-3.5 rounded bg-black/30 hover:bg-black/50 flex items-center justify-center text-xs font-bold"
               >
                 -
               </button>
@@ -283,7 +274,7 @@ export function KdsTicketCard({
                   }
                 }}
                 title="Increase ETA by 5m"
-                className="w-3.5 h-3.5 rounded bg-black/30 hover:bg-black/50 flex items-center justify-center text-[10px] font-bold"
+                className="w-3.5 h-3.5 rounded bg-black/30 hover:bg-black/50 flex items-center justify-center text-xs font-bold"
               >
                 +
               </button>
@@ -309,7 +300,7 @@ export function KdsTicketCard({
           <div className="flex items-start gap-1.5 min-w-0 flex-1">
             <MapPin className="w-3.5 h-3.5 text-red-400 shrink-0 mt-0.5" />
             <div className="min-w-0 flex-1">
-              <span className="text-[9.5px] uppercase font-black text-amber-400 block tracking-wider leading-none mb-0.5">
+              <span className="text-xs uppercase font-black text-amber-400 block tracking-wider leading-none mb-0.5">
                 🛵 Delivery Location
               </span>
               <span className="text-xs font-semibold text-neutral-100 truncate block">
@@ -326,7 +317,7 @@ export function KdsTicketCard({
                 rel="noreferrer"
                 onClick={(e) => e.stopPropagation()}
                 title="Open in Google Maps"
-                className="py-1 px-1.5 rounded bg-neutral-800 hover:bg-neutral-700 text-emerald-400 hover:text-emerald-300 transition-colors flex items-center gap-1 text-[10.5px] font-bold"
+                className="py-1 px-1.5 rounded bg-neutral-800 hover:bg-neutral-700 text-emerald-400 hover:text-emerald-300 transition-colors flex items-center gap-1 text-xs font-bold"
               >
                 <ExternalLink className="w-3 h-3" />
                 <span className="hidden sm:inline">Maps</span>
@@ -340,7 +331,7 @@ export function KdsTicketCard({
                 setIsShareModalOpen(true);
               }}
               title="Share Address anywhere (Messenger, Instagram, SMS...)"
-              className="py-1 px-2 rounded bg-[#BA1A20] hover:bg-[#8B0000] text-white transition-colors flex items-center gap-1 text-[10.5px] font-bold shadow-2xs cursor-pointer"
+              className="py-1 px-2 rounded bg-brand hover:bg-brand-dark text-white transition-colors flex items-center gap-1 text-xs font-bold shadow-2xs cursor-pointer"
             >
               <Share2 className="w-3 h-3" />
               <span>Share</span>
@@ -351,8 +342,8 @@ export function KdsTicketCard({
 
       {/* Order-Level Special Dining / Cooking Instructions */}
       {order.specialNotes && (
-        <div className="px-3 py-1.5 bg-amber-50 border-b border-amber-200 text-[11px] text-amber-900 font-semibold flex items-start gap-1">
-          <span className="text-amber-700 uppercase text-[10px] tracking-wide font-black">Instruction:</span>
+        <div className="px-3 py-1.5 bg-amber-50 border-b border-amber-200 text-xs text-amber-900 font-semibold flex items-start gap-1">
+          <span className="text-amber-700 uppercase text-xs tracking-wide font-black">Instruction:</span>
           <span>{order.specialNotes}</span>
         </div>
       )}
@@ -406,7 +397,7 @@ export function KdsTicketCard({
                 </div>
 
                 {/* Modifiers: Variants, Portions, Spice, Addons */}
-                <div className="flex flex-wrap items-center gap-1.5 mt-0.5 text-[10px] text-neutral-500">
+                <div className="flex flex-wrap items-center gap-1.5 mt-0.5 text-xs text-neutral-500">
                   {/* Custom Variants if present */}
                   {item.selectedVariants && item.selectedVariants.length > 0 ? (
                     item.selectedVariants.map((v, idx) => (
@@ -441,7 +432,7 @@ export function KdsTicketCard({
                 </div>
 
                 {item.specialNotes && (
-                  <p className="text-[10px] text-amber-800 mt-0.5 font-medium">
+                  <p className="text-xs text-amber-800 mt-0.5 font-medium">
                     Note: {item.specialNotes}
                   </p>
                 )}
@@ -471,7 +462,7 @@ export function KdsTicketCard({
             type="button"
             onClick={() => router.push(`/pos?orderId=${order.id}`)}
             title="Open in POS to add/remove items or settle bill"
-            className="flex items-center gap-1 px-2 py-1.5 rounded-lg border border-neutral-200 bg-white hover:bg-neutral-100 text-neutral-700 text-[11px] font-semibold transition-colors"
+            className="flex items-center gap-1 px-2 py-1.5 rounded-lg border border-neutral-200 bg-white hover:bg-neutral-100 text-neutral-700 text-xs font-semibold transition-colors"
           >
             <Edit3 className="w-3 h-3" />
             <span>Update Order</span>
@@ -482,9 +473,9 @@ export function KdsTicketCard({
             type="button"
             onClick={() => setIsShareModalOpen(true)}
             title="Share Address & Details to Messenger, Instagram, SMS..."
-            className="flex items-center gap-1 px-2 py-1.5 rounded-lg border border-neutral-200 bg-white hover:bg-neutral-100 text-neutral-700 text-[11px] font-semibold transition-colors cursor-pointer"
+            className="flex items-center gap-1 px-2 py-1.5 rounded-lg border border-neutral-200 bg-white hover:bg-neutral-100 text-neutral-700 text-xs font-semibold transition-colors cursor-pointer"
           >
-            <Share2 className="w-3 h-3 text-[#BA1A20]" />
+            <Share2 className="w-3 h-3 text-brand" />
             <span>Share</span>
           </button>
 
@@ -494,7 +485,7 @@ export function KdsTicketCard({
               type="button"
               onClick={() => setIsChangeTableOpen(true)}
               title="Move or reassign table"
-              className="flex items-center gap-1 px-2 py-1.5 rounded-lg border border-neutral-200 bg-white hover:bg-neutral-100 text-neutral-700 text-[11px] font-semibold transition-colors cursor-pointer"
+              className="flex items-center gap-1 px-2 py-1.5 rounded-lg border border-neutral-200 bg-white hover:bg-neutral-100 text-neutral-700 text-xs font-semibold transition-colors cursor-pointer"
             >
               <ArrowRightLeft className="w-3 h-3" />
               <span>Table</span>
@@ -506,7 +497,7 @@ export function KdsTicketCard({
             type="button"
             onClick={handleCancelOrder}
             title="Cancel this order"
-            className="px-2 py-1.5 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 text-[11px] font-semibold transition-colors"
+            className="px-2 py-1.5 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 text-xs font-semibold transition-colors"
           >
             Cancel
           </button>
@@ -576,5 +567,15 @@ export function KdsTicketCard({
         />
       )}
     </div>
+      <ConfirmDialog
+        open={confirmCancelOpen}
+        title={`Cancel order ${order.orderNumber}?`}
+        message="The order is removed from the kitchen, its stock goes back, and the table is freed."
+        confirmLabel="Cancel order"
+        tone="danger"
+        onConfirm={confirmCancel}
+        onCancel={() => setConfirmCancelOpen(false)}
+      />
+    </>
   );
 }

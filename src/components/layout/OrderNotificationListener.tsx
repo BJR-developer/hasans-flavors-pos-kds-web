@@ -148,14 +148,14 @@ export function OrderNotificationListener() {
 
   return (
     <div className="fixed bottom-5 right-5 z-50 animate-in slide-in-from-bottom-5 fade-in duration-300">
-      <div className="bg-[#1F1F1F] text-white p-4 rounded-xl shadow-2xl border border-neutral-700 max-w-sm w-full flex items-start gap-3">
-        <div className="w-10 h-10 rounded-full bg-[#BA1A20] text-white flex items-center justify-center shrink-0 shadow-md">
+      <div className="bg-ink text-white p-4 rounded-xl shadow-2xl border border-neutral-700 max-w-sm w-full flex items-start gap-3">
+        <div className="w-10 h-10 rounded-full bg-brand text-white flex items-center justify-center shrink-0 shadow-md">
           <Bell className="w-5 h-5 animate-bounce" />
         </div>
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between gap-1">
-            <span className={`text-[11px] font-black uppercase tracking-wider flex items-center gap-1 ${
+            <span className={`text-xs font-black uppercase tracking-wider flex items-center gap-1 ${
               activeToast.needsReview ? 'text-amber-400 animate-pulse' : 'text-amber-400'
             }`}>
               {activeToast.needsReview ? (
@@ -202,7 +202,7 @@ export function OrderNotificationListener() {
               )}
             </div>
             {activeToast.notes && (
-              <p className="text-[11px] text-amber-300/90 italic truncate mt-0.5">
+              <p className="text-xs text-amber-300/90 italic truncate mt-0.5">
                 &ldquo;{activeToast.notes}&rdquo;
               </p>
             )}
@@ -224,7 +224,7 @@ export function OrderNotificationListener() {
               className={`flex-1 py-1.5 px-3 text-white text-xs font-bold rounded-lg transition-colors flex items-center justify-center gap-1 shadow-sm ${
                 activeToast.needsReview
                   ? 'bg-amber-600 hover:bg-amber-700'
-                  : 'bg-[#BA1A20] hover:bg-[#8B0000]'
+                  : 'bg-brand hover:bg-brand-dark'
               }`}
             >
               <span>{activeToast.needsReview ? 'Review in KDS' : 'View Order'}</span>

@@ -133,18 +133,18 @@ function ChangeTableModalContent({
 
   return (
     <div className="fixed inset-0 z-[80] bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
-      <div className="relative bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border border-[#E5E5E5] my-6 animate-in fade-in zoom-in-95 duration-200">
+      <div className="relative bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border border-line my-6 animate-in fade-in zoom-in-95 duration-200">
         {/* Modal Header */}
-        <div className="px-5 py-3.5 border-b border-[#E5E5E5] bg-[#FAFAFA] flex items-center justify-between">
+        <div className="px-5 py-3.5 border-b border-line bg-canvas flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-neutral-900 text-white flex items-center justify-center">
               <ArrowRightLeft className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-[#1F1F1F]">
+              <h3 className="text-sm font-bold text-ink">
                 Change Dining Table
               </h3>
-              <p className="text-[11px] text-[#737373]">
+              <p className="text-xs text-muted">
                 Order {order.orderNumber} • Currently seated at{' '}
                 <strong className="text-neutral-900">{currentTable || 'Unassigned'}</strong>
               </p>
@@ -153,7 +153,7 @@ function ChangeTableModalContent({
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-lg text-[#737373] hover:text-[#1F1F1F] hover:bg-white transition-colors cursor-pointer"
+            className="p-1.5 rounded-lg text-muted hover:text-ink hover:bg-white transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -163,10 +163,10 @@ function ChangeTableModalContent({
         <div className="p-5 space-y-4 max-h-[70vh] overflow-y-auto">
           {/* Header Metrics */}
           <div className="flex items-center justify-between text-xs">
-            <span className="font-bold text-[#1F1F1F]">
+            <span className="font-bold text-ink">
               Select New Destination Table:
             </span>
-            <span className="text-[11px] text-emerald-700 font-semibold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+            <span className="text-xs text-emerald-700 font-semibold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
               {availableTableNumbers.length} Available
             </span>
           </div>
@@ -196,11 +196,11 @@ function ChangeTableModalContent({
                   >
                     <div className="flex items-center justify-between">
                       <span className="font-bold text-xs text-neutral-700">{tNum}</span>
-                      <span className="text-[10px] font-semibold bg-neutral-200 text-neutral-700 px-1.5 py-0.2 rounded">
+                      <span className="text-xs font-semibold bg-neutral-200 text-neutral-700 px-1.5 py-0.2 rounded">
                         Current
                       </span>
                     </div>
-                    <span className="text-[10px] text-neutral-500 mt-2 flex items-center gap-1">
+                    <span className="text-xs text-neutral-500 mt-2 flex items-center gap-1">
                       <Users className="w-3 h-3" />
                       <span>Seated here now</span>
                     </span>
@@ -216,11 +216,11 @@ function ChangeTableModalContent({
                   >
                     <div className="flex items-center justify-between">
                       <span className="font-medium text-xs text-neutral-500">{tNum}</span>
-                      <span className="text-[9px] font-bold text-neutral-500 bg-neutral-200/80 px-1 py-0.2 rounded">
+                      <span className="text-xs font-bold text-neutral-500 bg-neutral-200/80 px-1 py-0.2 rounded">
                         Occupied
                       </span>
                     </div>
-                    <span className="text-[10px] text-neutral-400 mt-2 block truncate">
+                    <span className="text-xs text-neutral-400 mt-2 block truncate">
                       {activeOrder ? activeOrder.orderNumber : 'Occupied'}
                     </span>
                   </div>
@@ -235,18 +235,18 @@ function ChangeTableModalContent({
                   onClick={() => setSelectedTable(tNum)}
                   className={`p-3 rounded-xl border text-left flex flex-col justify-between transition-all cursor-pointer select-none ${
                     isSelected
-                      ? 'border-[#BA1A20] bg-[#FFF2F0] text-[#BA1A20] shadow-xs ring-2 ring-[#BA1A20]/20'
-                      : 'border-[#E5E5E5] bg-white text-[#1F1F1F] hover:border-neutral-400 hover:bg-[#FAFAFA]'
+                      ? 'border-brand bg-brand-soft text-brand shadow-xs ring-2 ring-brand/20'
+                      : 'border-line bg-white text-ink hover:border-neutral-400 hover:bg-canvas'
                   }`}
                 >
                   <div className="flex items-center justify-between w-full">
                     <span className="font-bold text-xs">{tNum}</span>
                     <div className="flex items-center gap-1">
                       <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                      {isSelected && <Check className="w-3.5 h-3.5 text-[#BA1A20]" />}
+                      {isSelected && <Check className="w-3.5 h-3.5 text-brand" />}
                     </div>
                   </div>
-                  <span className="text-[10px] font-medium text-neutral-500 mt-2 flex items-center gap-1">
+                  <span className="text-xs font-medium text-neutral-500 mt-2 flex items-center gap-1">
                     <Users className="w-3 h-3 text-neutral-400" />
                     <span>Cap: {table.guestCount || 4} guests</span>
                   </span>
@@ -263,11 +263,11 @@ function ChangeTableModalContent({
         </div>
 
         {/* Modal Action Bar */}
-        <div className="px-5 py-3 border-t border-[#E5E5E5] bg-[#FAFAFA] flex items-center justify-end gap-2">
+        <div className="px-5 py-3 border-t border-line bg-canvas flex items-center justify-end gap-2">
           <button
             type="button"
             onClick={onClose}
-            className="px-3.5 py-1.5 text-xs font-semibold text-[#525252] hover:bg-[#EAEAEA] rounded-lg transition-colors cursor-pointer"
+            className="px-3.5 py-1.5 text-xs font-semibold text-ink-soft hover:bg-[#EAEAEA] rounded-lg transition-colors cursor-pointer"
           >
             Cancel
           </button>
@@ -275,7 +275,7 @@ function ChangeTableModalContent({
             type="button"
             disabled={!selectedTable || selectedTable === currentTable || transferTableMutation.isPending}
             onClick={handleConfirmTransfer}
-            className="px-4 py-1.5 text-xs font-bold text-white bg-[#BA1A20] hover:bg-[#8B0000] rounded-lg transition-colors shadow-xs flex items-center gap-1.5 disabled:opacity-40 cursor-pointer"
+            className="px-4 py-1.5 text-xs font-bold text-white bg-brand hover:bg-brand-dark rounded-lg transition-colors shadow-xs flex items-center gap-1.5 disabled:opacity-40 cursor-pointer"
           >
             {transferTableMutation.isPending ? (
               <>

@@ -13,7 +13,6 @@ import { DishCustomizerModal } from './DishCustomizerModal';
 import { ThermalReceiptModal } from './ThermalReceiptModal';
 import { KeyboardShortcutsModal } from './KeyboardShortcutsModal';
 import { OrderDetailsModal } from '../orders/OrderDetailsModal';
-import { PosShiftButton } from './PosShiftButton';
 import { SafeImage } from '@/components/common/SafeImage';
 import { PORTION_OPTIONS } from '@/data/options';
 
@@ -215,7 +214,7 @@ export function PosRegister() {
   };
 
   return (
-    <div className="flex-1 flex flex-col md:flex-row min-h-[calc(100vh-3.5rem)] bg-[#FAFAFA] relative">
+    <div className="flex-1 flex flex-col md:flex-row min-h-[calc(100vh-3.5rem)] bg-canvas relative">
       {/* Menu Catalog Pane */}
       <div className="flex-1 min-w-0 flex flex-col">
         {/* Minimal Banner when Managing an Existing Order */}
@@ -228,7 +227,7 @@ export function PosRegister() {
                 Managing: {loadedOrder.type === 'dine_in' ? (loadedOrder.tableNumber || 'Dine-In') : loadedOrder.customerName}
               </span>
               <span className="text-neutral-500">•</span>
-              <span className={`px-2 py-0.5 rounded text-[10px] font-semibold uppercase ${
+              <span className={`px-2 py-0.5 rounded text-xs font-semibold uppercase ${
                 loadedOrder.paymentStatus === 'paid' ? 'bg-emerald-800 text-emerald-100' : 'bg-amber-800 text-amber-100'
               }`}>
                 {loadedOrder.paymentStatus}
@@ -241,7 +240,7 @@ export function PosRegister() {
                 setCartItems([]);
                 router.replace('/pos');
               }}
-              className="text-[11px] text-neutral-400 hover:text-white transition-colors underline"
+              className="text-xs text-neutral-400 hover:text-white transition-colors underline"
             >
               Close (New Order)
             </button>
@@ -249,7 +248,7 @@ export function PosRegister() {
         )}
 
         {/* Minimal Category & Search Bar */}
-        <div className="px-4 sm:px-5 py-2.5 bg-white border-b border-[#E5E5E5] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shrink-0 sticky top-14 z-10">
+        <div className="px-4 sm:px-5 py-2.5 bg-white border-b border-line flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shrink-0 sticky top-14 z-10">
           {/* Categories with IMAGES for Fast Visual Selection */}
           <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
             {/* All Dishes Category Chip */}
@@ -257,15 +256,15 @@ export function PosRegister() {
               onClick={() => setSelectedCatId('all')}
               className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all border ${
                 selectedCatId === 'all'
-                  ? 'bg-[#1F1F1F] text-white border-[#1F1F1F] shadow-xs'
-                  : 'bg-white text-[#525252] border-[#E5E5E5] hover:bg-[#F5F5F5] hover:text-[#1F1F1F]'
+                  ? 'bg-ink text-white border-ink shadow-xs'
+                  : 'bg-white text-ink-soft border-line hover:bg-[#F5F5F5] hover:text-ink'
               }`}
             >
-              <span className="w-5 h-5 rounded-md bg-[#FAF9F8] border border-[#E5E5E5] flex items-center justify-center text-[10px] font-black text-[#BA1A20]">
+              <span className="w-5 h-5 rounded-md bg-[#FAF9F8] border border-line flex items-center justify-center text-xs font-black text-brand">
                 All
               </span>
               <span>All Dishes</span>
-              <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${selectedCatId === 'all' ? 'bg-white/20 text-white' : 'bg-[#F5F5F5] text-[#737373]'}`}>
+              <span className={`text-xs px-1.5 py-0.2 rounded-full font-bold ${selectedCatId === 'all' ? 'bg-white/20 text-white' : 'bg-[#F5F5F5] text-muted'}`}>
                 {dishes.length}
               </span>
             </button>
@@ -279,8 +278,8 @@ export function PosRegister() {
                   onClick={() => setSelectedCatId(cat.id)}
                   className={`flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all border ${
                     isSelected
-                      ? 'bg-[#1F1F1F] text-white border-[#1F1F1F] shadow-xs'
-                      : 'bg-white text-[#525252] border-[#E5E5E5] hover:bg-[#F5F5F5] hover:text-[#1F1F1F]'
+                      ? 'bg-ink text-white border-ink shadow-xs'
+                      : 'bg-white text-ink-soft border-line hover:bg-[#F5F5F5] hover:text-ink'
                   }`}
                 >
                   {cat.imageUrl ? (
@@ -296,8 +295,8 @@ export function PosRegister() {
                   ) : null}
                   <span>{cat.name}</span>
                   <span
-                    className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
-                      isSelected ? 'bg-white/20 text-white' : 'bg-[#F5F5F5] text-[#737373]'
+                    className={`text-xs px-1.5 py-0.2 rounded-full font-bold ${
+                      isSelected ? 'bg-white/20 text-white' : 'bg-[#F5F5F5] text-muted'
                     }`}
                   >
                     {cat.count}
@@ -317,12 +316,12 @@ export function PosRegister() {
                 placeholder="Search dish (Press /)..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-8 pr-7 py-1.5 text-xs rounded-lg border border-[#E5E5E5] bg-[#FAFAFA] text-[#1F1F1F] placeholder-[#A3A3A3] focus:bg-white focus:outline-none focus:border-[#1F1F1F] transition-colors"
+                className="w-full pl-8 pr-7 py-1.5 text-xs rounded-lg border border-line bg-canvas text-ink placeholder-[#A3A3A3] focus:bg-white focus:outline-none focus:border-ink transition-colors"
               />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-2.5 top-2 text-[#A3A3A3] hover:text-[#1F1F1F]"
+                  className="absolute right-2.5 top-2 text-[#A3A3A3] hover:text-ink"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
@@ -334,10 +333,10 @@ export function PosRegister() {
         {/* Fast Dish Grid (Responsive 2 to 5 columns) */}
         <div className="p-3 sm:p-4 lg:p-5">
           {filteredDishes.length === 0 ? (
-            <div className="h-64 flex flex-col items-center justify-center text-center text-[#737373]">
+            <div className="h-64 flex flex-col items-center justify-center text-center text-muted">
               <AlertCircle className="w-6 h-6 stroke-1 text-[#A3A3A3] mb-1.5" />
-              <p className="text-xs font-semibold text-[#1F1F1F]">No items found</p>
-              <p className="text-[11px] text-[#A3A3A3] mt-0.5">Try a different category or search term.</p>
+              <p className="text-xs font-semibold text-ink">No items found</p>
+              <p className="text-xs text-[#A3A3A3] mt-0.5">Try a different category or search term.</p>
             </div>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-2.5 sm:gap-3">
@@ -364,7 +363,7 @@ export function PosRegister() {
       {/* Fast Order Ticket Pane (100% Sticky Right from md: up) */}
       <aside
         id="pos-order-ticket"
-        className="w-full md:w-[360px] lg:w-[390px] xl:w-[420px] shrink-0 bg-white border-t md:border-t-0 md:border-l border-[#E5E5E5] md:sticky md:top-14 md:h-[calc(100dvh-3.5rem)] md:self-start z-20 flex flex-col"
+        className="w-full md:w-[360px] lg:w-[390px] xl:w-[420px] shrink-0 bg-white border-t md:border-t-0 md:border-l border-line md:sticky md:top-14 md:h-[calc(100dvh-3.5rem)] md:self-start z-20 flex flex-col"
       >
         <PosCartPane
           items={cartItems}
@@ -384,18 +383,18 @@ export function PosRegister() {
 
       {/* Mobile Sticky Bottom Summary Bar */}
       {cartItems.length > 0 && (
-        <div className="md:hidden fixed bottom-0 left-0 right-0 p-3 bg-white/95 backdrop-blur-xs border-t border-[#E5E5E5] shadow-lg flex items-center justify-between z-30 px-4">
+        <div className="md:hidden fixed bottom-0 left-0 right-0 p-3 bg-white/95 backdrop-blur-xs border-t border-line shadow-lg flex items-center justify-between z-30 px-4">
           <div>
             <div className="flex items-center gap-1.5">
-              <span className="text-xs font-bold text-[#1F1F1F]">
+              <span className="text-xs font-bold text-ink">
                 {cartItems.reduce((s, i) => s + i.quantity, 0)} items
               </span>
               <span className="text-[#D4D4D4]">•</span>
-              <span className="text-sm font-black text-[#BA1A20]">
+              <span className="text-sm font-black text-brand">
                 ₱{cartItems.reduce((s, i) => s + i.totalPrice, 0).toLocaleString()}
               </span>
             </div>
-            <span className="text-[10px] text-[#737373]">
+            <span className="text-xs text-muted">
               {vatEnabled ? `+${vatRate}% VAT included` : 'VAT Exempt (0%)'}
             </span>
           </div>
@@ -406,7 +405,7 @@ export function PosRegister() {
               const el = document.getElementById('pos-order-ticket');
               el?.scrollIntoView({ behavior: 'smooth' });
             }}
-            className="px-4 py-2 rounded-lg bg-[#BA1A20] hover:bg-[#8B0000] text-white text-xs font-bold shadow-xs transition-colors"
+            className="px-4 py-2 rounded-lg bg-brand hover:bg-brand-dark text-white text-xs font-bold shadow-xs transition-colors"
           >
             Review Ticket &amp; Pay
           </button>

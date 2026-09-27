@@ -189,7 +189,7 @@ function DishCustomizerModalContent({
               </button>
 
               {/* Photo Count Badge */}
-              <div className="absolute top-3 left-3 px-2 py-0.5 rounded-full bg-black/60 text-white text-[10px] font-bold backdrop-blur-xs flex items-center gap-1 z-10">
+              <div className="absolute top-3 left-3 px-2 py-0.5 rounded-full bg-black/60 text-white text-xs font-bold backdrop-blur-xs flex items-center gap-1 z-10">
                 <Images className="w-3 h-3" />
                 <span>{selectedImgIdx + 1}/{allImages.length}</span>
               </div>
@@ -212,11 +212,11 @@ function DishCustomizerModalContent({
 
           <div className="absolute bottom-3 left-4 right-4 text-white z-10">
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-[#BA1A20] text-white">
+              <span className="text-xs uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-brand text-white">
                 {dish.category}
               </span>
               {dish.isChefSpecial && (
-                <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-[#B45309] text-white flex items-center gap-1">
+                <span className="text-xs uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-[#B45309] text-white flex items-center gap-1">
                   <Sparkles className="w-3 h-3" /> Chef&apos;s Special
                 </span>
               )}
@@ -241,7 +241,7 @@ function DishCustomizerModalContent({
                 return (
                   <div key={group.id}>
                     <label className="block text-xs font-extrabold text-[#2D2926] uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                      <Layers className="w-3.5 h-3.5 text-[#BA1A20]" />
+                      <Layers className="w-3.5 h-3.5 text-brand" />
                       <span>{group.name}</span>
                     </label>
 
@@ -261,7 +261,7 @@ function DishCustomizerModalContent({
                             }
                             className={`p-2.5 rounded-xl border text-left transition-all ${
                               isSelected
-                                ? 'border-[#BA1A20] bg-[#FFF2F0] text-[#BA1A20] shadow-xs'
+                                ? 'border-brand bg-brand-soft text-brand shadow-xs'
                                 : 'border-[#E9E8E7] bg-white text-[#5B403D] hover:bg-[#F4F3F2]'
                             }`}
                           >
@@ -282,7 +282,7 @@ function DishCustomizerModalContent({
             <div>
               <div className="flex items-center justify-between mb-2">
                 <label className="text-xs font-extrabold text-[#2D2926] uppercase tracking-wider flex items-center gap-1.5">
-                  <Flame className="w-3.5 h-3.5 text-[#BA1A20]" />
+                  <Flame className="w-3.5 h-3.5 text-brand" />
                   Spice Level
                 </label>
                 <span className="text-xs font-bold text-[#B45309]">
@@ -300,12 +300,12 @@ function DishCustomizerModalContent({
                       onClick={() => setSelectedSpice(spice.level)}
                       className={`p-2 rounded-xl border text-center transition-all ${
                         isSelected
-                          ? 'border-[#BA1A20] bg-[#FFF2F0] text-[#BA1A20] shadow-xs'
+                          ? 'border-brand bg-brand-soft text-brand shadow-xs'
                           : 'border-[#E9E8E7] bg-white text-[#5B403D] hover:bg-[#F4F3F2]'
                       }`}
                     >
                       <div className="text-base">{spice.icon}</div>
-                      <p className="text-[10px] font-bold mt-0.5">{spice.label}</p>
+                      <p className="text-xs font-bold mt-0.5">{spice.label}</p>
                     </button>
                   );
                 })}
@@ -329,7 +329,7 @@ function DishCustomizerModalContent({
                       onClick={() => toggleAddon(addon)}
                       className={`flex items-center justify-between p-2 rounded-xl border text-left transition-all cursor-pointer ${
                         isSelected
-                          ? 'border-[#2E7D32] bg-[#E8F5E9] text-[#2E7D32] shadow-xs'
+                          ? 'border-money bg-[#E8F5E9] text-money shadow-xs'
                           : 'border-[#E9E8E7] bg-white text-[#5B403D] hover:bg-[#F4F3F2]'
                       }`}
                     >
@@ -367,7 +367,7 @@ function DishCustomizerModalContent({
               placeholder="e.g. Less oil, extra crispy, no coriander..."
               value={specialNotes}
               onChange={(e) => setSpecialNotes(e.target.value)}
-              className="w-full px-3 py-2 text-xs rounded-xl border border-[#E9E8E7] bg-[#FAF9F8] focus:bg-white focus:border-[#BA1A20] focus:outline-none transition-all"
+              className="w-full px-3 py-2 text-xs rounded-xl border border-[#E9E8E7] bg-[#FAF9F8] focus:bg-white focus:border-brand focus:outline-none transition-all"
             />
           </div>
         </div>
@@ -400,7 +400,7 @@ function DishCustomizerModalContent({
           <button
             type="button"
             onClick={handleAdd}
-            className="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-[#BA1A20] hover:bg-[#8B0000] text-white text-xs font-bold transition-all shadow-sm"
+            className="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-brand hover:bg-brand-dark text-white text-xs font-bold transition-all shadow-sm"
           >
             <span>Add to Cart</span>
             <span>•</span>

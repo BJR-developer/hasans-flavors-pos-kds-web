@@ -84,7 +84,7 @@ export function OwnerPasswordResetModal({
                 <h3 className="text-base font-extrabold text-neutral-900">
                   Direct Password Reset
                 </h3>
-                <p className="text-[11px] text-neutral-500">
+                <p className="text-xs text-neutral-500">
                   Immediate reset without email verification
                 </p>
               </div>
@@ -122,7 +122,7 @@ export function OwnerPasswordResetModal({
 
               {/* Target Account Info */}
               <div className="p-3 rounded-xl bg-neutral-50 border border-neutral-200/80 space-y-0.5">
-                <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
+                <span className="text-xs font-bold text-neutral-400 uppercase tracking-wider block">
                   Target Account
                 </span>
                 <span className="text-xs font-bold text-neutral-900">
@@ -170,7 +170,7 @@ export function OwnerPasswordResetModal({
               </div>
 
               {/* Notice */}
-              <div className="flex items-start gap-2 p-2.5 rounded-xl bg-amber-50 border border-amber-100 text-[11px] text-amber-800">
+              <div className="flex items-start gap-2 p-2.5 rounded-xl bg-amber-50 border border-amber-100 text-xs text-amber-800">
                 <ShieldCheck className="w-4 h-4 shrink-0 mt-0.5 text-amber-600" />
                 <span>
                   This immediately overwrites the password in Supabase. The staff member can sign in right away with this new password.

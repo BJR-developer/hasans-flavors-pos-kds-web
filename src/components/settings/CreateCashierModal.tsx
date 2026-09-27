@@ -148,7 +148,7 @@ export function CreateCashierModal({
                 <h3 className="text-base font-extrabold text-neutral-900">
                   Create Staff Account
                 </h3>
-                <p className="text-[11px] text-neutral-500">
+                <p className="text-xs text-neutral-500">
                   Configured with distinct username and auto-confirmed access
                 </p>
               </div>
@@ -206,7 +206,7 @@ export function CreateCashierModal({
                     <User className="w-3.5 h-3.5 text-neutral-400" />
                     <span>Username</span>
                   </label>
-                  <span className="text-[10px] text-neutral-400 font-medium">
+                  <span className="text-xs text-neutral-400 font-medium">
                     Letters, numbers, underscores only
                   </span>
                 </div>
@@ -223,11 +223,11 @@ export function CreateCashierModal({
                   } focus:outline-none`}
                 />
                 {usernameError ? (
-                  <span className="text-[11px] text-rose-600 font-medium block">
+                  <span className="text-xs text-rose-600 font-medium block">
                     {usernameError}
                   </span>
                 ) : (
-                  <span className="text-[10px] text-neutral-400 block">
+                  <span className="text-xs text-neutral-400 block">
                     Staff can use this username to sign in directly without typing the full email.
                   </span>
                 )}
@@ -248,7 +248,7 @@ export function CreateCashierModal({
                         const cleanUser = sanitizeUsername(username);
                         setEmail(cleanUser ? `${cleanUser}@hasan.com` : '');
                       }}
-                      className="text-[10px] text-neutral-500 hover:text-neutral-900 underline"
+                      className="text-xs text-neutral-500 hover:text-neutral-900 underline"
                     >
                       Reset to Default
                     </button>
@@ -267,7 +267,7 @@ export function CreateCashierModal({
                   } focus:outline-none`}
                 />
                 {emailError && (
-                  <span className="text-[11px] text-rose-600 font-medium block">
+                  <span className="text-xs text-rose-600 font-medium block">
                     {emailError}
                   </span>
                 )}
@@ -303,7 +303,7 @@ export function CreateCashierModal({
                     }`}
                   >
                     <span className="block font-black">Cashier</span>
-                    <span className={`text-[10px] block ${role === 'cashier' ? 'text-neutral-300' : 'text-neutral-400'}`}>
+                    <span className={`text-xs block ${role === 'cashier' ? 'text-neutral-300' : 'text-neutral-400'}`}>
                       POS, KDS, &amp; Orders
                     </span>
                   </button>
@@ -318,7 +318,7 @@ export function CreateCashierModal({
                     }`}
                   >
                     <span className="block font-black">Owner / Manager</span>
-                    <span className={`text-[10px] block ${role === 'owner' ? 'text-neutral-300' : 'text-neutral-400'}`}>
+                    <span className={`text-xs block ${role === 'owner' ? 'text-neutral-300' : 'text-neutral-400'}`}>
                       Full analytics &amp; staff
                     </span>
                   </button>
@@ -349,7 +349,7 @@ export function CreateCashierModal({
                 </div>
               </div>
 
-              <div className="flex items-center gap-1.5 text-[11px] text-emerald-700 bg-emerald-50 px-3 py-2 rounded-xl border border-emerald-200">
+              <div className="flex items-center gap-1.5 text-xs text-emerald-700 bg-emerald-50 px-3 py-2 rounded-xl border border-emerald-200">
                 <ShieldCheck className="w-4 h-4 shrink-0 text-emerald-600" />
                 <span>Auto-confirmed in Supabase. No confirmation email needed.</span>
               </div>

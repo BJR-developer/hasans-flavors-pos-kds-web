@@ -68,12 +68,12 @@ export function FlyingTicketOverlay({ flight, onAnimationComplete }: FlyingTicke
         className="bg-white rounded-xl border-2 border-neutral-900 flex flex-col overflow-hidden shadow-2xl ring-4 ring-neutral-950/20"
       >
         {/* Flying Beacon Ribbon */}
-        <div className="bg-neutral-900 text-white text-[10px] font-black px-2.5 py-1 flex items-center justify-between tracking-wide uppercase">
+        <div className="bg-neutral-900 text-white text-xs font-black px-2.5 py-1 flex items-center justify-between tracking-wide uppercase">
           <span className="flex items-center gap-1 text-amber-300">
             {direction === 'forward' ? <ArrowRight className="w-3 h-3 animate-pulse" /> : <ArrowLeft className="w-3 h-3 animate-pulse" />}
             {statusLabel}
           </span>
-          <span className="flex items-center gap-1 text-white font-mono text-[9px]">
+          <span className="flex items-center gap-1 text-white font-mono text-xs">
             <Sparkles className="w-2.5 h-2.5 text-amber-400" /> Gliding
           </span>
         </div>
@@ -85,16 +85,16 @@ export function FlyingTicketOverlay({ flight, onAnimationComplete }: FlyingTicke
           <div className="flex items-center gap-2">
             <span className="font-mono font-black text-sm">{order.orderNumber}</span>
             {order.type === 'dine_in' ? (
-              <span className={`text-[10.5px] font-extrabold px-2 py-0.5 rounded ${colorTheme.badgeBg}`}>
+              <span className={`text-xs font-extrabold px-2 py-0.5 rounded ${colorTheme.badgeBg}`}>
                 {order.tableNumber || 'Dine-In'}
               </span>
             ) : (
-              <span className={`text-[10.5px] font-bold px-2 py-0.5 rounded ${colorTheme.badgeBg}`}>
+              <span className={`text-xs font-bold px-2 py-0.5 rounded ${colorTheme.badgeBg}`}>
                 {order.type === 'delivery' ? 'Delivery' : 'Takeout'}
               </span>
             )}
           </div>
-          <span className="text-[10.5px] font-bold font-mono">
+          <span className="text-xs font-bold font-mono">
             {order.items.length} item{order.items.length === 1 ? '' : 's'}
           </span>
         </div>
@@ -110,7 +110,7 @@ export function FlyingTicketOverlay({ flight, onAnimationComplete }: FlyingTicke
             </div>
           ))}
           {order.items.length > 3 && (
-            <p className="text-[10px] text-neutral-500 font-medium italic">
+            <p className="text-xs text-neutral-500 font-medium italic">
               +{order.items.length - 3} more items...
             </p>
           )}

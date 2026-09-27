@@ -65,13 +65,13 @@ export function OrdersTable() {
       case 'sent_to_kitchen':
         return { label: 'Received', color: 'text-[#B45309]', bg: 'bg-[#FFF8E1]' };
       case 'preparing':
-        return { label: 'In Kitchen', color: 'text-[#BA1A20]', bg: 'bg-[#FFF2F0]' };
+        return { label: 'In Kitchen', color: 'text-brand', bg: 'bg-brand-soft' };
       case 'ready':
-        return { label: 'Ready', color: 'text-[#2E7D32]', bg: 'bg-[#E8F5E9]' };
+        return { label: 'Ready', color: 'text-money', bg: 'bg-[#E8F5E9]' };
       case 'served':
         return { label: 'Served', color: 'text-blue-700', bg: 'bg-blue-50' };
       case 'completed':
-        return { label: 'Closed', color: 'text-[#525252]', bg: 'bg-[#F5F5F5]' };
+        return { label: 'Closed', color: 'text-ink-soft', bg: 'bg-[#F5F5F5]' };
       case 'cancelled':
         return { label: 'Cancelled', color: 'text-red-700', bg: 'bg-red-50' };
     }
@@ -169,22 +169,22 @@ export function OrdersTable() {
   });
 
   return (
-    <div className="min-h-[calc(100vh-56px)] bg-[#FAFAFA] p-4 sm:p-6 space-y-5">
+    <div className="min-h-[calc(100vh-56px)] bg-canvas p-4 sm:p-6 space-y-5">
       {/* Top Banner & Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black text-[#1F1F1F] tracking-tight">
-            Order History &amp; Shift Register
+          <h1 className="text-2xl font-black text-ink tracking-tight">
+            Orders
           </h1>
-          <p className="text-xs text-[#737373]">
-            Filter orders by cashier shift time windows, view financial breakdown, and manage orders
+          <p className="text-sm text-muted">
+            Find, reprint, settle or cancel orders
           </p>
         </div>
 
         {unpaidDineInOrders.length > 0 && (
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold">
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-sm font-bold">
             <AlertCircle className="w-4 h-4 text-amber-600" />
-            <span>{unpaidDineInOrders.length} Unsettled Dine-In Tables</span>
+            <span>{unpaidDineInOrders.length} unpaid dine-in order{unpaidDineInOrders.length === 1 ? '' : 's'}</span>
           </div>
         )}
       </div>
@@ -250,7 +250,7 @@ export function OrdersTable() {
           <table className="w-full text-left border-collapse">
             <thead>
               {table.getHeaderGroups().map((headerGroup) => (
-                <tr key={headerGroup.id} className="border-b border-neutral-100 bg-neutral-50/70 text-[11px] font-bold text-neutral-500 uppercase tracking-wider">
+                <tr key={headerGroup.id} className="border-b border-neutral-100 bg-neutral-50/70 text-xs font-bold text-neutral-500 uppercase tracking-wider">
                   {headerGroup.headers.map((header) => (
                     <th key={header.id} className="px-4 py-3">
                       {header.isPlaceholder

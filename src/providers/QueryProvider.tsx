@@ -4,6 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { QueryClient, QueryClientProvider, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { QUERY_KEYS } from '@/hooks/useRestaurantData';
+import { showToast } from '@/lib/toast';
+import { Toaster } from '@/components/common/Toaster';
 
 function RealtimeSubscriptions() {
   const queryClient = useQueryClient();
@@ -14,7 +16,6 @@ function RealtimeSubscriptions() {
       .channel('web:global:orders')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, () => {
         queryClient.invalidateQueries({ queryKey: QUERY_KEYS.orders });
-        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.dailyStats });
       })
       .subscribe();
 
@@ -31,7 +32,6 @@ function RealtimeSubscriptions() {
       .channel('web:global:dining_tables')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'dining_tables' }, () => {
         queryClient.invalidateQueries({ queryKey: QUERY_KEYS.tables });
-        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.dailyStats });
       })
       .subscribe();
 
@@ -54,6 +54,13 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
             staleTime: 1000 * 5, // 5 seconds
             refetchOnWindowFocus: false,
           },
+          mutations: {
+            // Every failed save tells the user why instead of failing silently
+            onError: (err: unknown) => {
+              const msg = err instanceof Error ? err.message : (err as { message?: string })?.message;
+              showToast(msg || 'Something went wrong. Please try again.');
+            },
+          },
         },
       })
   );
@@ -62,6 +69,7 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
     <QueryClientProvider client={queryClient}>
       <RealtimeSubscriptions />
       {children}
+      <Toaster />
     </QueryClientProvider>
   );
 }

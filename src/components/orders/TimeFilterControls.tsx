@@ -120,7 +120,7 @@ export function TimeFilterControls({
         <div className="flex flex-wrap items-center justify-between gap-3">
           {/* Preset Buttons */}
           <div className="flex items-center gap-1.5 flex-wrap">
-            <span className="text-[11px] font-bold text-neutral-400 uppercase tracking-wider mr-1">
+            <span className="text-xs font-bold text-neutral-400 uppercase tracking-wider mr-1">
               Time Shift:
             </span>
             <button
@@ -195,7 +195,7 @@ export function TimeFilterControls({
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 pt-2 border-t border-neutral-100">
           {/* Date Selector */}
           <div className="space-y-1">
-            <label className="text-[11px] font-bold text-neutral-600 flex items-center gap-1">
+            <label className="text-xs font-bold text-neutral-600 flex items-center gap-1">
               <Calendar className="w-3.5 h-3.5 text-neutral-400" />
               <span>Shift Date</span>
             </label>
@@ -211,7 +211,7 @@ export function TimeFilterControls({
 
           {/* Time From */}
           <div className="space-y-1">
-            <label className="text-[11px] font-bold text-neutral-600 flex items-center gap-1">
+            <label className="text-xs font-bold text-neutral-600 flex items-center gap-1">
               <Clock className="w-3.5 h-3.5 text-neutral-400" />
               <span>Start Time (From)</span>
             </label>
@@ -227,7 +227,7 @@ export function TimeFilterControls({
 
           {/* Time To */}
           <div className="space-y-1">
-            <label className="text-[11px] font-bold text-neutral-600 flex items-center gap-1">
+            <label className="text-xs font-bold text-neutral-600 flex items-center gap-1">
               <Clock className="w-3.5 h-3.5 text-neutral-400" />
               <span>End Time (To)</span>
             </label>
@@ -243,7 +243,7 @@ export function TimeFilterControls({
 
           {/* Cashier / Staff Filter */}
           <div className="space-y-1">
-            <label className="text-[11px] font-bold text-neutral-600 flex items-center gap-1">
+            <label className="text-xs font-bold text-neutral-600 flex items-center gap-1">
               <User className="w-3.5 h-3.5 text-neutral-400" />
               <span>Cashier / Staff</span>
             </label>
@@ -265,71 +265,15 @@ export function TimeFilterControls({
         </div>
       </div>
 
-      {/* Live Financial Calculation Banner for this Time Window */}
-      <div className="p-4 rounded-2xl bg-neutral-900 text-white shadow-sm space-y-3">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-2.5">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <h4 className="text-xs font-black tracking-wide uppercase text-neutral-300">
-              Shift Data Calculations ({filters.startTime} &ndash; {filters.endTime})
-            </h4>
-          </div>
-          <div className="text-[11px] text-neutral-400 font-medium">
-            Staff: <span className="text-white font-bold">{filters.cashierName === 'all' ? 'All Staff' : filters.cashierName}</span> &bull; Date: <span className="text-white font-bold">{filters.date}</span>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 pt-1">
-          {/* Orders */}
-          <div>
-            <span className="text-[10px] text-neutral-400 uppercase font-bold block">
-              Orders Placed
-            </span>
-            <span className="text-lg font-black font-mono text-white">
-              {metrics.orderCount}
-            </span>
-          </div>
-
-          {/* Gross Sales */}
-          <div>
-            <span className="text-[10px] text-neutral-400 uppercase font-bold block">
-              Gross Sales
-            </span>
-            <span className="text-lg font-black font-mono text-white">
-              ₱{metrics.grossRevenue.toLocaleString()}
-            </span>
-          </div>
-
-          {/* Cash Collected */}
-          <div>
-            <span className="text-[10px] text-emerald-400 uppercase font-bold block">
-              Cash Collected
-            </span>
-            <span className="text-lg font-black font-mono text-emerald-300">
-              ₱{metrics.cashTotal.toLocaleString()}
-            </span>
-          </div>
-
-          {/* Card / Digital */}
-          <div>
-            <span className="text-[10px] text-blue-400 uppercase font-bold block">
-              Card &amp; Digital
-            </span>
-            <span className="text-lg font-black font-mono text-blue-300">
-              ₱{metrics.cardTotal.toLocaleString()}
-            </span>
-          </div>
-
-          {/* Total Discounts */}
-          <div>
-            <span className="text-[10px] text-amber-400 uppercase font-bold block">
-              Discounts Given
-            </span>
-            <span className="text-lg font-black font-mono text-amber-300">
-              ₱{metrics.discountTotal.toLocaleString()}
-            </span>
-          </div>
-        </div>
+      {/* Money totals live in Cash & Shifts so every screen shows the same numbers */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-4 py-3 rounded-xl bg-neutral-50 border border-neutral-200 text-sm">
+        <span className="text-neutral-700">
+          <strong className="text-neutral-900">{metrics.orderCount}</strong> orders between {filters.startTime} and {filters.endTime}
+          {filters.cashierName !== 'all' ? ` by ${filters.cashierName}` : ''}
+        </span>
+        <a href="/shifts" className="font-semibold text-brand hover:underline">
+          Money collected → Cash &amp; Shifts
+        </a>
       </div>
     </div>
   );

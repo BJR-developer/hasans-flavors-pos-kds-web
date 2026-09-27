@@ -19,7 +19,6 @@ interface AuthState {
   initialize: () => Promise<void>;
   signInWithPassword: (email: string, pass: string) => Promise<{ success: boolean; error?: string; role?: UserRole }>;
   sendPasswordResetEmail: (email: string) => Promise<{ success: boolean; message?: string; error?: string }>;
-  resetPasswordDirectly: (usernameOrEmail: string, newPass: string) => Promise<{ success: boolean; message?: string; error?: string }>;
   signOut: () => Promise<void>;
 }
 
@@ -46,7 +45,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
               id: profile.id,
               email: profile.email,
               name: profile.full_name || profile.email.split('@')[0],
-              role: (profile.role as UserRole) || 'cashier',
+              role: (profile.role as UserRole) || 'customer',
               phone: profile.phone,
               avatarUrl: profile.avatar_url,
             },
@@ -62,7 +61,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             id: session.user.id,
             email: session.user.email || '',
             name: meta.full_name || session.user.email?.split('@')[0] || 'Staff Member',
-            role: (meta.role as UserRole) || 'cashier',
+            role: 'customer',
             phone: meta.phone,
           },
           isLoading: false,
@@ -88,17 +87,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       let email = cleanInput;
 
       if (!cleanInput.includes('@')) {
-        const { data: profileMatch } = await supabase
-          .from('profiles')
-          .select('email')
-          .eq('username', cleanInput)
-          .maybeSingle();
-
-        if (profileMatch?.email) {
-          email = profileMatch.email;
-        } else {
-          email = `${cleanInput}@hasan.com`;
-        }
+        const { data: matchedEmail } = await supabase.rpc('get_login_email', { p_username: cleanInput });
+        email = typeof matchedEmail === 'string' && matchedEmail ? matchedEmail : `${cleanInput}@hasan.com`;
       }
 
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -118,7 +108,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           .eq('id', data.user.id)
           .single();
 
-        const role = (profile?.role as UserRole) || (data.user.user_metadata?.role as UserRole) || 'cashier';
+        const role = (profile?.role as UserRole) || 'customer';
+        if (role !== 'owner' && role !== 'cashier') {
+          await supabase.auth.signOut();
+          const msg = 'This portal is for restaurant staff only.';
+          set({ user: null, isLoading: false, error: msg });
+          return { success: false, error: msg };
+        }
         const user: AuthUser = {
           id: data.user.id,
           email: data.user.email || email,
@@ -161,47 +157,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     } catch (err: any) {
       set({ isLoading: false, error: err?.message || 'Failed to send reset email' });
       return { success: false, error: err?.message || 'Failed to send reset email' };
-    }
-  },
-
-  resetPasswordDirectly: async (usernameOrEmail: string, newPass: string) => {
-    try {
-      set({ isLoading: true, error: null });
-      const cleanInput = usernameOrEmail.trim().toLowerCase().replace(/\s+/g, '');
-      let email = cleanInput;
-
-      if (!cleanInput.includes('@')) {
-        const { data: profileMatch } = await supabase
-          .from('profiles')
-          .select('email')
-          .eq('username', cleanInput)
-          .maybeSingle();
-
-        if (profileMatch?.email) {
-          email = profileMatch.email;
-        } else {
-          email = `${cleanInput}@hasan.com`;
-        }
-      }
-
-      const { data, error } = await supabase.rpc('admin_reset_user_password', {
-        p_email: email,
-        p_new_password: newPass,
-      });
-
-      set({ isLoading: false });
-      if (error) {
-        set({ error: error.message });
-        return { success: false, error: error.message };
-      }
-
-      return {
-        success: true,
-        message: data?.message || 'Password updated successfully without email verification.',
-      };
-    } catch (err: any) {
-      set({ isLoading: false, error: err?.message || 'Failed to reset password directly' });
-      return { success: false, error: err?.message || 'Failed to reset password directly' };
     }
   },
 

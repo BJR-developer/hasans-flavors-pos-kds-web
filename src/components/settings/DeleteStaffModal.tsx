@@ -63,7 +63,7 @@ export function DeleteStaffModal({
                 <h3 className="text-base font-extrabold text-neutral-900">
                   Delete Staff Account
                 </h3>
-                <p className="text-[11px] text-neutral-500">
+                <p className="text-xs text-neutral-500">
                   Revoke credentials and remove staff access
                 </p>
               </div>
@@ -105,7 +105,7 @@ export function DeleteStaffModal({
                 (<span className="font-mono text-neutral-800">{staff.email}</span>)?
               </p>
 
-              <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200/80 text-[11px] text-amber-900 space-y-1">
+              <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200/80 text-xs text-amber-900 space-y-1">
                 <div className="flex items-center gap-1.5 font-bold">
                   <AlertTriangle className="w-3.5 h-3.5 text-amber-700" />
                   <span>Audit Trail Preserved</span>

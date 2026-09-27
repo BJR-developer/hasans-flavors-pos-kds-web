@@ -130,23 +130,23 @@ export function OrderDetailsModal({
                 <button
                   type="button"
                   onClick={() => setIsChangeTableOpen(true)}
-                  className="inline-flex items-center gap-1 text-[11px] font-bold text-neutral-800 bg-neutral-100 hover:bg-neutral-200 border border-neutral-200 px-2 py-0.5 rounded-md transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1 text-xs font-bold text-neutral-800 bg-neutral-100 hover:bg-neutral-200 border border-neutral-200 px-2 py-0.5 rounded-md transition-colors cursor-pointer"
                   title="Click to change / move table"
                 >
                   <span>{currentOrder.tableNumber || 'Dine-In'}</span>
                   <ArrowRightLeft className="w-2.5 h-2.5 text-neutral-500" />
                 </button>
               ) : (
-                <span className="text-[11px] font-medium text-neutral-500">
+                <span className="text-xs font-medium text-neutral-500">
                   {currentOrder.type === 'delivery' ? 'Delivery' : 'Takeout'}
                 </span>
               )}
               <span className="text-neutral-300">•</span>
-              <span className={`text-[11px] font-semibold ${isFullyPaid ? 'text-emerald-700' : 'text-neutral-900'}`}>
+              <span className={`text-xs font-semibold ${isFullyPaid ? 'text-emerald-700' : 'text-neutral-900'}`}>
                 {isFullyPaid ? 'Paid' : 'Unpaid'}
               </span>
             </div>
-            <p className="text-[11px] text-neutral-400">
+            <p className="text-xs text-neutral-400">
               {currentOrder.customerName} · {new Date(currentOrder.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
             </p>
           </div>
@@ -157,7 +157,7 @@ export function OrderDetailsModal({
               title="Share Order & Address to Messenger, Instagram, SMS..."
               className="p-1.5 rounded-lg text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100 transition-colors"
             >
-              <Share2 className="w-4 h-4 text-[#BA1A20]" />
+              <Share2 className="w-4 h-4 text-brand" />
             </button>
             <button
               onClick={() => onPrintReceipt(currentOrder)}
@@ -185,7 +185,7 @@ export function OrderDetailsModal({
               <div className="flex items-start gap-2.5 min-w-0 flex-1">
                 <MapPin className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
                 <div className="min-w-0 flex-1">
-                  <span className="text-[10px] uppercase font-bold text-neutral-400 block tracking-wider">
+                  <span className="text-xs uppercase font-bold text-neutral-400 block tracking-wider">
                     Delivery Destination
                   </span>
                   <p className="text-xs font-semibold text-neutral-100 leading-snug break-words">
@@ -200,7 +200,7 @@ export function OrderDetailsModal({
                     href={getOrderMapsUrl(currentOrder)!}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-400 hover:text-emerald-300 bg-neutral-800 hover:bg-neutral-700 px-2.5 py-1 rounded-lg border border-neutral-700 transition-colors"
+                    className="inline-flex items-center gap-1 text-xs font-bold text-emerald-400 hover:text-emerald-300 bg-neutral-800 hover:bg-neutral-700 px-2.5 py-1 rounded-lg border border-neutral-700 transition-colors"
                   >
                     <ExternalLink className="w-3.5 h-3.5" />
                     <span>Maps</span>
@@ -209,7 +209,7 @@ export function OrderDetailsModal({
                 <button
                   type="button"
                   onClick={() => setIsShareModalOpen(true)}
-                  className="inline-flex items-center gap-1 text-[11px] font-bold text-white bg-[#BA1A20] hover:bg-[#8B0000] px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1 text-xs font-bold text-white bg-brand hover:bg-brand-dark px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
                 >
                   <Share2 className="w-3.5 h-3.5" />
                   <span>Share</span>
@@ -222,14 +222,14 @@ export function OrderDetailsModal({
           {currentOrder.paymentMethod === 'inr_qr' && (
             <div className="p-3.5 bg-indigo-50/80 rounded-xl border border-indigo-200 text-xs text-indigo-950 space-y-1.5">
               <div className="flex items-center justify-between">
-                <span className="font-bold uppercase text-[10px] tracking-wide text-indigo-700">
+                <span className="font-bold uppercase text-xs tracking-wide text-indigo-700">
                   ⚡ INR UPI Payment (Manual Verification)
                 </span>
-                <span className="text-[11px] font-mono font-bold bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded">
+                <span className="text-xs font-mono font-bold bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded">
                   ₹{Math.round(total * 1.65).toLocaleString()} INR
                 </span>
               </div>
-              <p className="text-[11px] text-indigo-900 leading-relaxed">
+              <p className="text-xs text-indigo-900 leading-relaxed">
                 Customer selected UPI QR. Please review the customer's transfer screenshot or match the 12-digit UTR below against your GPay/PhonePe business account.
               </p>
             </div>
@@ -238,7 +238,7 @@ export function OrderDetailsModal({
           {/* Order-Level Special Dining / Cooking Instructions */}
           {currentOrder.specialNotes && (
             <div className="p-3 bg-amber-50 rounded-xl border border-amber-200 text-xs text-amber-900">
-              <span className="font-bold text-amber-800 uppercase text-[10px] tracking-wide block mb-0.5">Special Instructions:</span>
+              <span className="font-bold text-amber-800 uppercase text-xs tracking-wide block mb-0.5">Special Instructions:</span>
               <span className="font-medium">{currentOrder.specialNotes}</span>
             </div>
           )}
@@ -246,7 +246,7 @@ export function OrderDetailsModal({
           {/* Ordered Items List */}
           <div>
             <div className="flex items-center justify-between pb-2 border-b border-neutral-100 mb-3">
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-neutral-400">
+              <span className="text-xs font-semibold uppercase tracking-wider text-neutral-400">
                 Ordered Items ({currentOrder.items.reduce((s, i) => s + i.quantity, 0)})
               </span>
               {!isFullyPaid && (
@@ -266,14 +266,14 @@ export function OrderDetailsModal({
               {currentOrder.items.map((item) => (
                 <div key={item.cartItemId} className="flex items-start justify-between text-xs py-1 border-b border-neutral-50 last:border-0">
                   <div className="flex items-start gap-2 min-w-0 flex-1">
-                    <span className="font-mono text-neutral-400 text-[11px] w-4 mt-0.5">
+                    <span className="font-mono text-neutral-400 text-xs w-4 mt-0.5">
                       {item.quantity}×
                     </span>
                     <div className="min-w-0 flex-1">
                       <span className="text-neutral-900 font-medium">{item.dish.name}</span>
                       
                       {/* Variants & Spice details */}
-                      <div className="flex flex-wrap items-center gap-1.5 mt-0.5 text-[10.5px]">
+                      <div className="flex flex-wrap items-center gap-1.5 mt-0.5 text-xs">
                         {item.selectedVariants && item.selectedVariants.length > 0 ? (
                           item.selectedVariants.map((v, idx) => (
                             <span key={idx} className="bg-neutral-100 text-neutral-800 px-1.5 py-0.2 rounded font-medium">
@@ -307,7 +307,7 @@ export function OrderDetailsModal({
                       </div>
 
                       {item.specialNotes && (
-                        <p className="text-[10px] text-amber-800 italic mt-0.5">
+                        <p className="text-xs text-amber-800 italic mt-0.5">
                           Note: {item.specialNotes}
                         </p>
                       )}
@@ -354,10 +354,10 @@ export function OrderDetailsModal({
           {/* Status Progression: Single segmented control with immediate UI feedback */}
           <div className="pt-4 border-t border-neutral-100">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-neutral-400">
+              <span className="text-xs font-semibold uppercase tracking-wider text-neutral-400">
                 Status
               </span>
-              <span className="text-[11px] text-neutral-500 capitalize">
+              <span className="text-xs text-neutral-500 capitalize">
                 {activeStatus}
               </span>
             </div>
@@ -392,7 +392,7 @@ export function OrderDetailsModal({
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-1.5">
                 <Clock className="w-3.5 h-3.5 text-neutral-500" />
-                <span className="text-[11px] font-semibold uppercase tracking-wider text-neutral-400">
+                <span className="text-xs font-semibold uppercase tracking-wider text-neutral-400">
                   Customer App ETA
                 </span>
               </div>

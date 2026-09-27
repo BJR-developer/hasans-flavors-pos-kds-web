@@ -23,10 +23,10 @@ export default function HomePage() {
   }, [user, isLoading, router]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#FAFAFA]">
+    <div className="min-h-screen flex items-center justify-center bg-canvas">
       <div className="flex flex-col items-center gap-2">
-        <div className="w-6 h-6 border-2 border-[#BA1A20] border-t-transparent rounded-full animate-spin" />
-        <p className="text-xs text-[#737373] font-medium">Loading operations portal...</p>
+        <div className="w-6 h-6 border-2 border-brand border-t-transparent rounded-full animate-spin" />
+        <p className="text-xs text-muted font-medium">Loading operations portal...</p>
       </div>
     </div>
   );

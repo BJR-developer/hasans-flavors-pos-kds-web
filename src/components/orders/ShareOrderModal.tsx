@@ -77,12 +77,12 @@ export function ShareOrderModal({ isOpen, onClose, order }: ShareOrderModalProps
         {/* Header */}
         <div className="p-4 bg-neutral-900 text-white flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-[#BA1A20] flex items-center justify-center text-white">
+            <div className="w-8 h-8 rounded-full bg-brand flex items-center justify-center text-white">
               <Share2 className="w-4 h-4" />
             </div>
             <div>
               <h3 className="text-sm font-extrabold tracking-tight">Share Delivery Location</h3>
-              <p className="text-[11px] text-neutral-400">
+              <p className="text-xs text-neutral-400">
                 Order {order.orderNumber} • {order.customerName || 'Valued Diner'}
               </p>
             </div>
@@ -107,16 +107,16 @@ export function ShareOrderModal({ isOpen, onClose, order }: ShareOrderModalProps
           {/* Location Summary Box */}
           <div className="p-3 bg-neutral-50 rounded-xl border border-neutral-200/80 space-y-2">
             <div className="flex items-start gap-2">
-              <MapPin className="w-4 h-4 text-[#BA1A20] shrink-0 mt-0.5" />
+              <MapPin className="w-4 h-4 text-brand shrink-0 mt-0.5" />
               <div className="flex-1 min-w-0">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-400 block">
+                <span className="text-xs font-bold uppercase tracking-wider text-neutral-400 block">
                   Delivery Destination
                 </span>
                 <p className="text-xs font-bold text-neutral-900 leading-snug break-words">
                   {order.deliveryAddress || 'No address specified'}
                 </p>
                 {order.specialNotes && (
-                  <p className="text-[11px] text-amber-900 bg-amber-50/80 p-1 rounded border border-amber-200/60 mt-1 italic">
+                  <p className="text-xs text-amber-900 bg-amber-50/80 p-1 rounded border border-amber-200/60 mt-1 italic">
                     Note: {order.specialNotes}
                   </p>
                 )}
@@ -129,7 +129,7 @@ export function ShareOrderModal({ isOpen, onClose, order }: ShareOrderModalProps
                   href={mapsUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 px-2.5 py-1 rounded-lg border border-emerald-200 transition-colors"
+                  className="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 px-2.5 py-1 rounded-lg border border-emerald-200 transition-colors"
                 >
                   <ExternalLink className="w-3.5 h-3.5" />
                   <span>Open in Google Maps</span>
@@ -140,7 +140,7 @@ export function ShareOrderModal({ isOpen, onClose, order }: ShareOrderModalProps
 
           {/* Quick Share Options */}
           <div className="space-y-2">
-            <span className="text-[10.5px] font-bold uppercase tracking-wider text-neutral-400 block">
+            <span className="text-xs font-bold uppercase tracking-wider text-neutral-400 block">
               Share Anywhere
             </span>
 
@@ -148,7 +148,7 @@ export function ShareOrderModal({ isOpen, onClose, order }: ShareOrderModalProps
             <button
               type="button"
               onClick={handleNativeShare}
-              className="w-full py-2.5 px-3 rounded-xl bg-[#BA1A20] hover:bg-[#8B0000] text-white text-xs font-bold flex items-center justify-center gap-2 shadow-xs transition-colors"
+              className="w-full py-2.5 px-3 rounded-xl bg-brand hover:bg-brand-dark text-white text-xs font-bold flex items-center justify-center gap-2 shadow-xs transition-colors"
             >
               <Share2 className="w-4 h-4" />
               <span>Share via Apps (Messenger, Instagram, SMS...)</span>
@@ -219,10 +219,10 @@ export function ShareOrderModal({ isOpen, onClose, order }: ShareOrderModalProps
 
           {/* Message Preview */}
           <div className="space-y-1 pt-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-400 block">
+            <span className="text-xs font-bold uppercase tracking-wider text-neutral-400 block">
               Formatted Message Preview
             </span>
-            <pre className="p-2.5 rounded-lg bg-neutral-900 text-neutral-100 text-[11px] font-mono whitespace-pre-wrap leading-relaxed max-h-36 overflow-y-auto border border-neutral-800">
+            <pre className="p-2.5 rounded-lg bg-neutral-900 text-neutral-100 text-xs font-mono whitespace-pre-wrap leading-relaxed max-h-36 overflow-y-auto border border-neutral-800">
               {shareText}
             </pre>
           </div>

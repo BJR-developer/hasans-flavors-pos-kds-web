@@ -32,18 +32,18 @@ export function PosCartHeader({
   onOpenChangeTable,
 }: PosCartHeaderProps) {
   return (
-    <div className="p-4 border-b border-[#E5E5E5] bg-white space-y-3 shrink-0">
+    <div className="p-4 border-b border-line bg-white space-y-3 shrink-0">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="text-xs font-bold text-[#1F1F1F] tracking-tight">
+          <span className="text-xs font-bold text-ink tracking-tight">
             Order Ticket
           </span>
           {loadedOrder ? (
-            <span className="text-[11px] font-semibold bg-neutral-900 text-white px-2 py-0.5 rounded-md">
+            <span className="text-xs font-semibold bg-neutral-900 text-white px-2 py-0.5 rounded-md">
               Active Order
             </span>
           ) : itemsCount > 0 ? (
-            <span className="text-[11px] font-semibold bg-[#F5F5F5] text-[#525252] px-2 py-0.5 rounded-md">
+            <span className="text-xs font-semibold bg-[#F5F5F5] text-ink-soft px-2 py-0.5 rounded-md">
               {itemsCount} items
             </span>
           ) : null}
@@ -53,7 +53,7 @@ export function PosCartHeader({
           <button
             type="button"
             onClick={onCancelLoadedOrder}
-            className="text-[11px] font-medium text-neutral-500 hover:text-neutral-900 transition-colors"
+            className="text-xs font-medium text-neutral-500 hover:text-neutral-900 transition-colors"
           >
             New Ticket
           </button>
@@ -62,7 +62,7 @@ export function PosCartHeader({
             <button
               type="button"
               onClick={onClearCart}
-              className="text-[11px] font-medium text-[#737373] hover:text-[#BA1A20] flex items-center gap-1 transition-colors"
+              className="text-xs font-medium text-muted hover:text-brand flex items-center gap-1 transition-colors"
             >
               <RotateCcw className="w-3 h-3" />
               <span>Clear</span>
@@ -79,7 +79,7 @@ export function PosCartHeader({
               {loadedOrder.orderNumber}
             </span>
             <span
-              className={`text-[10px] font-semibold uppercase px-2 py-0.5 rounded-md ${
+              className={`text-xs font-semibold uppercase px-2 py-0.5 rounded-md ${
                 loadedOrder.paymentStatus === 'paid'
                   ? 'bg-emerald-100 text-emerald-800'
                   : 'bg-amber-100 text-amber-800'
@@ -90,7 +90,7 @@ export function PosCartHeader({
           </div>
 
           {loadedOrder.type === 'dine_in' ? (
-            <div className="flex items-center justify-between text-[11px] pt-0.5">
+            <div className="flex items-center justify-between text-xs pt-0.5">
               <span className="text-neutral-500">Dining Table:</span>
               <button
                 type="button"
@@ -100,11 +100,11 @@ export function PosCartHeader({
               >
                 <span>{loadedOrder.tableNumber || 'Dine-In'}</span>
                 <ArrowRightLeft className="w-2.5 h-2.5 text-neutral-400" />
-                <span className="text-[10px] text-neutral-500 font-normal underline ml-0.5">Change</span>
+                <span className="text-xs text-neutral-500 font-normal underline ml-0.5">Change</span>
               </button>
             </div>
           ) : (
-            <div className="flex justify-between text-[11px] text-neutral-500">
+            <div className="flex justify-between text-xs text-neutral-500">
               <span>Customer:</span>
               <span className="font-medium text-neutral-700">
                 {loadedOrder.customerName || 'Takeout Customer'}
@@ -113,7 +113,7 @@ export function PosCartHeader({
           )}
 
           {loadedOrder.specialNotes && (
-            <div className="pt-1 border-t border-neutral-200 text-[10.5px] text-amber-900 font-medium">
+            <div className="pt-1 border-t border-neutral-200 text-xs text-amber-900 font-medium">
               <span className="font-bold text-amber-800">Instruction: </span>
               <span>{loadedOrder.specialNotes}</span>
             </div>
@@ -128,8 +128,8 @@ export function PosCartHeader({
               onClick={() => onChannelChange('dine_in')}
               className={`flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-semibold transition-all ${
                 orderType === 'dine_in'
-                  ? 'bg-white text-[#1F1F1F] shadow-xs'
-                  : 'text-[#737373] hover:text-[#1F1F1F]'
+                  ? 'bg-white text-ink shadow-xs'
+                  : 'text-muted hover:text-ink'
               }`}
             >
               <Utensils className="w-3.5 h-3.5" />
@@ -141,8 +141,8 @@ export function PosCartHeader({
               onClick={() => onChannelChange('takeout')}
               className={`flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-semibold transition-all ${
                 orderType === 'takeout'
-                  ? 'bg-white text-[#1F1F1F] shadow-xs'
-                  : 'text-[#737373] hover:text-[#1F1F1F]'
+                  ? 'bg-white text-ink shadow-xs'
+                  : 'text-muted hover:text-ink'
               }`}
             >
               <ShoppingBag className="w-3.5 h-3.5" />
@@ -154,8 +154,8 @@ export function PosCartHeader({
               onClick={() => onChannelChange('delivery')}
               className={`flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-semibold transition-all ${
                 orderType === 'delivery'
-                  ? 'bg-white text-[#1F1F1F] shadow-xs'
-                  : 'text-[#737373] hover:text-[#1F1F1F]'
+                  ? 'bg-white text-ink shadow-xs'
+                  : 'text-muted hover:text-ink'
               }`}
             >
               <span>Delivery</span>
@@ -165,11 +165,11 @@ export function PosCartHeader({
           {/* Table Chips for Dine-In (Available Tables) */}
           {orderType === 'dine_in' && (
             <div>
-              <div className="flex items-center justify-between text-[11px] font-semibold text-[#737373] mb-1.5">
+              <div className="flex items-center justify-between text-xs font-semibold text-muted mb-1.5">
                 <span className="font-semibold text-neutral-800">
                   Available Tables ({availableTables.length})
                 </span>
-                <span className="text-[10px] text-emerald-700 font-medium">
+                <span className="text-xs text-emerald-700 font-medium">
                   Ready to Seat
                 </span>
               </div>
@@ -190,15 +190,15 @@ export function PosCartHeader({
                         key={t}
                         type="button"
                         onClick={() => onSelectTable(t)}
-                        className={`px-2.5 py-1 rounded-md text-[11px] font-bold shrink-0 transition-colors flex items-center gap-1 cursor-pointer select-none ${
+                        className={`px-2.5 py-1 rounded-md text-xs font-bold shrink-0 transition-colors flex items-center gap-1 cursor-pointer select-none ${
                           isSelected
-                            ? 'bg-[#1F1F1F] text-white shadow-2xs'
-                            : 'bg-[#F5F5F5] text-[#525252] hover:bg-[#E5E5E5]'
+                            ? 'bg-ink text-white shadow-2xs'
+                            : 'bg-[#F5F5F5] text-ink-soft hover:bg-line'
                         }`}
                       >
                         <span>{short}</span>
                         <span
-                          className={`text-[9px] font-normal ${
+                          className={`text-xs font-normal ${
                             isSelected ? 'text-white/70' : 'text-neutral-400'
                           }`}
                         >

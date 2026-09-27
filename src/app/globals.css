@@ -1,5 +1,18 @@
 @import "tailwindcss";
 
+/* Design tokens: use bg-brand, text-ink, border-line, bg-canvas, text-muted, etc. */
+@theme {
+  --color-brand: #ba1a20;
+  --color-brand-dark: #8b0000;
+  --color-brand-soft: #fff2f0;
+  --color-ink: #1f1f1f;
+  --color-ink-soft: #525252;
+  --color-muted: #737373;
+  --color-line: #e5e5e5;
+  --color-canvas: #fafafa;
+  --color-money: #2e7d32;
+}
+
 @layer base {
   :root {
     --bg-main: #faf9f8;

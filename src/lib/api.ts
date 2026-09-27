@@ -90,6 +90,7 @@ export const mapOrderFromDB = (row: any): Order => {
     shiftId: row.shift_id || undefined,
     items: Array.isArray(row.items) ? row.items : [],
     createdAt: row.created_at,
+    updatedAt: row.updated_at || row.created_at,
     estimatedMinutes: Number(
       row.estimated_minutes !== undefined && row.estimated_minutes !== null
         ? row.estimated_minutes
@@ -427,37 +428,6 @@ export const updateOrderStatusInDB = async (
 ): Promise<void> => {
   const updatePayload: any = { status, updated_at: new Date().toISOString() };
 
-  // When an order is completed, mark it paid in full and settle payment so revenue reflects on dashboard
-  if (status === 'completed') {
-    try {
-      const { data: ord } = await supabase
-        .from('orders')
-        .select('total, amount_paid, payment_status, payment_method, payment_history')
-        .eq('id', orderId)
-        .single();
-
-      if (ord) {
-        const orderTotal = Number(ord.total || 0);
-        updatePayload.payment_status = 'paid';
-        updatePayload.amount_paid = orderTotal;
-
-        const history = Array.isArray(ord.payment_history) ? [...ord.payment_history] : [];
-        if (history.length === 0 || ord.payment_status !== 'paid') {
-          history.push({
-            id: `pay_${Date.now()}`,
-            amount: orderTotal,
-            method: ord.payment_method || 'cash',
-            timestamp: new Date().toISOString(),
-            note: 'Settled upon order completion',
-          });
-        }
-        updatePayload.payment_history = history;
-      }
-    } catch (err) {
-      console.warn('Error querying order details for completion payment settlement:', err);
-    }
-  }
-
   const { error } = await supabase
     .from('orders')
     .update(updatePayload)
@@ -494,6 +464,7 @@ export const updateOrderPaymentInDB = async (
     closeOrder?: boolean;
     tax?: number;
     total?: number;
+    collector?: { cashierId?: string; cashierName?: string; shiftId?: string };
   }
 ): Promise<void> => {
   const dbUpdates: any = {
@@ -502,8 +473,44 @@ export const updateOrderPaymentInDB = async (
   };
 
   if (updates.paymentMethod) dbUpdates.payment_method = updates.paymentMethod;
-  if (updates.amountPaid !== undefined) dbUpdates.amount_paid = updates.amountPaid;
-  if (updates.paymentHistory !== undefined) dbUpdates.payment_history = updates.paymentHistory;
+  if (updates.paymentHistory !== undefined) {
+    dbUpdates.payment_history = updates.paymentHistory;
+    if (updates.amountPaid !== undefined) dbUpdates.amount_paid = updates.amountPaid;
+  } else {
+    // Record every newly collected amount with who collected it and in which shift
+    const { data: existing, error: fetchError } = await supabase
+      .from('orders')
+      .select('total, amount_paid, payment_method, payment_history')
+      .eq('id', orderId)
+      .single();
+    if (fetchError || !existing) throw fetchError || new Error('Order not found');
+
+    const previousPaid = Number(existing.amount_paid || 0);
+    const orderTotal = updates.total !== undefined ? updates.total : Number(existing.total || 0);
+    const newPaid =
+      updates.amountPaid !== undefined
+        ? updates.amountPaid
+        : updates.paymentStatus === 'paid'
+        ? orderTotal
+        : previousPaid;
+    dbUpdates.amount_paid = newPaid;
+
+    const delta = Math.round((newPaid - previousPaid) * 100) / 100;
+    if (delta > 0) {
+      const history = Array.isArray(existing.payment_history) ? [...existing.payment_history] : [];
+      history.push({
+        id: `pay_${Date.now()}`,
+        amount: delta,
+        method: updates.paymentMethod || existing.payment_method || 'cash',
+        timestamp: new Date().toISOString(),
+        note: 'Payment collected',
+        cashierId: updates.collector?.cashierId,
+        cashierName: updates.collector?.cashierName,
+        shiftId: updates.collector?.shiftId,
+      });
+      dbUpdates.payment_history = history;
+    }
+  }
   if (updates.closeOrder) dbUpdates.status = 'completed';
   if (updates.tax !== undefined) dbUpdates.tax = updates.tax;
   if (updates.total !== undefined) dbUpdates.total = updates.total;

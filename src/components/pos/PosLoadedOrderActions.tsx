@@ -81,7 +81,7 @@ export function PosLoadedOrderActions({
             <div className="space-y-2">
               <div className="flex items-center justify-between text-xs">
                 <span className="font-bold text-neutral-800">Cash Received from Customer</span>
-                <span className="text-[11px] font-mono text-neutral-500">Bill: ₱{total.toLocaleString()}</span>
+                <span className="text-xs font-mono text-neutral-500">Bill: ₱{total.toLocaleString()}</span>
               </div>
 
               {/* Fast Cash Presets */}
@@ -115,7 +115,7 @@ export function PosLoadedOrderActions({
 
               {/* Custom Cash Tendered Input with clear label */}
               <div>
-                <label className="block text-[11px] font-medium text-neutral-600 mb-1">
+                <label className="block text-xs font-medium text-neutral-600 mb-1">
                   Amount Tendered (₱)
                 </label>
                 <div className="relative">
@@ -136,10 +136,10 @@ export function PosLoadedOrderActions({
                 tenderedNum >= total ? (
                   <div className="p-2.5 rounded-lg bg-emerald-50 border border-emerald-300 text-emerald-900 flex items-center justify-between">
                     <div>
-                      <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-800 block">
+                      <span className="text-xs font-extrabold uppercase tracking-wider text-emerald-800 block">
                         Cash Return / Change Due
                       </span>
-                      <span className="text-[11px] text-emerald-700">
+                      <span className="text-xs text-emerald-700">
                         ₱{tenderedNum.toLocaleString()} received − ₱{total.toLocaleString()} bill
                       </span>
                     </div>
@@ -150,10 +150,10 @@ export function PosLoadedOrderActions({
                 ) : (
                   <div className="p-2.5 rounded-lg bg-rose-50 border border-rose-300 text-rose-900 flex items-center justify-between">
                     <div>
-                      <span className="text-[10px] font-extrabold uppercase tracking-wider text-rose-800 block">
+                      <span className="text-xs font-extrabold uppercase tracking-wider text-rose-800 block">
                         Insufficient Cash Tendered
                       </span>
-                      <span className="text-[11px] text-rose-700">
+                      <span className="text-xs text-rose-700">
                         Customer owes remaining balance
                       </span>
                     </div>

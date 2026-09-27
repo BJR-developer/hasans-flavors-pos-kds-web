@@ -317,27 +317,27 @@ export function PosCartPane({
       />
 
       {/* 3. Sticky Bottom Action Area */}
-      <div className="p-4 border-t border-[#E5E5E5] bg-white space-y-3 shrink-0 sticky bottom-0 z-10 shadow-xs">
+      <div className="p-4 border-t border-line bg-white space-y-3 shrink-0 sticky bottom-0 z-10 shadow-xs">
         {/* Dynamic Financials */}
         <div className="space-y-1 text-xs">
-          <div className="flex justify-between text-[#737373]">
+          <div className="flex justify-between text-muted">
             <span>Subtotal</span>
             <span className="font-mono">₱{subtotal.toLocaleString()}</span>
           </div>
           {tax > 0 && (
-            <div className="flex justify-between text-[#737373]">
+            <div className="flex justify-between text-muted">
               <span>Tax ({vatRate}% VAT)</span>
               <span className="font-mono">₱{tax.toLocaleString()}</span>
             </div>
           )}
           {deliveryFee > 0 && (
-            <div className="flex justify-between text-[#737373]">
+            <div className="flex justify-between text-muted">
               <span>Delivery Fee</span>
               <span className="font-mono">₱{deliveryFee}</span>
             </div>
           )}
-          <div className="flex justify-between items-baseline pt-1.5 border-t border-[#E5E5E5]">
-            <span className="font-bold text-xs text-[#1F1F1F]">Total Due</span>
+          <div className="flex justify-between items-baseline pt-1.5 border-t border-line">
+            <span className="font-bold text-xs text-ink">Total Due</span>
             <span className="text-xl font-black text-neutral-900 font-mono">
               ₱{total.toLocaleString()}
             </span>

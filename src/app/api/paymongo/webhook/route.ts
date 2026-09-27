@@ -1,21 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
-import { createClient } from '@supabase/supabase-js';
+import { getSupabaseAdmin } from '@/lib/supabaseAdmin';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-// Use service role key if available, otherwise anon key
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
-const supabase = createClient(supabaseUrl, supabaseKey);
 
 const WEBHOOK_SECRET = process.env.PAYMONGO_WEBHOOK_SECRET || '';
 
 export async function POST(req: NextRequest) {
   try {
+    const supabase = getSupabaseAdmin();
     const rawBody = await req.text();
     const signatureHeader = req.headers.get('paymongo-signature');
 
-    // 1. Verify webhook signature if secret is configured
-    if (WEBHOOK_SECRET && signatureHeader) {
+    // 1. Verify webhook signature (mandatory)
+    if (!WEBHOOK_SECRET) {
+      console.error('PAYMONGO_WEBHOOK_SECRET is not configured; rejecting webhook');
+      return NextResponse.json({ error: 'Webhook not configured' }, { status: 500 });
+    }
+    if (!signatureHeader) {
+      return NextResponse.json({ error: 'Missing signature' }, { status: 400 });
+    }
+    {
       const parts = signatureHeader.split(',');
       const timestampPart = parts.find((p) => p.startsWith('t='));
       const testSigPart = parts.find((p) => p.startsWith('te='));

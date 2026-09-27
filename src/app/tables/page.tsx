@@ -296,7 +296,7 @@ export default function TableStandeesPage() {
           <h2 className="text-lg font-black tracking-tight leading-none">
             Hasan&apos;s Flavors
           </h2>
-          <p className="text-[9.5px] font-bold tracking-[0.2em] text-[#C25E00] uppercase mt-1">
+          <p className="text-xs font-bold tracking-[0.2em] text-[#C25E00] uppercase mt-1">
             Authentic Halal Dining
           </p>
         </div>
@@ -312,10 +312,10 @@ export default function TableStandeesPage() {
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent" />
           <div className="absolute bottom-2 left-2.5 right-2.5 flex items-center justify-between">
-            <span className="px-2.5 py-0.5 rounded-md bg-black/80 backdrop-blur-sm text-[#FFB74D] text-[10.5px] font-black uppercase tracking-wider border border-white/10">
+            <span className="px-2.5 py-0.5 rounded-md bg-black/80 backdrop-blur-sm text-[#FFB74D] text-xs font-black uppercase tracking-wider border border-white/10">
               {tableItem.tableNumber}
             </span>
-            <span className="text-[9.5px] font-semibold text-white/90">
+            <span className="text-xs font-semibold text-white/90">
               Dine-In
             </span>
           </div>
@@ -335,12 +335,12 @@ export default function TableStandeesPage() {
               ) : (
                 <div className="flex flex-col items-center justify-center gap-1 text-neutral-400">
                   <RefreshCw className="w-5 h-5 animate-spin text-[#C25E00]" />
-                  <span className="text-[9px]">Generating...</span>
+                  <span className="text-xs">Generating...</span>
                 </div>
               )}
             </div>
           </div>
-          <p className="text-[10px] font-extrabold uppercase tracking-wider mt-1.5 flex items-center gap-1.5 opacity-90">
+          <p className="text-xs font-extrabold uppercase tracking-wider mt-1.5 flex items-center gap-1.5 opacity-90">
             <QrCode className="w-3.5 h-3.5 text-[#C25E00]" />
             <span>Scan with camera to order</span>
           </p>
@@ -348,20 +348,20 @@ export default function TableStandeesPage() {
 
         {/* 4. Three Key Points: Clean Minimalist Bottom Block */}
         <div className={`pt-2.5 border-t ${panelSubBorder} text-left space-y-1.5 mt-auto`}>
-          <div className="flex items-center gap-2 text-[10px]">
-            <span className="w-3.5 h-3.5 rounded-full bg-[#C25E00] text-white text-[9px] font-black flex items-center justify-center shrink-0">
+          <div className="flex items-center gap-2 text-xs">
+            <span className="w-3.5 h-3.5 rounded-full bg-[#C25E00] text-white text-xs font-black flex items-center justify-center shrink-0">
               1
             </span>
             <span className={textMuted}>Scan to browse the live interactive menu</span>
           </div>
-          <div className="flex items-center gap-2 text-[10px]">
-            <span className="w-3.5 h-3.5 rounded-full bg-[#C25E00] text-white text-[9px] font-black flex items-center justify-center shrink-0">
+          <div className="flex items-center gap-2 text-xs">
+            <span className="w-3.5 h-3.5 rounded-full bg-[#C25E00] text-white text-xs font-black flex items-center justify-center shrink-0">
               2
             </span>
             <span className={textMuted}>Select dishes &amp; customize your spice level</span>
           </div>
-          <div className="flex items-center gap-2 text-[10px]">
-            <span className="w-3.5 h-3.5 rounded-full bg-[#C25E00] text-white text-[9px] font-black flex items-center justify-center shrink-0">
+          <div className="flex items-center gap-2 text-xs">
+            <span className="w-3.5 h-3.5 rounded-full bg-[#C25E00] text-white text-xs font-black flex items-center justify-center shrink-0">
               3
             </span>
             <span className={textMuted}>Cooked fresh &amp; served hot to this table</span>
@@ -382,11 +382,11 @@ export default function TableStandeesPage() {
 
         {/* 1. Header: 100% Halal Guarantee */}
         <div className="pt-2 text-center flex flex-col items-center">
-          <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[#16A34A]/15 text-[#16A34A] text-[10px] font-black tracking-wider uppercase mb-1">
+          <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[#16A34A]/15 text-[#16A34A] text-xs font-black tracking-wider uppercase mb-1">
             <ShieldCheck className="w-3.5 h-3.5" />
             <span>100% Zabihah Halal Certified</span>
           </div>
-          <p className="text-[9.5px] text-[#8C8780]">
+          <p className="text-xs text-[#8C8780]">
             Fresh cuts • Strictly no alcohol • Prepared daily
           </p>
         </div>
@@ -402,10 +402,10 @@ export default function TableStandeesPage() {
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent" />
           <div className="absolute bottom-2 left-2.5 right-2.5 flex items-center justify-between">
-            <span className="text-[10.5px] font-black text-[#FFB74D] uppercase tracking-wide">
+            <span className="text-xs font-black text-[#FFB74D] uppercase tracking-wide">
               Flame-Grilled Daily
             </span>
-            <span className="text-[9.5px] text-white/90 font-medium">
+            <span className="text-xs text-white/90 font-medium">
               Heirloom Ground Spices
             </span>
           </div>
@@ -415,16 +415,16 @@ export default function TableStandeesPage() {
         <div className={`${panelSubBg} rounded-xl p-3 my-1`}>
           <div className="flex items-center justify-between gap-3">
             <div className="space-y-1 flex-1 min-w-0">
-              <div className="flex items-center gap-1.5 text-[9.5px] font-extrabold text-[#0284C7] uppercase tracking-wider">
+              <div className="flex items-center gap-1.5 text-xs font-extrabold text-[#0284C7] uppercase tracking-wider">
                 <Wifi className="w-3.5 h-3.5" />
                 <span>Complimentary Wi-Fi</span>
               </div>
               <div>
-                <p className="text-[9px] uppercase font-bold text-[#8C8780]">Network (SSID)</p>
+                <p className="text-xs uppercase font-bold text-[#8C8780]">Network (SSID)</p>
                 <p className="text-xs font-black text-[#C25E00] truncate">{wifiSsid}</p>
               </div>
               <div>
-                <p className="text-[9px] uppercase font-bold text-[#8C8780]">Password</p>
+                <p className="text-xs uppercase font-bold text-[#8C8780]">Password</p>
                 <p className="text-xs font-mono font-bold truncate">{wifiPassword}</p>
               </div>
             </div>
@@ -444,13 +444,13 @@ export default function TableStandeesPage() {
               </span>
             </div>
           </div>
-          <p className="text-[9px] text-[#8C8780] mt-2 pt-1.5 border-t border-black/5 text-center">
+          <p className="text-xs text-[#8C8780] mt-2 pt-1.5 border-t border-black/5 text-center">
             Scan the small QR to join Wi-Fi immediately without manual typing.
           </p>
         </div>
 
         {/* 4. Floor Assistance & Hospitality Footer */}
-        <div className={`pt-2.5 border-t ${panelSubBorder} flex items-center justify-between text-[10px] ${textMuted} mt-auto`}>
+        <div className={`pt-2.5 border-t ${panelSubBorder} flex items-center justify-between text-xs ${textMuted} mt-auto`}>
           <span className="flex items-center gap-1.5">
             <Phone className="w-3.5 h-3.5 text-[#C25E00]" />
             <span>Floor Captain: <strong className={textColor}>+63 917 888 2345</strong></span>
@@ -466,8 +466,8 @@ export default function TableStandeesPage() {
   // Guard unauthenticated visitors after all hooks have been called
   if (isLoading) {
     return (
-      <div className="flex-1 flex items-center justify-center p-6 bg-[#FAFAFA] min-h-[calc(100vh-56px)]">
-        <div className="w-6 h-6 border-2 border-[#BA1A20] border-t-transparent rounded-full animate-spin" />
+      <div className="flex-1 flex items-center justify-center p-6 bg-canvas min-h-[calc(100vh-56px)]">
+        <div className="w-6 h-6 border-2 border-brand border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -534,16 +534,16 @@ export default function TableStandeesPage() {
       `}</style>
 
       {/* ================= PRIMARY SUB-NAVIGATION (NO PRINT) ================= */}
-      <div className="no-print bg-white border-b border-[#E5E5E5] sticky top-14 z-30 shadow-2xs">
+      <div className="no-print bg-white border-b border-line sticky top-14 z-30 shadow-2xs">
         <div className="max-w-[1720px] mx-auto px-4 sm:px-6 h-13 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-1.5 p-1 bg-[#F5F5F5] rounded-xl border border-[#E5E5E5]/80">
+          <div className="flex items-center gap-1.5 p-1 bg-[#F5F5F5] rounded-xl border border-line/80">
             <button
               type="button"
               onClick={() => setActiveTab('management')}
               className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer select-none ${
                 activeTab === 'management'
-                  ? 'bg-white text-[#1F1F1F] shadow-2xs'
-                  : 'text-[#737373] hover:text-[#1F1F1F]'
+                  ? 'bg-white text-ink shadow-2xs'
+                  : 'text-muted hover:text-ink'
               }`}
             >
               <LayoutGrid className="w-3.5 h-3.5" />
@@ -555,8 +555,8 @@ export default function TableStandeesPage() {
               onClick={() => setActiveTab('standees')}
               className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer select-none ${
                 activeTab === 'standees'
-                  ? 'bg-white text-[#1F1F1F] shadow-2xs'
-                  : 'text-[#737373] hover:text-[#1F1F1F]'
+                  ? 'bg-white text-ink shadow-2xs'
+                  : 'text-muted hover:text-ink'
               }`}
             >
               <QrCode className="w-3.5 h-3.5" />
@@ -564,7 +564,7 @@ export default function TableStandeesPage() {
             </button>
           </div>
 
-          <div className="text-[11px] font-semibold text-[#737373] hidden sm:block">
+          <div className="text-xs font-semibold text-muted hidden sm:block">
             {activeTab === 'management' ? (
               <span>Manage active tables, seat capacity, and live status</span>
             ) : (
@@ -583,7 +583,7 @@ export default function TableStandeesPage() {
         /* ================= STANDIES STUDIO TAB CONTENT ================= */
         <>
           {/* Top Sub-Bar for Standees Studio */}
-          <div className="no-print bg-[#FAFAFA] border-b border-neutral-200">
+          <div className="no-print bg-canvas border-b border-neutral-200">
             <div className="max-w-[1720px] mx-auto px-4 sm:px-6 h-12 flex items-center justify-between gap-3">
               {/* Left: Minimalist 1-Click Table Selector Strip */}
               <div className="flex items-center gap-1 overflow-x-auto no-scrollbar bg-neutral-100 p-1 rounded-xl">
@@ -725,7 +725,7 @@ export default function TableStandeesPage() {
                     setRotX(-4);
                     setRotY(0);
                   }}
-                  className={`px-3 py-1 rounded-md font-bold text-[11px] border transition-colors cursor-pointer ${Math.round(rotY) % 360 === 0
+                  className={`px-3 py-1 rounded-md font-bold text-xs border transition-colors cursor-pointer ${Math.round(rotY) % 360 === 0
                       ? 'bg-[#0F172A] text-white border-[#0F172A]'
                       : 'bg-[#F8FAFC] text-[#0F172A] border-[#E2E8F0] hover:bg-white'
                     }`}
@@ -737,7 +737,7 @@ export default function TableStandeesPage() {
                     setRotX(-4);
                     setRotY(180);
                   }}
-                  className={`px-3 py-1 rounded-md font-bold text-[11px] border transition-colors cursor-pointer ${Math.round(rotY) % 360 === 180
+                  className={`px-3 py-1 rounded-md font-bold text-xs border transition-colors cursor-pointer ${Math.round(rotY) % 360 === 180
                       ? 'bg-[#0F172A] text-white border-[#0F172A]'
                       : 'bg-[#F8FAFC] text-[#0F172A] border-[#E2E8F0] hover:bg-white'
                     }`}
@@ -749,7 +749,7 @@ export default function TableStandeesPage() {
                     setRotX(-8);
                     setRotY(32);
                   }}
-                  className="px-3 py-1 bg-[#F8FAFC] hover:bg-white border border-[#E2E8F0] rounded-md font-bold text-[#0F172A] text-[11px] transition-colors cursor-pointer"
+                  className="px-3 py-1 bg-[#F8FAFC] hover:bg-white border border-[#E2E8F0] rounded-md font-bold text-[#0F172A] text-xs transition-colors cursor-pointer"
                 >
                   3D Perspective
                 </button>
@@ -758,7 +758,7 @@ export default function TableStandeesPage() {
                     setRotX(-4);
                     setRotY(90);
                   }}
-                  className="px-3 py-1 bg-[#F8FAFC] hover:bg-white border border-[#E2E8F0] rounded-md font-bold text-[#0F172A] text-[11px] transition-colors cursor-pointer"
+                  className="px-3 py-1 bg-[#F8FAFC] hover:bg-white border border-[#E2E8F0] rounded-md font-bold text-[#0F172A] text-xs transition-colors cursor-pointer"
                 >
                   Card Edge (14mm)
                 </button>
@@ -769,7 +769,7 @@ export default function TableStandeesPage() {
                 <button
                   type="button"
                   onClick={() => setAutoRotate(!autoRotate)}
-                  className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-[11px] font-medium border transition-all cursor-pointer ${
+                  className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-medium border transition-all cursor-pointer ${
                     autoRotate
                       ? 'bg-neutral-900 text-white border-neutral-900 shadow-2xs'
                       : 'bg-white text-neutral-600 border-neutral-200 hover:text-neutral-900 hover:bg-neutral-50'
@@ -788,7 +788,7 @@ export default function TableStandeesPage() {
                   >
                     <ZoomOut className="w-3.5 h-3.5" />
                   </button>
-                  <span className="text-[10px] font-mono text-[#64748B] w-9 text-center">
+                  <span className="text-xs font-mono text-[#64748B] w-9 text-center">
                     {Math.round(zoom * 100)}%
                   </span>
                   <button
@@ -1015,7 +1015,7 @@ export default function TableStandeesPage() {
 
               {/* Floating Instructions Tag */}
               <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between pointer-events-none">
-                <div className="px-3 py-1.5 rounded-lg bg-white/95 backdrop-blur-md text-neutral-800 text-[11px] font-medium flex items-center gap-2 border border-neutral-200 shadow-2xs">
+                <div className="px-3 py-1.5 rounded-lg bg-white/95 backdrop-blur-md text-neutral-800 text-xs font-medium flex items-center gap-2 border border-neutral-200 shadow-2xs">
                   <Rotate3d className="w-3.5 h-3.5 text-neutral-500" />
                   <span>
                     Click &amp; drag anywhere to rotate 360° • Both Sides &amp; 14mm Rigid Card
@@ -1051,7 +1051,7 @@ export default function TableStandeesPage() {
                   }}
                 >
                   {/* Subtle Clean Meta Header (Hidden in Print) */}
-                  <div className="no-print flex items-center justify-between pb-3 mb-4 border-b border-[#F1F5F9] text-[11px] text-[#94A3B8] font-mono">
+                  <div className="no-print flex items-center justify-between pb-3 mb-4 border-b border-[#F1F5F9] text-xs text-[#94A3B8] font-mono">
                     <span>Hasan&apos;s Flavors • Double-Sided Standee</span>
                     <span className="font-bold text-[#1E293B]">
                       {tableItem.tableNumber}
@@ -1065,18 +1065,18 @@ export default function TableStandeesPage() {
                     <div className="hidden sm:block absolute top-0 bottom-0 left-1/2 -translate-x-1/2 border-r border-dashed border-[#CBD5E1] pointer-events-none z-10" />
 
                     {/* Side 1: Front Face */}
-                    <div className="h-[540px] rounded-xl overflow-hidden border border-[#E5E5E5] shadow-xs print:shadow-none">
+                    <div className="h-[540px] rounded-xl overflow-hidden border border-line shadow-xs print:shadow-none">
                       {renderFrontFace(tableItem)}
                     </div>
 
                     {/* Side 2: Back Face */}
-                    <div className="h-[540px] rounded-xl overflow-hidden border border-[#E5E5E5] shadow-xs print:shadow-none">
+                    <div className="h-[540px] rounded-xl overflow-hidden border border-line shadow-xs print:shadow-none">
                       {renderBackFace(tableItem)}
                     </div>
                   </div>
 
                   {/* Minimalist Cutting & Folding Guide */}
-                  <div className="pt-3 mt-4 text-center text-[10px] text-[#94A3B8] font-mono flex items-center justify-center gap-2">
+                  <div className="pt-3 mt-4 text-center text-xs text-[#94A3B8] font-mono flex items-center justify-center gap-2">
                     <Scissors className="w-3 h-3 text-[#CBD5E1]" />
                     <span>[ SIDE 1: FRONT (ORDER QR) ] &lt;--- CUT OR FOLD HERE ---&gt; [ SIDE 2: BACK (WI-FI QR) ]</span>
                     <Scissors className="w-3 h-3 text-[#CBD5E1] rotate-180" />

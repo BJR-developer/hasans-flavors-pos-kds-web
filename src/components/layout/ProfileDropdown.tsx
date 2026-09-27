@@ -68,7 +68,7 @@ export function ProfileDropdown() {
             ? 'bg-neutral-100 border-neutral-400 shadow-xs'
             : isSettingsActive || isShiftsActive
             ? 'border-neutral-900 bg-neutral-50 shadow-xs'
-            : 'border-[#E5E5E5] bg-white hover:bg-neutral-50 hover:border-neutral-300'
+            : 'border-line bg-white hover:bg-neutral-50 hover:border-neutral-300'
         }`}
       >
         {/* Avatar Circle / Picture */}
@@ -108,7 +108,7 @@ export function ProfileDropdown() {
                       {user.name}
                     </span>
                     <span
-                      className={`text-[9px] font-black px-1.5 py-0.2 rounded-full uppercase tracking-wider ${
+                      className={`text-xs font-black px-1.5 py-0.2 rounded-full uppercase tracking-wider ${
                         user.role === 'owner'
                           ? 'bg-amber-100 text-amber-800 border border-amber-200'
                           : user.role === 'cashier'
@@ -119,7 +119,7 @@ export function ProfileDropdown() {
                       {user.role}
                     </span>
                   </div>
-                  <span className="text-[11px] text-neutral-500 truncate block font-mono mt-0.5">
+                  <span className="text-xs text-neutral-500 truncate block font-mono mt-0.5">
                     {user.email}
                   </span>
                 </div>
@@ -128,7 +128,8 @@ export function ProfileDropdown() {
 
             {/* Menu Items */}
             <div className="p-1.5 space-y-0.5">
-              {/* Sessions Link */}
+              {/* My Shift (cashiers; owners have Cash & Shifts in the main menu) */}
+              {user.role === 'cashier' && (
               <Link
                 href="/shifts"
                 onClick={() => setIsOpen(false)}
@@ -140,22 +141,23 @@ export function ProfileDropdown() {
               >
                 <Clock
                   className={`w-4 h-4 ${
-                    isShiftsActive ? 'text-white' : 'text-[#BA1A20]'
+                    isShiftsActive ? 'text-white' : 'text-brand'
                   }`}
                 />
                 <div className="flex-1">
                   <span className="block leading-tight">
-                    {user.role === 'owner' ? 'Staff Sessions' : 'My Session'}
+                    My Shift
                   </span>
                   <span
-                    className={`text-[10px] block ${
+                    className={`text-xs block ${
                       isShiftsActive ? 'text-neutral-300' : 'text-neutral-400'
                     }`}
                   >
-                    {user.role === 'owner' ? 'Audit cashier work & sales' : 'Today’s orders & activity'}
+                    Drawer cash, payments, close shift
                   </span>
                 </div>
               </Link>
+              )}
 
               {/* Settings Link */}
               <Link
@@ -169,13 +171,13 @@ export function ProfileDropdown() {
               >
                 <SlidersHorizontal
                   className={`w-4 h-4 ${
-                    isSettingsActive ? 'text-white' : 'text-[#BA1A20]'
+                    isSettingsActive ? 'text-white' : 'text-brand'
                   }`}
                 />
                 <div className="flex-1">
                   <span className="block leading-tight">Settings</span>
                   <span
-                    className={`text-[10px] block ${
+                    className={`text-xs block ${
                       isSettingsActive ? 'text-neutral-300' : 'text-neutral-400'
                     }`}
                   >

@@ -6,21 +6,20 @@ import {
   Users,
   UserPlus,
   KeyRound,
-  ShieldCheck,
   Phone,
-  Mail,
-  Calendar,
   CheckCircle2,
   RefreshCw,
   Search,
   Trash2,
   User,
+  AtSign,
 } from 'lucide-react';
 import { useStaffUsers } from '@/hooks/useStaffData';
 import { useAuthStore } from '@/lib/auth';
 import { CreateCashierModal } from './CreateCashierModal';
 import { OwnerPasswordResetModal } from './OwnerPasswordResetModal';
 import { DeleteStaffModal } from './DeleteStaffModal';
+import { ChangeUsernameModal } from './ChangeUsernameModal';
 import { StaffUser } from '@/types';
 
 export function StaffManagementTab() {
@@ -31,6 +30,7 @@ export function StaffManagementTab() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [resetTargetUser, setResetTargetUser] = useState<StaffUser | null>(null);
   const [deleteTargetUser, setDeleteTargetUser] = useState<StaffUser | null>(null);
+  const [usernameTargetUser, setUsernameTargetUser] = useState<StaffUser | null>(null);
 
   const filteredStaff = staffList.filter((s) => {
     const q = searchQuery.toLowerCase();
@@ -58,7 +58,7 @@ export function StaffManagementTab() {
               <h2 className="text-lg font-extrabold text-neutral-900 tracking-tight">
                 Staff &amp; Cashier Management
               </h2>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
+              <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
                 Auto-Confirmed
               </span>
             </div>
@@ -139,7 +139,7 @@ export function StaffManagementTab() {
                               {staff.fullName}
                             </h3>
                             <span
-                              className={`text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider ${
+                              className={`text-xs font-black px-2 py-0.5 rounded-full uppercase tracking-wider ${
                                 staff.role === 'owner'
                                   ? 'bg-amber-100 text-amber-800 border border-amber-200'
                                   : 'bg-red-100 text-red-800 border border-red-200'
@@ -151,7 +151,7 @@ export function StaffManagementTab() {
 
                           {/* Username & Email Badges */}
                           <div className="flex items-center gap-2 mt-1 flex-wrap">
-                            <span className="inline-flex items-center gap-1 text-[11px] font-mono text-neutral-700 bg-neutral-100 px-2 py-0.5 rounded-md font-bold">
+                            <span className="inline-flex items-center gap-1 text-xs font-mono text-neutral-700 bg-neutral-100 px-2 py-0.5 rounded-md font-bold">
                               <User className="w-3 h-3 text-neutral-400" />
                               <span>@{displayUsername}</span>
                             </span>
@@ -176,8 +176,8 @@ export function StaffManagementTab() {
                   </div>
 
                   {/* Actions Toolbar */}
-                  <div className="pt-3 flex items-center justify-between gap-2 border-t border-neutral-100">
-                    <div>
+                  <div className="pt-3 flex items-center justify-between gap-2 border-t border-neutral-100 flex-wrap">
+                    <div className="flex items-center gap-2">
                       {!isOwnerAccount ? (
                         <button
                           type="button"
@@ -189,20 +189,32 @@ export function StaffManagementTab() {
                           <span>Delete</span>
                         </button>
                       ) : (
-                        <span className="text-[10px] text-neutral-400 italic">
+                        <span className="text-xs text-neutral-400 italic">
                           Protected Account
                         </span>
                       )}
                     </div>
 
-                    <button
-                      type="button"
-                      onClick={() => setResetTargetUser(staff)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-neutral-200 hover:bg-neutral-50 text-neutral-800 text-xs font-bold transition-colors"
-                    >
-                      <KeyRound className="w-3.5 h-3.5 text-neutral-500" />
-                      <span>Reset Password</span>
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setUsernameTargetUser(staff)}
+                        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border border-neutral-200 hover:bg-neutral-50 text-neutral-800 text-xs font-bold transition-colors"
+                        title="Change username"
+                      >
+                        <AtSign className="w-3.5 h-3.5 text-neutral-500" />
+                        <span>Username</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setResetTargetUser(staff)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-neutral-200 hover:bg-neutral-50 text-neutral-800 text-xs font-bold transition-colors"
+                      >
+                        <KeyRound className="w-3.5 h-3.5 text-neutral-500" />
+                        <span>Reset Password</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
               );
@@ -233,6 +245,16 @@ export function StaffManagementTab() {
           isOpen={Boolean(deleteTargetUser)}
           onClose={() => setDeleteTargetUser(null)}
           staff={deleteTargetUser}
+          onSuccess={() => refetch()}
+        />
+      )}
+
+      {usernameTargetUser && (
+        <ChangeUsernameModal
+          key={usernameTargetUser.id}
+          isOpen={Boolean(usernameTargetUser)}
+          onClose={() => setUsernameTargetUser(null)}
+          staff={usernameTargetUser}
           onSuccess={() => refetch()}
         />
       )}

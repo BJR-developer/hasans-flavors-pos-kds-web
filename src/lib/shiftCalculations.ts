@@ -88,7 +88,8 @@ export function calculateShiftMetrics(params: {
     if (orderTs < startTs || orderTs > endTs) return false;
 
     // If specific cashier filter is provided, match order cashier
-    if (cashierId && order.cashierId && order.cashierId !== cashierId) {
+    // (an order with no cashierId attached is never "this cashier's" order)
+    if (cashierId && order.cashierId !== cashierId) {
       return false;
     }
     if (

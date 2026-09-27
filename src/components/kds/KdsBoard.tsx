@@ -138,7 +138,8 @@ export function KdsBoard() {
     (targetStatus: OrderStatus) => {
       if (!draggingOrderId) return;
       const order = orders.find((o) => o.id === draggingOrderId);
-      if (order && order.status !== targetStatus) {
+      const needsApproval = order && isCashOrderPendingReview(order) && targetStatus !== 'cancelled';
+      if (order && order.status !== targetStatus && !needsApproval) {
         playBumpChime();
         markOrderAsJustMoved(order.id);
         updateStatusMutation.mutate({
@@ -244,7 +245,7 @@ export function KdsBoard() {
             })}
           </div>
 
-          <span className="hidden md:flex items-center gap-1 text-[11px] font-medium text-neutral-400 pl-1">
+          <span className="hidden md:flex items-center gap-1 text-xs font-medium text-neutral-400 pl-1">
             <Clock className="w-3 h-3" />
             <span>Last 24h</span>
           </span>
@@ -331,18 +332,18 @@ export function KdsBoard() {
                     Received ({pendingOrders.length})
                   </span>
                   {pendingReviewCount > 0 && (
-                    <span className="text-[10px] font-black px-1.5 py-0.5 rounded bg-amber-400 text-amber-950 border border-amber-500 animate-pulse">
+                    <span className="text-xs font-black px-1.5 py-0.5 rounded bg-amber-400 text-amber-950 border border-amber-500 animate-pulse">
                       {pendingReviewCount} COD REVIEW
                     </span>
                   )}
                 </div>
                 {dragOverColumn === 'pending' && (
-                  <span className="text-[10px] font-bold text-amber-800 animate-pulse flex items-center gap-1">
+                  <span className="text-xs font-bold text-amber-800 animate-pulse flex items-center gap-1">
                     <ArrowDown className="w-3 h-3" /> Drop here
                   </span>
                 )}
                 {activeFlight?.nextStatus === 'pending' && (
-                  <span className="text-[10px] font-bold text-amber-800 animate-pulse flex items-center gap-1">
+                  <span className="text-xs font-bold text-amber-800 animate-pulse flex items-center gap-1">
                     <Sparkles className="w-3 h-3" /> Incoming...
                   </span>
                 )}
@@ -411,12 +412,12 @@ export function KdsBoard() {
                   Cooking ({preparingOrders.length})
                 </span>
                 {dragOverColumn === 'preparing' && (
-                  <span className="text-[10px] font-bold text-neutral-800 animate-pulse flex items-center gap-1">
+                  <span className="text-xs font-bold text-neutral-800 animate-pulse flex items-center gap-1">
                     <ArrowDown className="w-3 h-3" /> Drop here
                   </span>
                 )}
                 {activeFlight?.nextStatus === 'preparing' && (
-                  <span className="text-[10px] font-bold text-neutral-900 animate-pulse flex items-center gap-1">
+                  <span className="text-xs font-bold text-neutral-900 animate-pulse flex items-center gap-1">
                     <Sparkles className="w-3 h-3 text-amber-500" /> Incoming...
                   </span>
                 )}
@@ -485,12 +486,12 @@ export function KdsBoard() {
                   Ready ({readyOrders.length})
                 </span>
                 {dragOverColumn === 'ready' && (
-                  <span className="text-[10px] font-bold text-blue-700 animate-pulse flex items-center gap-1">
+                  <span className="text-xs font-bold text-blue-700 animate-pulse flex items-center gap-1">
                     <ArrowDown className="w-3 h-3" /> Drop here
                   </span>
                 )}
                 {activeFlight?.nextStatus === 'ready' && (
-                  <span className="text-[10px] font-bold text-blue-800 animate-pulse flex items-center gap-1">
+                  <span className="text-xs font-bold text-blue-800 animate-pulse flex items-center gap-1">
                     <Sparkles className="w-3 h-3 text-blue-600" /> Incoming...
                   </span>
                 )}
@@ -559,12 +560,12 @@ export function KdsBoard() {
                   Served ({servedOrders.length})
                 </span>
                 {dragOverColumn === 'served' && (
-                  <span className="text-[10px] font-bold text-emerald-700 animate-pulse flex items-center gap-1">
+                  <span className="text-xs font-bold text-emerald-700 animate-pulse flex items-center gap-1">
                     <ArrowDown className="w-3 h-3" /> Drop here
                   </span>
                 )}
                 {activeFlight?.nextStatus === 'served' && (
-                  <span className="text-[10px] font-bold text-emerald-800 animate-pulse flex items-center gap-1">
+                  <span className="text-xs font-bold text-emerald-800 animate-pulse flex items-center gap-1">
                     <Sparkles className="w-3 h-3 text-emerald-600" /> Incoming...
                   </span>
                 )}

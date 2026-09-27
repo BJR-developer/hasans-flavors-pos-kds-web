@@ -21,7 +21,7 @@ function SuccessContent() {
 
         {orderId && (
           <div className="bg-neutral-50 rounded-xl p-3.5 mb-6 border border-neutral-200 text-left">
-            <span className="text-[11px] font-bold text-neutral-500 uppercase tracking-wider block mb-1">
+            <span className="text-xs font-bold text-neutral-500 uppercase tracking-wider block mb-1">
               Reference ID
             </span>
             <span className="text-sm font-mono font-bold text-neutral-900 select-all block break-all">

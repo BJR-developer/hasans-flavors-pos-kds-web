@@ -1,45 +1,23 @@
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname, useRouter } from 'next/navigation';
-import {
-  UtensilsCrossed,
-  ChefHat,
-  History,
-  Boxes,
-  BarChart3,
-  LogOut,
-  LogIn,
-  QrCode,
-  Bike,
-  Bell,
-  Check,
-  CheckCheck,
-  Phone,
-  Smartphone,
-  ArrowRight,
-  Sparkles,
-  ShoppingBag,
-  ExternalLink,
-  Share2,
-  Clock,
-} from 'lucide-react';
+import { usePathname } from 'next/navigation';
+import { UtensilsCrossed, ChefHat, History, Boxes, BarChart3, LogIn, QrCode, Bike, Wallet, Users } from 'lucide-react';
 import { useOrders } from '@/hooks/useRestaurantData';
 import { useAuthStore } from '@/lib/auth';
-import { isMobileOrder } from '@/lib/orderUtils';
+import { useNow } from '@/hooks/useNow';
 import { ShareOrderModal } from '@/components/orders/ShareOrderModal';
 import { ProfileDropdown } from './ProfileDropdown';
 import { OrderNotificationDropdown } from './OrderNotificationDropdown';
-import { NavbarDrawerWidget } from './NavbarDrawerWidget';
+import { ShiftPill } from './ShiftPill';
 import { Order } from '@/types';
 
 export function Navbar() {
   const pathname = usePathname();
-  const router = useRouter();
   const { data: orders = [] } = useOrders();
-  const { user, initialize, signOut } = useAuthStore();
+  const { user, initialize } = useAuthStore();
   const [shareOrder, setShareOrder] = useState<Order | null>(null);
 
   useEffect(() => {
@@ -47,9 +25,11 @@ export function Navbar() {
   }, [initialize]);
 
   const isSignInPage = pathname === '/signin';
+  const authLoading = useAuthStore((st) => st.isLoading);
 
   // Scope active counts strictly to last 24 hours (matching KdsBoard logic)
-  const recent24hCutoff = Date.now() - 24 * 60 * 60 * 1000;
+  const now = useNow();
+  const recent24hCutoff = now - 24 * 60 * 60 * 1000;
 
   const kitchenQueueCount = orders.filter(
     (o) =>
@@ -67,77 +47,38 @@ export function Navbar() {
       new Date(o.createdAt).getTime() >= recent24hCutoff
   ).length;
 
-  // STRICT ROLE SEPARATION PER USER DIRECTIVE:
-  // - Owner: Can ONLY access Owner Dashboard (/analytics) and Table Standees (/tables).
-  // - Cashier: Manages POS (/pos), Kitchen (/kds), Orders (/orders), Stock (/inventory), Table Standees (/tables).
-  // - Unauthenticated / Customer: Must NOT see any staff operations or links.
   const isOwner = user?.role === 'owner';
   const isCashier = user?.role === 'cashier';
+  const isStaff = isOwner || isCashier;
 
-  // Define navigation items based on role. Strictly staff/owner only.
+  const kitchenBadge = kitchenQueueCount > 0 ? kitchenQueueCount : null;
+  const deliveryBadge = runningDeliveriesCount > 0 ? runningDeliveriesCount : null;
+
+  // Owner manages everything; cashiers run the till. Settings live in the profile menu.
   const navItems = isOwner
     ? [
-        {
-          href: '/analytics',
-          label: 'Owner Dashboard',
-          icon: BarChart3,
-          badge: null,
-        },
-        {
-          href: '/tables',
-          label: 'Tables & Floor',
-          icon: QrCode,
-          badge: null,
-        },
+        { href: '/analytics', label: 'Dashboard', icon: BarChart3, badge: null },
+        { href: '/shifts', label: 'Cash & Shifts', icon: Wallet, badge: null },
+        { href: '/orders', label: 'Orders', icon: History, badge: null },
+        { href: '/kds', label: 'Kitchen', icon: ChefHat, badge: kitchenBadge },
+        { href: '/delivery', label: 'Delivery', icon: Bike, badge: deliveryBadge },
+        { href: '/inventory', label: 'Menu & Stock', icon: Boxes, badge: null },
+        { href: '/tables', label: 'Tables', icon: QrCode, badge: null },
+        { href: '/staff', label: 'Staff', icon: Users, badge: null },
       ]
     : isCashier
     ? [
-        {
-          href: '/pos',
-          label: 'Register (POS)',
-          icon: UtensilsCrossed,
-          badge: null,
-        },
-        {
-          href: '/kds',
-          label: 'Kitchen (KDS)',
-          icon: ChefHat,
-          badge: kitchenQueueCount > 0 ? kitchenQueueCount : null,
-        },
-        {
-          href: '/delivery',
-          label: 'Delivery',
-          icon: Bike,
-          badge: runningDeliveriesCount > 0 ? runningDeliveriesCount : null,
-        },
-        {
-          href: '/orders',
-          label: 'Order History',
-          icon: History,
-          badge: null,
-        },
-        {
-          href: '/inventory',
-          label: 'Menu & Stock',
-          icon: Boxes,
-          badge: null,
-        },
-        {
-          href: '/tables',
-          label: 'Tables & Floor',
-          icon: QrCode,
-          badge: null,
-        },
+        { href: '/pos', label: 'Register', icon: UtensilsCrossed, badge: null },
+        { href: '/kds', label: 'Kitchen', icon: ChefHat, badge: kitchenBadge },
+        { href: '/delivery', label: 'Delivery', icon: Bike, badge: deliveryBadge },
+        { href: '/orders', label: 'Orders', icon: History, badge: null },
+        { href: '/inventory', label: 'Menu & Stock', icon: Boxes, badge: null },
+        { href: '/tables', label: 'Tables', icon: QrCode, badge: null },
       ]
     : [];
 
-  const handleSignOut = async () => {
-    await signOut();
-    router.push('/signin');
-  };
-
   return (
-    <header className="bg-white border-b border-[#E5E5E5] sticky top-0 z-40">
+    <header className="bg-white border-b border-line sticky top-0 z-40">
       <div className="max-w-[1720px] mx-auto px-3 sm:px-4 lg:px-6 h-14 flex items-center justify-between gap-2 sm:gap-4">
         {/* Brand */}
         <div className="flex items-center gap-2.5 shrink-0">
@@ -153,11 +94,11 @@ export function Navbar() {
               />
             </div>
             <div className="hidden xs:block">
-              <span className="font-extrabold text-[#1F1F1F] text-xs sm:text-sm tracking-tight group-hover:text-[#BA1A20] transition-colors block">
+              <span className="font-extrabold text-ink text-xs sm:text-sm tracking-tight group-hover:text-brand transition-colors block">
                 Hasan&apos;s Flavors
               </span>
-              <span className="text-[10px] text-[#737373] font-medium block leading-none">
-                {!user ? 'Staff Portal • Please Sign In' : isOwner ? 'Owner Executive Portal' : 'POS & Kitchen Operations'}
+              <span className="text-xs text-muted font-medium block leading-none">
+                {!user ? 'Staff Portal' : isOwner ? 'Owner' : 'Cashier'}
               </span>
             </div>
           </Link>
@@ -168,24 +109,25 @@ export function Navbar() {
           <nav className="flex items-center gap-1 overflow-x-auto no-scrollbar py-0.5">
             {navItems.map((item) => {
               const Icon = item.icon;
-              const isActive = pathname === item.href;
+              const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
 
               return (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
+                  title={item.label}
+                  className={`flex items-center gap-1.5 px-2.5 xl:px-3 py-1.5 rounded-lg text-sm font-semibold whitespace-nowrap transition-all ${
                     isActive
-                      ? 'bg-[#1F1F1F] text-white shadow-xs'
-                      : 'text-[#525252] hover:bg-[#F5F5F5] hover:text-[#1F1F1F]'
+                      ? 'bg-ink text-white shadow-xs'
+                      : 'text-ink-soft hover:bg-[#F5F5F5] hover:text-ink'
                   }`}
                 >
-                  <Icon className="w-3.5 h-3.5" />
-                  <span>{item.label}</span>
+                  <Icon className="w-4 h-4" />
+                  <span className={isOwner ? 'hidden xl:inline' : 'hidden lg:inline'}>{item.label}</span>
                   {item.badge !== null && (
                     <span
-                      className={`text-[10px] font-bold px-1.5 py-0.2 rounded-full ${
-                        isActive ? 'bg-white text-[#1F1F1F]' : 'bg-[#BA1A20] text-white'
+                      className={`text-xs font-bold px-1.5 rounded-full ${
+                        isActive ? 'bg-white text-ink' : 'bg-brand text-white'
                       }`}
                     >
                       {item.badge}
@@ -197,26 +139,22 @@ export function Navbar() {
           </nav>
         )}
 
-        {/* Right Tools: Cash Drawer Float + Mobile Notifications Bell + Profile Dropdown */}
+        {/* Right tools: shift pill (cashier), mobile-order bell, profile */}
         <div className="flex items-center gap-2 shrink-0 relative">
-          {/* Drawer Float Widget on the left of Notification Bell */}
-          {!isSignInPage && user && isCashier && (
-            <NavbarDrawerWidget />
-          )}
+          {!isSignInPage && isCashier && <ShiftPill />}
 
-          {/* Notifications: Mobile Orders Only (Delivery, Takeout, Mobile Dine-In) */}
-          {!isSignInPage && user && isCashier && (
+          {!isSignInPage && isStaff && (
             <OrderNotificationDropdown orders={orders} onShareOrder={setShareOrder} />
           )}
 
           {!isSignInPage && user ? (
             <ProfileDropdown />
-          ) : !isSignInPage ? (
+          ) : !isSignInPage && !authLoading ? (
             <Link
               href="/signin"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#BA1A20] text-white text-xs font-bold hover:bg-[#8B0000] transition-colors shadow-xs"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-brand text-white text-sm font-bold hover:bg-brand-dark transition-colors shadow-xs"
             >
-              <LogIn className="w-3.5 h-3.5" />
+              <LogIn className="w-4 h-4" />
               <span>Sign In</span>
             </Link>
           ) : null}

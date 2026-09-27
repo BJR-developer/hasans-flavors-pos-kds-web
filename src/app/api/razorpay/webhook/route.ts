@@ -1,23 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
-import { createClient } from '@supabase/supabase-js';
+import { getSupabaseAdmin } from '@/lib/supabaseAdmin';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseKey =
-  process.env.SUPABASE_SERVICE_ROLE_KEY ||
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
-  '';
-const supabase = createClient(supabaseUrl, supabaseKey);
 
 const WEBHOOK_SECRET = process.env.RAZORPAY_WEBHOOK_SECRET || '';
 
 export async function POST(req: NextRequest) {
   try {
+    const supabase = getSupabaseAdmin();
     const rawBody = await req.text();
     const signature = req.headers.get('x-razorpay-signature');
 
-    // 1. Verify webhook signature if secret is configured
-    if (WEBHOOK_SECRET && signature) {
+    // 1. Verify webhook signature (mandatory)
+    if (!WEBHOOK_SECRET) {
+      console.error('[Razorpay Webhook] RAZORPAY_WEBHOOK_SECRET is not configured; rejecting webhook');
+      return NextResponse.json({ error: 'Webhook not configured' }, { status: 500 });
+    }
+    if (!signature) {
+      return NextResponse.json({ error: 'Missing signature' }, { status: 400 });
+    }
+    {
       const expectedSignature = crypto
         .createHmac('sha256', WEBHOOK_SECRET)
         .update(rawBody)

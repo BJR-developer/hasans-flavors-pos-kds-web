@@ -353,20 +353,20 @@ function ProductFormContent({
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
-      <div className="relative bg-white rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden border border-[#E5E5E5] my-6 animate-in fade-in zoom-in-95 duration-200">
+      <div className="relative bg-white rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden border border-line my-6 animate-in fade-in zoom-in-95 duration-200">
         {/* Modal Header */}
-        <div className="px-5 sm:px-6 py-4 border-b border-[#E5E5E5] bg-[#FAFAFA] flex items-center justify-between">
+        <div className="px-5 sm:px-6 py-4 border-b border-line bg-canvas flex items-center justify-between">
           <div>
-            <h3 className="text-base font-bold text-[#1F1F1F]">
+            <h3 className="text-base font-bold text-ink">
               {dishToEdit ? 'Edit Menu Product' : 'Add New Menu Product'}
             </h3>
-            <p className="text-xs text-[#737373] mt-0.5">
+            <p className="text-xs text-muted mt-0.5">
               Updates immediately across POS register, KDS, and tables
             </p>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-[#737373] hover:text-[#1F1F1F] hover:bg-white transition-colors cursor-pointer"
+            className="p-1.5 rounded-lg text-muted hover:text-ink hover:bg-white transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -376,7 +376,7 @@ function ProductFormContent({
         <form onSubmit={handleSubmit} className="p-5 sm:p-6 space-y-4 max-h-[78vh] overflow-y-auto">
           {/* Dish Name */}
           <div>
-            <label className="block text-xs font-bold text-[#1F1F1F] mb-1">
+            <label className="block text-xs font-bold text-ink mb-1">
               Product / Dish Name *
             </label>
             <input
@@ -385,7 +385,7 @@ function ProductFormContent({
               placeholder="e.g. Mutton Shinwari Karahi"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full px-3 py-2 text-xs rounded-lg border border-[#E5E5E5] bg-[#FAFAFA] text-[#1F1F1F] focus:bg-white focus:outline-none focus:border-[#1F1F1F]"
+              className="w-full px-3 py-2 text-xs rounded-lg border border-line bg-canvas text-ink focus:bg-white focus:outline-none focus:border-ink"
             />
           </div>
 
@@ -393,13 +393,13 @@ function ProductFormContent({
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
             <div>
               <div className="flex items-center justify-between mb-1">
-                <label className="block text-xs font-bold text-[#1F1F1F]">
+                <label className="block text-xs font-bold text-ink">
                   Category *
                 </label>
                 <button
                   type="button"
                   onClick={() => setIsAddCategoryModalOpen(true)}
-                  className="text-[11px] font-semibold text-[#BA1A20] hover:text-[#8B0000] flex items-center gap-0.5 cursor-pointer"
+                  className="text-xs font-semibold text-brand hover:text-brand-dark flex items-center gap-0.5 cursor-pointer"
                   title="Create a new menu category"
                 >
                   <Plus className="w-3 h-3" />
@@ -419,11 +419,11 @@ function ProductFormContent({
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-[#1F1F1F] mb-1">
+              <label className="block text-xs font-bold text-ink mb-1">
                 Price (₱) *
               </label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-[#737373]">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-muted">
                   ₱
                 </span>
                 <input
@@ -433,13 +433,13 @@ function ProductFormContent({
                   placeholder="150"
                   value={price}
                   onChange={(e) => setPrice(e.target.value)}
-                  className="w-full pl-7 pr-3 py-2 text-xs font-semibold rounded-lg border border-[#E5E5E5] bg-[#FAFAFA] text-[#1F1F1F] focus:bg-white focus:outline-none focus:border-[#1F1F1F] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  className="w-full pl-7 pr-3 py-2 text-xs font-semibold rounded-lg border border-line bg-canvas text-ink focus:bg-white focus:outline-none focus:border-ink [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-[#1F1F1F] mb-1">
+              <label className="block text-xs font-bold text-ink mb-1">
                 Stock (Units) *
               </label>
               <input
@@ -449,12 +449,12 @@ function ProductFormContent({
                 placeholder="50"
                 value={stockQuantity}
                 onChange={(e) => setStockQuantity(e.target.value)}
-                className="w-full px-3 py-2 text-xs font-semibold rounded-lg border border-[#E5E5E5] bg-[#FAFAFA] text-[#1F1F1F] focus:bg-white focus:outline-none focus:border-[#1F1F1F]"
+                className="w-full px-3 py-2 text-xs font-semibold rounded-lg border border-line bg-canvas text-ink focus:bg-white focus:outline-none focus:border-ink"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-[#1F1F1F] mb-1">
+              <label className="block text-xs font-bold text-ink mb-1">
                 Prep Time
               </label>
               <input
@@ -462,7 +462,7 @@ function ProductFormContent({
                 value={preparationTime}
                 onChange={(e) => setPreparationTime(e.target.value)}
                 placeholder="15-20 mins"
-                className="w-full px-3 py-2 text-xs rounded-lg border border-[#E5E5E5] bg-[#FAFAFA] text-[#1F1F1F] focus:bg-white focus:outline-none focus:border-[#1F1F1F]"
+                className="w-full px-3 py-2 text-xs rounded-lg border border-line bg-canvas text-ink focus:bg-white focus:outline-none focus:border-ink"
               />
             </div>
           </div>
@@ -470,11 +470,11 @@ function ProductFormContent({
           {/* Multiple Product Images Upload Section */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <label className="block text-xs font-bold text-[#1F1F1F]">
+              <label className="block text-xs font-bold text-ink">
                 Product Images * ({imageUrls.length})
               </label>
               {imageUrls.length > 0 && (
-                <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#166534]">
+                <span className="inline-flex items-center gap-1 text-xs font-semibold text-[#166534]">
                   <CheckCircle2 className="w-3.5 h-3.5" />
                   {imageUrls.length} image{imageUrls.length > 1 ? 's' : ''} uploaded
                 </span>
@@ -493,8 +493,8 @@ function ProductFormContent({
 
             {/* Active Primary / Selected Preview */}
             {activePreviewUrl && (
-              <div className="mb-3 relative border border-[#E5E5E5] rounded-xl overflow-hidden bg-[#FAFAFA] p-2 space-y-2">
-                <div className="relative w-full h-40 rounded-lg overflow-hidden bg-gray-100 border border-[#E5E5E5]">
+              <div className="mb-3 relative border border-line rounded-xl overflow-hidden bg-canvas p-2 space-y-2">
+                <div className="relative w-full h-40 rounded-lg overflow-hidden bg-gray-100 border border-line">
                   <SafeImage
                     src={activePreviewUrl}
                     alt="Product Preview"
@@ -503,7 +503,7 @@ function ProductFormContent({
                     sizes="500px"
                   />
                   {selectedPreviewIndex === 0 && (
-                    <div className="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-[#1F1F1F]/80 text-white text-[10px] font-bold backdrop-blur-xs flex items-center gap-1 shadow-xs">
+                    <div className="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-ink/80 text-white text-xs font-bold backdrop-blur-xs flex items-center gap-1 shadow-xs">
                       <Star className="w-3 h-3 fill-[#F59E0B] text-[#F59E0B]" />
                       <span>Primary Cover</span>
                     </div>
@@ -521,7 +521,7 @@ function ProductFormContent({
             {/* Image Thumbnails & Management Grid */}
             {imageUrls.length > 0 && (
               <div className="mb-3 space-y-1.5">
-                <span className="text-[10px] font-semibold text-[#737373] block uppercase tracking-wider">
+                <span className="text-xs font-semibold text-muted block uppercase tracking-wider">
                   Uploaded Gallery (First image is primary cover):
                 </span>
                 <div className="grid grid-cols-4 sm:grid-cols-5 gap-2">
@@ -533,8 +533,8 @@ function ProductFormContent({
                       <div
                         key={url + idx}
                         onClick={() => setSelectedPreviewIndex(idx)}
-                        className={`group relative rounded-lg overflow-hidden border-2 cursor-pointer transition-all aspect-square bg-[#FAFAFA] ${
-                          isSelected ? 'border-[#BA1A20] ring-2 ring-[#BA1A20]/20' : 'border-[#E5E5E5] hover:border-[#A3A3A3]'
+                        className={`group relative rounded-lg overflow-hidden border-2 cursor-pointer transition-all aspect-square bg-canvas ${
+                          isSelected ? 'border-brand ring-2 ring-brand/20' : 'border-line hover:border-[#A3A3A3]'
                         }`}
                       >
                         <SafeImage
@@ -545,7 +545,7 @@ function ProductFormContent({
                           sizes="80px"
                         />
                         {isPrimary && (
-                          <div className="absolute top-1 left-1 bg-[#1F1F1F] text-white p-0.5 rounded shadow-xs" title="Primary Cover">
+                          <div className="absolute top-1 left-1 bg-ink text-white p-0.5 rounded shadow-xs" title="Primary Cover">
                             <Star className="w-2.5 h-2.5 fill-[#F59E0B] text-[#F59E0B]" />
                           </div>
                         )}
@@ -559,7 +559,7 @@ function ProductFormContent({
                                 e.stopPropagation();
                                 handleMakePrimary(idx);
                               }}
-                              className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-[#1F1F1F] text-white hover:bg-black w-full text-center"
+                              className="px-1.5 py-0.5 rounded text-xs font-bold bg-ink text-white hover:bg-black w-full text-center"
                               title="Set as primary cover"
                             >
                               Make Cover
@@ -571,7 +571,7 @@ function ProductFormContent({
                               e.stopPropagation();
                               handleRemoveImage(idx);
                             }}
-                            className="p-1 rounded text-white bg-[#BA1A20] hover:bg-[#8B0000]"
+                            className="p-1 rounded text-white bg-brand hover:bg-brand-dark"
                             title="Remove image"
                           >
                             <Trash2 className="w-3 h-3" />
@@ -586,10 +586,10 @@ function ProductFormContent({
                     type="button"
                     disabled={isUploading}
                     onClick={() => fileInputRef.current?.click()}
-                    className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-[#D4D4D4] hover:border-[#BA1A20] hover:bg-[#FFF2F0] aspect-square transition-all text-[#737373] hover:text-[#BA1A20] disabled:opacity-50 cursor-pointer"
+                    className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-[#D4D4D4] hover:border-brand hover:bg-brand-soft aspect-square transition-all text-muted hover:text-brand disabled:opacity-50 cursor-pointer"
                   >
                     <Plus className="w-4 h-4 mb-0.5" />
-                    <span className="text-[10px] font-bold leading-none">Add More</span>
+                    <span className="text-xs font-bold leading-none">Add More</span>
                   </button>
                 </div>
               </div>
@@ -604,26 +604,26 @@ function ProductFormContent({
                 onDragLeave={onDragLeave}
                 className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all ${
                   isDragging
-                    ? 'border-[#BA1A20] bg-[#FFF2F0]'
-                    : 'border-[#D4D4D4] bg-[#FAFAFA] hover:bg-[#F5F5F5] hover:border-[#A3A3A3]'
+                    ? 'border-brand bg-brand-soft'
+                    : 'border-[#D4D4D4] bg-canvas hover:bg-[#F5F5F5] hover:border-[#A3A3A3]'
                 }`}
               >
                 {isUploading ? (
                   <div className="flex flex-col items-center justify-center py-2 space-y-2">
-                    <Loader2 className="w-8 h-8 animate-spin text-[#BA1A20]" />
-                    <span className="text-xs font-bold text-[#1F1F1F]">Uploading images to storage...</span>
-                    <span className="text-[11px] text-[#737373]">Please wait a moment</span>
+                    <Loader2 className="w-8 h-8 animate-spin text-brand" />
+                    <span className="text-xs font-bold text-ink">Uploading images to storage...</span>
+                    <span className="text-xs text-muted">Please wait a moment</span>
                   </div>
                 ) : (
                   <div className="flex flex-col items-center justify-center space-y-2">
-                    <div className="w-10 h-10 rounded-full bg-white border border-[#E5E5E5] shadow-2xs flex items-center justify-center text-[#BA1A20]">
+                    <div className="w-10 h-10 rounded-full bg-white border border-line shadow-2xs flex items-center justify-center text-brand">
                       <UploadCloud className="w-5 h-5" />
                     </div>
                     <div>
-                      <span className="text-xs font-bold text-[#1F1F1F] block">
+                      <span className="text-xs font-bold text-ink block">
                         Upload Product Images (Multiple allowed)
                       </span>
-                      <span className="text-[11px] text-[#737373] mt-0.5 block">
+                      <span className="text-xs text-muted mt-0.5 block">
                         Drag &amp; drop or click to select multiple PNG, JPG, WEBP, or GIF files
                       </span>
                     </div>
@@ -633,20 +633,20 @@ function ProductFormContent({
             )}
 
             {uploadError && (
-              <p className="text-[11px] text-[#BA1A20] font-semibold mt-1.5">
+              <p className="text-xs text-brand font-semibold mt-1.5">
                 {uploadError}
               </p>
             )}
           </div>
 
           {/* Custom Product Variants Builder */}
-          <div className="pt-3 border-t border-[#E5E5E5] space-y-3">
+          <div className="pt-3 border-t border-line space-y-3">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5">
               <div>
-                <label className="block text-xs font-bold text-[#1F1F1F]">
+                <label className="block text-xs font-bold text-ink">
                   Product Variants &amp; Options ({variants.length})
                 </label>
-                <p className="text-[11px] text-[#737373]">
+                <p className="text-xs text-muted">
                   Define sizes, spice levels, protein choices, or custom options
                 </p>
               </div>
@@ -662,7 +662,7 @@ function ProductFormContent({
                       { id: `opt_${Date.now()}_3`, name: 'Family Bilao', priceDelta: 350 },
                     ])
                   }
-                  className="px-2.5 py-1.5 rounded-lg border border-[#E5E5E5] bg-white hover:bg-[#FAFAFA] text-[#1F1F1F] text-xs font-semibold shadow-2xs transition-colors flex items-center gap-1.5 cursor-pointer"
+                  className="px-2.5 py-1.5 rounded-lg border border-line bg-white hover:bg-canvas text-ink text-xs font-semibold shadow-2xs transition-colors flex items-center gap-1.5 cursor-pointer"
                 >
                   <Zap className="w-3.5 h-3.5 text-amber-600" />
                   <span>+ Size</span>
@@ -678,7 +678,7 @@ function ProductFormContent({
                       { id: `opt_${Date.now()}_4`, name: 'Very Spicy', priceDelta: 0 },
                     ])
                   }
-                  className="px-2.5 py-1.5 rounded-lg border border-[#E5E5E5] bg-white hover:bg-[#FAFAFA] text-[#1F1F1F] text-xs font-semibold shadow-2xs transition-colors flex items-center gap-1.5 cursor-pointer"
+                  className="px-2.5 py-1.5 rounded-lg border border-line bg-white hover:bg-canvas text-ink text-xs font-semibold shadow-2xs transition-colors flex items-center gap-1.5 cursor-pointer"
                 >
                   <Zap className="w-3.5 h-3.5 text-red-600" />
                   <span>+ Spice</span>
@@ -693,7 +693,7 @@ function ProductFormContent({
                       { id: `opt_${Date.now()}_3`, name: 'Mutton / Lamb', priceDelta: 90 },
                     ])
                   }
-                  className="px-2.5 py-1.5 rounded-lg border border-[#E5E5E5] bg-white hover:bg-[#FAFAFA] text-[#1F1F1F] text-xs font-semibold shadow-2xs transition-colors flex items-center gap-1.5 cursor-pointer"
+                  className="px-2.5 py-1.5 rounded-lg border border-line bg-white hover:bg-canvas text-ink text-xs font-semibold shadow-2xs transition-colors flex items-center gap-1.5 cursor-pointer"
                 >
                   <Zap className="w-3.5 h-3.5 text-neutral-600" />
                   <span>+ Protein</span>
@@ -702,7 +702,7 @@ function ProductFormContent({
                 <button
                   type="button"
                   onClick={() => handleAddVariantGroup('Custom Option')}
-                  className="px-2.5 py-1.5 rounded-lg bg-[#1F1F1F] hover:bg-black text-white text-xs font-semibold shadow-2xs transition-colors flex items-center gap-1.5 cursor-pointer"
+                  className="px-2.5 py-1.5 rounded-lg bg-ink hover:bg-black text-white text-xs font-semibold shadow-2xs transition-colors flex items-center gap-1.5 cursor-pointer"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   <span>+ Custom</span>
@@ -716,23 +716,23 @@ function ProductFormContent({
                 {variants.map((grp) => (
                   <div
                     key={grp.id}
-                    className="p-3 bg-[#FAFAFA] rounded-xl border border-[#E5E5E5] space-y-2.5"
+                    className="p-3 bg-canvas rounded-xl border border-line space-y-2.5"
                   >
                     <div className="flex items-center justify-between gap-2">
                       <div className="flex items-center gap-1.5 flex-1 min-w-0">
-                        <Layers className="w-3.5 h-3.5 text-[#737373] shrink-0" />
+                        <Layers className="w-3.5 h-3.5 text-muted shrink-0" />
                         <input
                           type="text"
                           value={grp.name}
                           onChange={(e) => handleUpdateGroupName(grp.id, e.target.value)}
                           placeholder="Variant Group Name (e.g. Size, Spice, Protein)"
-                          className="px-2.5 py-1 text-xs font-bold text-[#1F1F1F] bg-white border border-[#E5E5E5] rounded-md flex-1 min-w-0 focus:outline-none focus:border-[#1F1F1F]"
+                          className="px-2.5 py-1 text-xs font-bold text-ink bg-white border border-line rounded-md flex-1 min-w-0 focus:outline-none focus:border-ink"
                         />
                       </div>
                       <button
                         type="button"
                         onClick={() => handleRemoveVariantGroup(grp.id)}
-                        className="p-1 rounded-md text-[#A3A3A3] hover:text-[#BA1A20] hover:bg-[#FFF2F0] transition-colors shrink-0 cursor-pointer"
+                        className="p-1 rounded-md text-[#A3A3A3] hover:text-brand hover:bg-brand-soft transition-colors shrink-0 cursor-pointer"
                         title="Remove Variant Group"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -748,11 +748,11 @@ function ProductFormContent({
                             value={opt.name}
                             onChange={(e) => handleUpdateOption(grp.id, opt.id, 'name', e.target.value)}
                             placeholder="Option label (e.g. Regular, Mild, Chicken)"
-                            className="flex-1 min-w-0 px-3 py-1.5 text-xs text-[#1F1F1F] bg-white border border-[#E5E5E5] rounded-lg focus:outline-none focus:border-[#1F1F1F] placeholder-[#A3A3A3]"
+                            className="flex-1 min-w-0 px-3 py-1.5 text-xs text-ink bg-white border border-line rounded-lg focus:outline-none focus:border-ink placeholder-[#A3A3A3]"
                           />
                           <div className="flex items-center gap-2">
                             <div className="relative flex-1 sm:w-28 shrink-0">
-                              <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[11px] font-semibold text-[#737373] pointer-events-none">
+                              <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-muted pointer-events-none">
                                 +₱
                               </span>
                               <input
@@ -767,14 +767,14 @@ function ProductFormContent({
                                   )
                                 }
                                 placeholder="0"
-                                className="w-full pl-7 pr-2.5 py-1.5 text-xs font-semibold text-[#1F1F1F] bg-white border border-[#E5E5E5] rounded-lg focus:outline-none focus:border-[#1F1F1F] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                className="w-full pl-7 pr-2.5 py-1.5 text-xs font-semibold text-ink bg-white border border-line rounded-lg focus:outline-none focus:border-ink [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                               />
                             </div>
                             {grp.options.length > 1 && (
                               <button
                                 type="button"
                                 onClick={() => handleRemoveOptionFromGroup(grp.id, opt.id)}
-                                className="p-1.5 text-[#A3A3A3] hover:text-[#BA1A20] hover:bg-[#FFF2F0] rounded-lg transition-colors shrink-0 cursor-pointer"
+                                className="p-1.5 text-[#A3A3A3] hover:text-brand hover:bg-brand-soft rounded-lg transition-colors shrink-0 cursor-pointer"
                                 title="Remove option"
                               >
                                 <X className="w-3.5 h-3.5" />
@@ -787,7 +787,7 @@ function ProductFormContent({
                       <button
                         type="button"
                         onClick={() => handleAddOptionToGroup(grp.id)}
-                        className="text-[11px] font-semibold text-[#525252] hover:text-[#1F1F1F] flex items-center gap-1 pt-1 cursor-pointer"
+                        className="text-xs font-semibold text-ink-soft hover:text-ink flex items-center gap-1 pt-1 cursor-pointer"
                       >
                         <Plus className="w-3 h-3" />
                         <span>Add Option</span>
@@ -797,7 +797,7 @@ function ProductFormContent({
                 ))}
               </div>
             ) : (
-              <div className="p-3 bg-[#FAFAFA] rounded-xl border border-dashed border-[#E5E5E5] text-center text-xs text-[#737373]">
+              <div className="p-3 bg-canvas rounded-xl border border-dashed border-line text-center text-xs text-muted">
                 No variants configured yet. Use the quick buttons above (+ Size, + Spice, + Protein) or add Custom options.
               </div>
             )}
@@ -805,7 +805,7 @@ function ProductFormContent({
 
           {/* Description */}
           <div>
-            <label className="block text-xs font-bold text-[#1F1F1F] mb-1">
+            <label className="block text-xs font-bold text-ink mb-1">
               Description &amp; Ingredients
             </label>
             <textarea
@@ -813,18 +813,18 @@ function ProductFormContent({
               placeholder="Freshly prepared with slow-cooked aromatic spices and premium halal cuts..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full px-3 py-2 text-xs rounded-lg border border-[#E5E5E5] bg-[#FAFAFA] text-[#1F1F1F] focus:bg-white focus:outline-none focus:border-[#1F1F1F]"
+              className="w-full px-3 py-2 text-xs rounded-lg border border-line bg-canvas text-ink focus:bg-white focus:outline-none focus:border-ink"
             />
           </div>
 
           {/* Stock & Chef Special Toggles */}
           <div className="pt-2 border-t border-[#F5F5F5] flex items-center justify-between">
-            <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-[#1F1F1F]">
+            <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-ink">
               <input
                 type="checkbox"
                 checked={inStock}
                 onChange={(e) => setInStock(e.target.checked)}
-                className="w-4 h-4 rounded text-[#BA1A20] focus:ring-0"
+                className="w-4 h-4 rounded text-brand focus:ring-0"
               />
               <span>In Stock (Available for ordering)</span>
             </label>
@@ -843,18 +843,18 @@ function ProductFormContent({
           </div>
 
           {/* Action Buttons */}
-          <div className="pt-4 border-t border-[#E5E5E5] flex items-center justify-end gap-2">
+          <div className="pt-4 border-t border-line flex items-center justify-end gap-2">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-xs font-semibold text-[#525252] hover:bg-[#F5F5F5] rounded-lg transition-colors cursor-pointer"
+              className="px-4 py-2 text-xs font-semibold text-ink-soft hover:bg-[#F5F5F5] rounded-lg transition-colors cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isUploading}
-              className="px-5 py-2 text-xs font-bold text-white bg-[#BA1A20] hover:bg-[#8B0000] rounded-lg transition-colors shadow-xs disabled:opacity-50 cursor-pointer"
+              className="px-5 py-2 text-xs font-bold text-white bg-brand hover:bg-brand-dark rounded-lg transition-colors shadow-xs disabled:opacity-50 cursor-pointer"
             >
               {dishToEdit ? 'Save Changes' : 'Create Product'}
             </button>

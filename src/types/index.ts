@@ -108,6 +108,10 @@ export interface PaymentRecord {
   method: PaymentMethod;
   timestamp: string;
   note?: string;
+  // Who physically collected this payment, and in which shift (for drawer reconciliation)
+  cashierId?: string;
+  cashierName?: string;
+  shiftId?: string;
 }
 
 export interface Order {
@@ -132,6 +136,7 @@ export interface Order {
   paymentStatus: PaymentStatus;
   paymentHistory?: PaymentRecord[];
   createdAt: string;
+  updatedAt?: string;
   estimatedMinutes: number;
   specialNotes?: string;
   cashTendered?: number;
@@ -160,6 +165,10 @@ export interface Shift {
   totalDiscount: number;
   status: 'open' | 'closed';
   notes?: string;
+  reviewStatus?: 'pending' | 'approved' | 'flagged';
+  reviewNote?: string;
+  reviewedBy?: string;
+  reviewedAt?: string;
   initialFloatEdits?: {
     previousAmount: number;
     newAmount: number;

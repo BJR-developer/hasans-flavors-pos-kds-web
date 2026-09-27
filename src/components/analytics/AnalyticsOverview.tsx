@@ -1,416 +1,358 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import Link from 'next/link';
-import {
-  DollarSign,
-  Receipt,
-  Utensils,
-  ArrowRight,
-  TrendingUp,
-  Calendar,
-  ShoppingBag,
-  Clock,
-  User,
-} from 'lucide-react';
-import { useOrders, useTableSessions } from '@/hooks/useRestaurantData';
+import { Wallet, Receipt, TrendingUp, AlertTriangle, ClipboardCheck, ArrowRight, Package, Clock, Utensils } from 'lucide-react';
+import { useOrders, useDishes, useTableSessions } from '@/hooks/useRestaurantData';
+import { useShifts } from '@/hooks/useShiftData';
 import { useStaffUsers } from '@/hooks/useStaffData';
+import { useNow } from '@/hooks/useNow';
+import {
+  collectPayments,
+  filterPayments,
+  summarizePayments,
+  shiftMoney,
+  openBalances,
+  isCountableOrder,
+  formatPeso,
+  METHOD_LABELS,
+  MoneyMethod,
+} from '@/lib/money';
+import {
+  PageShell,
+  PageHeader,
+  Card,
+  CardTitle,
+  StatTile,
+  Badge,
+  EmptyState,
+  DatePresetBar,
+  DatePreset,
+  presetRange,
+  toDateInput,
+} from '@/components/ui';
 
-type DatePreset = 'today' | 'yesterday' | 'last_7_days' | 'this_month' | 'custom';
+const LOW_STOCK = 5;
+const STALE_SHIFT_HOURS = 12;
 
 export function AnalyticsOverview() {
+  const now = useNow();
   const { data: orders = [] } = useOrders();
+  const { data: dishes = [] } = useDishes();
   const { data: tables = [] } = useTableSessions();
-  const { data: staffList = [] } = useStaffUsers();
+  const { data: shifts = [] } = useShifts();
+  const { data: staff = [] } = useStaffUsers();
 
-  // Helper to format local YYYY-MM-DD string
-  const toDateInputString = (d: Date): string => {
-    const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  };
+  const [preset, setPreset] = useState<DatePreset>('today');
+  const [customFrom, setCustomFrom] = useState(() => toDateInput(Date.now()));
+  const [customTo, setCustomTo] = useState(() => toDateInput(Date.now()));
+  const range = useMemo(() => presetRange(preset, customFrom, customTo), [preset, customFrom, customTo]);
 
-  const todayStr = useMemo(() => toDateInputString(new Date()), []);
+  const allPayments = useMemo(() => collectPayments(orders), [orders]);
+  const rangePayments = useMemo(() => filterPayments(allPayments, { from: range.from, to: range.to }), [allPayments, range]);
+  const summary = useMemo(() => summarizePayments(rangePayments), [rangePayments]);
 
-  const [datePreset, setDatePreset] = useState<DatePreset>('today');
-  const [customStartDate, setCustomStartDate] = useState<string>(todayStr);
-  const [customEndDate, setCustomEndDate] = useState<string>(todayStr);
-  const [selectedStaffId, setSelectedStaffId] = useState<string>('all');
+  const rangeOrders = useMemo(
+    () =>
+      orders.filter((o) => {
+        const ts = new Date(o.createdAt).getTime();
+        return isCountableOrder(o) && ts >= range.from && ts <= range.to;
+      }),
+    [orders, range]
+  );
+  const open = useMemo(() => openBalances(rangeOrders), [rangeOrders]);
 
-  // Filter staff list to cashiers and owners only
-  const activeStaffMembers = useMemo(() => {
-    return staffList.filter((s) => s.role === 'cashier' || s.role === 'owner');
-  }, [staffList]);
+  const rangeShifts = useMemo(
+    () =>
+      shifts
+        .filter((s) => {
+          const start = new Date(s.startTime).getTime();
+          const end = s.endTime ? new Date(s.endTime).getTime() : now;
+          return start <= range.to && end >= range.from;
+        })
+        .map((s) => ({ shift: s, money: shiftMoney(s, allPayments) })),
+    [shifts, range, allPayments, now]
+  );
+  const shortTotal = rangeShifts.reduce((s, r) => s + Math.min(0, r.money.variance ?? 0), 0);
 
-  // Quick Preset Handlers
-  const handleSelectPreset = (preset: DatePreset) => {
-    setDatePreset(preset);
-    const now = new Date();
-
-    if (preset === 'today') {
-      const str = toDateInputString(now);
-      setCustomStartDate(str);
-      setCustomEndDate(str);
-    } else if (preset === 'yesterday') {
-      const yest = new Date(now);
-      yest.setDate(yest.getDate() - 1);
-      const str = toDateInputString(yest);
-      setCustomStartDate(str);
-      setCustomEndDate(str);
-    } else if (preset === 'last_7_days') {
-      const start = new Date(now);
-      start.setDate(start.getDate() - 6);
-      setCustomStartDate(toDateInputString(start));
-      setCustomEndDate(toDateInputString(now));
-    } else if (preset === 'this_month') {
-      const start = new Date(now.getFullYear(), now.getMonth(), 1);
-      const end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-      setCustomStartDate(toDateInputString(start));
-      setCustomEndDate(toDateInputString(end));
-    }
-  };
-
-  const selectedStaff = useMemo(() => {
-    if (selectedStaffId === 'all') return null;
-    return activeStaffMembers.find((s) => s.id === selectedStaffId) || null;
-  }, [selectedStaffId, activeStaffMembers]);
-
-  // Filter orders strictly by chosen date range and selected cashier account
-  const { filteredOrders, rangeLabel } = useMemo(() => {
-    let filtered = orders;
-
-    if (customStartDate && customEndDate) {
-      const start = new Date(`${customStartDate}T00:00:00`);
-      const end = new Date(`${customEndDate}T23:59:59.999`);
-      filtered = filtered.filter((o) => {
-        const orderTime = new Date(o.createdAt).getTime();
-        return orderTime >= start.getTime() && orderTime <= end.getTime();
+  // Alerts
+  const alerts = useMemo(() => {
+    const list: { tone: 'red' | 'amber'; text: string; href: string }[] = [];
+    shifts
+      .filter((s) => s.status === 'open' && (now - new Date(s.startTime).getTime()) / 3_600_000 > STALE_SHIFT_HOURS)
+      .forEach((s) =>
+        list.push({
+          tone: 'amber',
+          text: `${s.cashierName}'s shift has been open ${Math.floor((now - new Date(s.startTime).getTime()) / 3_600_000)}h and was never closed`,
+          href: '/shifts',
+        })
+      );
+    rangeShifts
+      .filter((r) => (r.money.variance ?? 0) < -0.01 && r.shift.reviewStatus !== 'approved')
+      .forEach((r) =>
+        list.push({
+          tone: 'red',
+          text: `${r.shift.cashierName}'s drawer was ${formatPeso(Math.abs(r.money.variance || 0))} short`,
+          href: '/shifts',
+        })
+      );
+    const outOfStock = dishes.filter((d) => !d.inStock).length;
+    const low = dishes.filter((d) => d.inStock && (d.stockQuantity ?? Infinity) <= LOW_STOCK);
+    if (outOfStock > 0) list.push({ tone: 'red', text: `${outOfStock} dish${outOfStock > 1 ? 'es are' : ' is'} out of stock`, href: '/inventory' });
+    if (low.length > 0)
+      list.push({
+        tone: 'amber',
+        text: `Low stock: ${low.slice(0, 3).map((d) => `${d.name} (${d.stockQuantity})`).join(', ')}${low.length > 3 ? ` +${low.length - 3} more` : ''}`,
+        href: '/inventory',
       });
-    }
-
-    if (selectedStaffId !== 'all') {
-      filtered = filtered.filter((o) => {
-        if (o.cashierId === selectedStaffId) return true;
-        if (selectedStaff) {
-          const matchName = o.cashierName && selectedStaff.fullName &&
-            o.cashierName.toLowerCase() === selectedStaff.fullName.toLowerCase();
-          const matchUsername = o.cashierName && selectedStaff.username &&
-            o.cashierName.toLowerCase() === selectedStaff.username.toLowerCase();
-          return matchName || matchUsername;
-        }
-        return false;
+    const liveTables = new Set(
+      orders
+        .filter((o) => isCountableOrder(o) && o.status !== 'completed' && o.type === 'dine_in' && o.tableNumber)
+        .map((o) => o.tableNumber)
+    );
+    const stuck = tables.filter((t) => t.status !== 'available' && !liveTables.has(t.tableNumber));
+    if (stuck.length > 0)
+      list.push({
+        tone: 'amber',
+        text: `${stuck.map((t) => t.tableNumber).join(', ')} marked occupied with no open order`,
+        href: '/tables',
       });
-    }
+    return list;
+  }, [shifts, rangeShifts, dishes, tables, orders, now]);
 
-    let label = 'Today';
-    if (customStartDate && customEndDate) {
-      const start = new Date(`${customStartDate}T00:00:00`);
-      const end = new Date(`${customEndDate}T23:59:59.999`);
-      const startFormatted = start.toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
+  // Per cashier
+  const cashierRows = useMemo(() => {
+    return staff
+      .filter((s) => s.role === 'cashier')
+      .map((c) => {
+        const own = rangeShifts.filter((r) => r.shift.cashierId === c.id);
+        const collected = summarizePayments(rangePayments.filter((p) => p.cashierId === c.id)).collected;
+        const openShift = shifts.find((s) => s.cashierId === c.id && s.status === 'open');
+        const variance = own.reduce((s, r) => s + (r.money.variance ?? 0), 0);
+        const hasClosed = own.some((r) => r.money.variance !== undefined);
+        return { cashier: c, shifts: own.length, collected, openShift, variance: hasClosed ? variance : undefined };
       });
-      const endFormatted = end.toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-      });
-      label = customStartDate === customEndDate ? startFormatted : `${startFormatted} – ${endFormatted}`;
-    }
+  }, [staff, rangeShifts, rangePayments, shifts]);
 
-    return { filteredOrders: filtered, rangeLabel: label };
-  }, [orders, customStartDate, customEndDate, selectedStaffId, selectedStaff]);
+  // Best sellers
+  const bestSellers = useMemo(() => {
+    const map = new Map<string, { name: string; qty: number; revenue: number }>();
+    rangeOrders.forEach((o) =>
+      (o.items || []).forEach((it) => {
+        const name = it.dish?.name || 'Item';
+        const cur = map.get(name) || { name, qty: 0, revenue: 0 };
+        cur.qty += Number(it.quantity || 1);
+        cur.revenue += Number(it.totalPrice || 0);
+        map.set(name, cur);
+      })
+    );
+    return Array.from(map.values()).sort((a, b) => b.qty - a.qty).slice(0, 8);
+  }, [rangeOrders]);
 
-  // Aggregate Range Metrics
-  const paidOrders = useMemo(
-    () => filteredOrders.filter((o) => o.paymentStatus === 'paid' && o.status !== 'cancelled'),
-    [filteredOrders]
-  );
+  // Collected by hour (single day) or by day
+  const isSingleDay = range.to - range.from <= 24 * 3_600_000;
+  const buckets = useMemo(() => {
+    const map = new Map<string, number>();
+    rangePayments.forEach((p) => {
+      const d = new Date(p.timestamp);
+      const key = isSingleDay
+        ? `${String(d.getHours()).padStart(2, '0')}:00`
+        : d.toLocaleDateString([], { month: 'short', day: 'numeric' });
+      map.set(key, (map.get(key) || 0) + p.amount);
+    });
+    const entries = Array.from(map.entries());
+    if (isSingleDay) entries.sort((a, b) => a[0].localeCompare(b[0]));
+    return entries;
+  }, [rangePayments, isSingleDay]);
+  const maxBucket = Math.max(1, ...buckets.map(([, v]) => v));
 
-  const totalRevenue = useMemo(
-    () => paidOrders.reduce((sum, o) => sum + (o.total || 0), 0),
-    [paidOrders]
-  );
-
-  const completedCount = useMemo(
-    () => filteredOrders.filter((o) => o.status === 'completed').length,
-    [filteredOrders]
-  );
-
-  const totalOrdersCount = filteredOrders.length;
-  const avgTicket = paidOrders.length > 0 ? Math.round(totalRevenue / paidOrders.length) : 0;
-  const activeTablesCount = tables.filter((t) => t.status !== 'available').length;
-
-  // Channel Breakdown
-  const dineInOrders = useMemo(
-    () => paidOrders.filter((o) => o.type === 'dine_in'),
-    [paidOrders]
-  );
-  const takeoutOrders = useMemo(
-    () => paidOrders.filter((o) => o.type === 'takeout'),
-    [paidOrders]
-  );
-
-  const dineInRevenue = dineInOrders.reduce((sum, o) => sum + (o.total || 0), 0);
-  const takeoutRevenue = takeoutOrders.reduce((sum, o) => sum + (o.total || 0), 0);
+  const methods: MoneyMethod[] = ['cash', 'gcash', 'card', 'inr_qr'];
 
   return (
-    <div className="max-w-[1720px] mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
-      {/* 1. Header Bar with Quick Navigation to Shifts */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-xl sm:text-2xl font-black text-[#1F1F1F] tracking-tight">
-            Owner Financial Dashboard
-          </h1>
-          <p className="text-xs text-[#737373] mt-0.5">
-            Real-time sales revenue, verified orders, and cashier account performance
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <Link
-            href="/shifts"
-            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-neutral-900 hover:bg-black text-white text-xs font-bold transition-all shadow-xs"
-          >
-            <Clock className="w-3.5 h-3.5 text-amber-400" />
-            <span>Cashier Shifts &amp; Logs</span>
-            <ArrowRight className="w-3.5 h-3.5" />
+    <PageShell>
+      <PageHeader
+        title="Dashboard"
+        subtitle={range.label}
+        actions={
+          <Link href="/shifts" className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-ink text-white text-sm font-bold hover:bg-black">
+            Cash & Shifts <ArrowRight className="w-4 h-4" />
           </Link>
-        </div>
+        }
+      />
+
+      <DatePresetBar
+        preset={preset}
+        onPreset={setPreset}
+        customFrom={customFrom}
+        customTo={customTo}
+        onCustomFrom={setCustomFrom}
+        onCustomTo={setCustomTo}
+      />
+
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
+        <StatTile tone="dark" label="Money collected" value={formatPeso(summary.collected)} hint={`Cash ${formatPeso(summary.byMethod.cash.amount)}`} icon={Wallet} />
+        <StatTile label="Orders" value={rangeOrders.length} hint={`${summary.orderCount} paid`} icon={Receipt} />
+        <StatTile
+          label="Average paid order"
+          value={formatPeso(summary.orderCount ? summary.collected / summary.orderCount : 0)}
+          icon={TrendingUp}
+        />
+        <StatTile tone={open.count ? 'amber' : 'default'} label="Not paid yet" value={formatPeso(open.amount)} hint={`${open.count} open orders`} icon={AlertTriangle} />
+        <StatTile
+          tone={shortTotal < 0 ? 'red' : 'green'}
+          label="Drawer shortages"
+          value={shortTotal < 0 ? `−${formatPeso(Math.abs(shortTotal))}` : formatPeso(0)}
+          hint={`${rangeShifts.length} shifts`}
+          icon={ClipboardCheck}
+        />
       </div>
 
-      {/* 2. Simplified Controls: Timeline Selection, Exact Dates & Staff Account Filter */}
-      <div className="bg-white rounded-2xl border border-[#E5E5E5] p-4 sm:p-5 shadow-2xs space-y-4">
-        {/* Timeline Presets & Exact Dates */}
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
-          <div className="flex items-center gap-1.5 flex-wrap">
-            {(
-              [
-                { id: 'today', label: 'Today (Default)' },
-                { id: 'yesterday', label: 'Yesterday' },
-                { id: 'last_7_days', label: 'Last 7 Days' },
-                { id: 'this_month', label: 'This Month' },
-                { id: 'custom', label: 'Custom Range' },
-              ] as const
-            ).map((preset) => (
-              <button
-                key={preset.id}
-                onClick={() => handleSelectPreset(preset.id)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                  datePreset === preset.id
-                    ? 'bg-[#1F1F1F] text-white shadow-xs'
-                    : 'bg-[#FAFAFA] text-[#525252] hover:bg-[#F5F5F5] border border-[#E5E5E5]'
-                }`}
+      {alerts.length > 0 && (
+        <Card>
+          <CardTitle title="Needs your attention" />
+          <div className="space-y-2">
+            {alerts.map((a, i) => (
+              <Link
+                key={i}
+                href={a.href}
+                className={`flex items-center justify-between gap-3 px-4 py-3 rounded-xl text-sm font-semibold border ${
+                  a.tone === 'red' ? 'bg-rose-50 border-rose-200 text-rose-900' : 'bg-amber-50 border-amber-200 text-amber-900'
+                } hover:brightness-95`}
               >
-                {preset.label}
-              </button>
+                <span className="flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4 shrink-0" />
+                  {a.text}
+                </span>
+                <ArrowRight className="w-4 h-4 shrink-0" />
+              </Link>
             ))}
           </div>
+        </Card>
+      )}
 
-          <div className="flex items-center gap-2 text-xs text-[#737373] font-medium bg-[#FAFAFA] px-3 py-1.5 rounded-lg border border-[#E5E5E5]">
-            <Calendar className="w-3.5 h-3.5 text-[#BA1A20]" />
-            <span>Period: <strong>{rangeLabel}</strong></span>
-          </div>
-        </div>
-
-        {/* Date Inputs & Cashier Account Filter */}
-        <div className="pt-3 border-t border-[#F5F5F5] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
-          {/* Exact Date From / To */}
-          <div className="flex items-center gap-2">
-            <span className="text-[11px] font-bold text-[#737373] uppercase tracking-wider shrink-0">
-              Dates:
-            </span>
-            <input
-              type="date"
-              value={customStartDate}
-              onChange={(e) => {
-                setCustomStartDate(e.target.value);
-                setDatePreset('custom');
-              }}
-              className="px-2.5 py-1.5 text-xs rounded-lg border border-[#E5E5E5] bg-[#FAFAFA] text-[#1F1F1F] focus:bg-white focus:outline-none focus:border-[#1F1F1F]"
-            />
-            <span className="text-[#A3A3A3]">to</span>
-            <input
-              type="date"
-              value={customEndDate}
-              onChange={(e) => {
-                setCustomEndDate(e.target.value);
-                setDatePreset('custom');
-              }}
-              className="px-2.5 py-1.5 text-xs rounded-lg border border-[#E5E5E5] bg-[#FAFAFA] text-[#1F1F1F] focus:bg-white focus:outline-none focus:border-[#1F1F1F]"
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
+        <Card padded={false} className="xl:col-span-2">
+          <div className="p-5 pb-0">
+            <CardTitle
+              title="Cashiers"
+              hint="Money each cashier collected and how their drawer balanced"
+              right={<Link href="/shifts" className="text-sm font-semibold text-brand hover:underline">All shifts</Link>}
             />
           </div>
+          {cashierRows.length === 0 ? (
+            <EmptyState title="No cashier accounts yet" hint="Create one in Staff." />
+          ) : (
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-left text-xs font-bold uppercase tracking-wide text-muted border-y border-line bg-neutral-50">
+                  <th className="px-5 py-3">Cashier</th>
+                  <th className="px-3 py-3">Now</th>
+                  <th className="px-3 py-3 text-right">Shifts</th>
+                  <th className="px-3 py-3 text-right">Collected</th>
+                  <th className="px-5 py-3 text-right">Drawer</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-line">
+                {cashierRows.map((r) => (
+                  <tr key={r.cashier.id}>
+                    <td className="px-5 py-3 font-bold text-ink">{r.cashier.fullName}</td>
+                    <td className="px-3 py-3">
+                      {r.openShift ? (
+                        <Badge tone="green">
+                          <Clock className="w-3 h-3" /> On shift since{' '}
+                          {new Date(r.openShift.startTime).toLocaleString([], {
+                            ...(new Date(r.openShift.startTime).toDateString() !== new Date(now).toDateString()
+                              ? { month: 'short', day: 'numeric' }
+                              : {}),
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
+                        </Badge>
+                      ) : (
+                        <Badge>Off</Badge>
+                      )}
+                    </td>
+                    <td className="px-3 py-3 text-right">{r.shifts}</td>
+                    <td className="px-3 py-3 text-right font-mono font-bold">{formatPeso(r.collected)}</td>
+                    <td className="px-5 py-3 text-right whitespace-nowrap">
+                      {r.variance === undefined ? (
+                        <span className="text-muted">—</span>
+                      ) : Math.abs(r.variance) < 0.01 ? (
+                        <span className="font-bold text-emerald-700">Balanced</span>
+                      ) : (
+                        <span className={`font-bold ${r.variance < 0 ? 'text-rose-700' : 'text-blue-700'}`}>
+                          {r.variance < 0 ? `−${formatPeso(Math.abs(r.variance))} short` : `+${formatPeso(r.variance)} over`}
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </Card>
 
-          {/* Staff Account Selector */}
-          <div className="flex items-center gap-2">
-            <span className="text-[11px] font-bold text-[#737373] uppercase tracking-wider shrink-0 flex items-center gap-1">
-              <User className="w-3.5 h-3.5 text-neutral-500" />
-              <span>Staff:</span>
-            </span>
-            <select
-              value={selectedStaffId}
-              onChange={(e) => setSelectedStaffId(e.target.value)}
-              className="flex-1 px-3 py-1.5 text-xs rounded-lg border border-[#E5E5E5] bg-[#FAFAFA] text-[#1F1F1F] font-semibold focus:bg-white focus:outline-none focus:border-[#1F1F1F]"
-            >
-              <option value="all">All Cashier Accounts (Default)</option>
-              {activeStaffMembers.map((staff) => (
-                <option key={staff.id} value={staff.id}>
-                  {staff.fullName} {staff.username ? `(@${staff.username})` : `(${staff.role})`}
-                </option>
+        <Card>
+          <CardTitle title="How customers paid" />
+          <div className="space-y-3">
+            {methods.map((m) => {
+              const v = summary.byMethod[m].amount;
+              const pct = summary.collected ? (v / summary.collected) * 100 : 0;
+              return (
+                <div key={m}>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span className="font-semibold text-ink-soft">{METHOD_LABELS[m]}</span>
+                    <span className="font-bold text-ink">{formatPeso(v)}</span>
+                  </div>
+                  <div className="h-2 rounded-full bg-neutral-100 overflow-hidden">
+                    <div className="h-full bg-ink rounded-full" style={{ width: `${pct}%` }} />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </Card>
+      </div>
+
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
+        <Card className="xl:col-span-2">
+          <CardTitle title={isSingleDay ? 'Money collected by hour' : 'Money collected by day'} />
+          {buckets.length === 0 ? (
+            <EmptyState title="No payments in this period" />
+          ) : (
+            <div className="flex items-end gap-2 h-44 overflow-x-auto pb-1">
+              {buckets.map(([label, v]) => (
+                <div key={label} className="flex flex-col items-center justify-end h-full min-w-[40px] flex-1">
+                  <span className="text-xs font-bold text-ink mb-1">{formatPeso(v)}</span>
+                  <div className="w-full max-w-[36px] rounded-t-lg bg-brand" style={{ height: `${Math.max(4, (v / maxBucket) * 100)}%` }} />
+                  <span className="text-xs text-muted mt-1 whitespace-nowrap">{label}</span>
+                </div>
               ))}
-            </select>
-          </div>
-
-          {/* Orders Count Summary */}
-          <div className="flex items-center justify-start lg:justify-end text-xs text-[#737373]">
-            <span>
-              Showing <strong>{filteredOrders.length}</strong> orders {selectedStaff ? `for ${selectedStaff.fullName}` : 'across all staff'}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* 3. Primary KPI Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        {/* Gross Revenue */}
-        <div className="p-4 sm:p-5 bg-white rounded-xl border border-[#E5E5E5] space-y-2 shadow-2xs">
-          <div className="flex items-center justify-between text-xs text-[#737373]">
-            <span>Gross Revenue</span>
-            <DollarSign className="w-4 h-4 text-[#BA1A20]" />
-          </div>
-          <h3 className="text-2xl sm:text-3xl font-black text-[#1F1F1F] tracking-tight">
-            ₱{totalRevenue.toLocaleString()}
-          </h3>
-          <p className="text-[11px] text-[#2E7D32] font-semibold flex items-center gap-1">
-            <TrendingUp className="w-3 h-3" />
-            <span>{paidOrders.length} paid receipts</span>
-          </p>
-        </div>
-
-        {/* Total Orders */}
-        <div className="p-4 sm:p-5 bg-white rounded-xl border border-[#E5E5E5] space-y-2 shadow-2xs">
-          <div className="flex items-center justify-between text-xs text-[#737373]">
-            <span>Total Orders</span>
-            <Receipt className="w-4 h-4 text-[#B45309]" />
-          </div>
-          <h3 className="text-2xl sm:text-3xl font-black text-[#1F1F1F] tracking-tight">
-            {totalOrdersCount}
-          </h3>
-          <p className="text-[11px] text-[#737373]">
-            {completedCount} fulfilled orders
-          </p>
-        </div>
-
-        {/* Average Order Value */}
-        <div className="p-4 sm:p-5 bg-white rounded-xl border border-[#E5E5E5] space-y-2 shadow-2xs">
-          <div className="flex items-center justify-between text-xs text-[#737373]">
-            <span>Average Order Value</span>
-            <span className="text-xs font-bold text-[#737373]">₱</span>
-          </div>
-          <h3 className="text-2xl sm:text-3xl font-black text-[#1F1F1F] tracking-tight">
-            ₱{avgTicket.toLocaleString()}
-          </h3>
-          <p className="text-[11px] text-[#737373]">Per guest transaction</p>
-        </div>
-
-        {/* Floor Tables Now */}
-        <div className="p-4 sm:p-5 bg-white rounded-xl border border-[#E5E5E5] space-y-2 shadow-2xs">
-          <div className="flex items-center justify-between text-xs text-[#737373]">
-            <span>Floor Tables Now</span>
-            <Utensils className="w-4 h-4 text-[#525252]" />
-          </div>
-          <h3 className="text-2xl sm:text-3xl font-black text-[#1F1F1F] tracking-tight">
-            {activeTablesCount} / {tables.length}
-          </h3>
-          <p className="text-[11px] text-[#737373]">
-            {tables.filter((t) => t.status === 'available').length} free right now
-          </p>
-        </div>
-      </div>
-
-      {/* 4. Sales Channel Breakdown & Floor Table Map */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Sales by Channel */}
-        <div className="bg-white rounded-xl border border-[#E5E5E5] p-5 space-y-4 shadow-2xs">
-          <h3 className="text-xs font-bold text-[#1F1F1F] uppercase tracking-wider">
-            Sales Channel Breakdown ({rangeLabel})
-          </h3>
-
-          <div className="space-y-4 text-xs">
-            {/* Dine-In */}
-            <div>
-              <div className="flex items-center justify-between font-semibold text-[#1F1F1F] mb-1.5">
-                <span className="flex items-center gap-1.5">
-                  <Utensils className="w-3.5 h-3.5 text-[#BA1A20]" /> Dine-In ({dineInOrders.length})
-                </span>
-                <span className="font-bold">₱{dineInRevenue.toLocaleString()}</span>
-              </div>
-              <div className="w-full h-2 bg-[#F5F5F5] rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-[#BA1A20] rounded-full transition-all"
-                  style={{
-                    width: `${totalRevenue > 0 ? Math.round((dineInRevenue / totalRevenue) * 100) : 0}%`,
-                  }}
-                />
-              </div>
             </div>
+          )}
+        </Card>
 
-            {/* Takeout */}
-            <div>
-              <div className="flex items-center justify-between font-semibold text-[#1F1F1F] mb-1.5">
-                <span className="flex items-center gap-1.5">
-                  <ShoppingBag className="w-3.5 h-3.5 text-[#B45309]" /> Takeout ({takeoutOrders.length})
-                </span>
-                <span className="font-bold">₱{takeoutRevenue.toLocaleString()}</span>
-              </div>
-              <div className="w-full h-2 bg-[#F5F5F5] rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-[#B45309] rounded-full transition-all"
-                  style={{
-                    width: `${totalRevenue > 0 ? Math.round((takeoutRevenue / totalRevenue) * 100) : 0}%`,
-                  }}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Live Dining Room Table Map */}
-        <div className="bg-white rounded-xl border border-[#E5E5E5] p-5 space-y-3 shadow-2xs">
-          <div className="flex items-center justify-between">
-            <h3 className="text-xs font-bold text-[#1F1F1F] uppercase tracking-wider">
-              Dining Floor Table Map
-            </h3>
-            <span className="text-[10px] text-[#2E7D32] font-bold">
-              {tables.filter((t) => t.status === 'available').length} Available
-            </span>
-          </div>
-
-          <div className="grid grid-cols-4 gap-1.5 max-h-[160px] overflow-y-auto pr-1">
-            {tables.map((t) => (
-              <div
-                key={t.tableNumber}
-                className={`p-2 rounded-lg border text-center transition-all ${
-                  t.status === 'occupied'
-                    ? 'bg-[#FFF2F0] border-[#FFDAD6] text-[#BA1A20]'
-                    : t.status === 'billing'
-                    ? 'bg-[#FFF8E1] border-[#FFE082] text-[#B45309]'
-                    : 'bg-[#FAFAFA] border-[#E5E5E5] text-[#525252]'
-                }`}
-              >
-                <p className="text-[11px] font-extrabold leading-tight">
-                  {t.tableNumber.replace('Table ', 'T')}
-                </p>
-                <p className="text-[9px] font-bold capitalize mt-0.5">
-                  {t.status === 'available' ? 'Free' : t.status}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
+        <Card>
+          <CardTitle title="Best sellers" right={<Link href="/inventory" className="text-sm font-semibold text-brand hover:underline"><Package className="w-4 h-4 inline" /> Stock</Link>} />
+          {bestSellers.length === 0 ? (
+            <EmptyState title="No sales yet" icon={Utensils} />
+          ) : (
+            <ol className="space-y-2">
+              {bestSellers.map((b, i) => (
+                <li key={b.name} className="flex items-center justify-between gap-2 text-sm">
+                  <span className="flex items-center gap-2 min-w-0">
+                    <span className="w-6 h-6 rounded-lg bg-neutral-100 text-xs font-bold flex items-center justify-center shrink-0">{i + 1}</span>
+                    <span className="truncate font-semibold text-ink">{b.name}</span>
+                  </span>
+                  <span className="text-muted whitespace-nowrap">
+                    <strong className="text-ink">{b.qty}</strong> · {formatPeso(b.revenue)}
+                  </span>
+                </li>
+              ))}
+            </ol>
+          )}
+        </Card>
       </div>
-    </div>
+    </PageShell>
   );
 }

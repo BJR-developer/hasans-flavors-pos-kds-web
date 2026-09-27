@@ -22,8 +22,12 @@ import {
 } from '@/hooks/useRestaurantData';
 import { AddonFormModal } from './AddonFormModal';
 import { SafeImage } from '@/components/common/SafeImage';
+import { ConfirmDialog } from '@/components/common/ConfirmDialog';
+import { useAuthStore } from '@/lib/auth';
 
 export function AddonManagementTab() {
+  const { user } = useAuthStore();
+  const isOwner = user?.role === 'owner';
   const { data: addons = [], isLoading } = useAddons();
   const deleteAddonMutation = useDeleteAddon();
   const toggleStockMutation = useToggleAddonStock();
@@ -33,6 +37,7 @@ export function AddonManagementTab() {
   const [stockFilter, setStockFilter] = useState<'all' | 'instock' | 'outofstock'>('all');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [addonToEdit, setAddonToEdit] = useState<AddonOption | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<AddonOption | null>(null);
 
   // Filtered addons
   const filteredAddons = useMemo(() => {
@@ -71,20 +76,25 @@ export function AddonManagementTab() {
     }
   };
 
-  const handleDelete = async (addon: AddonOption) => {
-    if (window.confirm(`Are you sure you want to delete "${addon.name}"?`)) {
-      try {
-        await deleteAddonMutation.mutateAsync(addon.id);
-      } catch (err: any) {
-        alert(err?.message || 'Failed to delete add-on');
-      }
+  const handleDelete = (addon: AddonOption) => {
+    setConfirmDelete(addon);
+  };
+
+  const executeDelete = async () => {
+    if (!confirmDelete) return;
+    try {
+      await deleteAddonMutation.mutateAsync(confirmDelete.id);
+    } catch (err: any) {
+      alert(err?.message || 'Failed to delete add-on');
+    } finally {
+      setConfirmDelete(null);
     }
   };
 
   return (
     <div className="space-y-6">
       {/* Action & Filter Bar */}
-      <div className="bg-white p-3 sm:p-4 rounded-xl border border-[#E5E5E5] shadow-2xs flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+      <div className="bg-white p-3 sm:p-4 rounded-xl border border-line shadow-2xs flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
         {/* Search */}
         <div className="relative flex-1 max-w-sm">
           <Search className="w-3.5 h-3.5 text-[#A3A3A3] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -93,13 +103,13 @@ export function AddonManagementTab() {
             placeholder="Search sides & add-ons..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-8 pr-8 py-1.5 text-xs rounded-lg border border-[#E5E5E5] bg-[#FAFAFA] text-[#1F1F1F] placeholder-[#A3A3A3] focus:bg-white focus:outline-none focus:border-[#1F1F1F] transition-colors"
+            className="w-full pl-8 pr-8 py-1.5 text-xs rounded-lg border border-line bg-canvas text-ink placeholder-[#A3A3A3] focus:bg-white focus:outline-none focus:border-ink transition-colors"
           />
           {searchQuery && (
             <button
               type="button"
               onClick={() => setSearchQuery('')}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#A3A3A3] hover:text-[#1F1F1F] p-0.5 cursor-pointer"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#A3A3A3] hover:text-ink p-0.5 cursor-pointer"
             >
               <X className="w-3 h-3" />
             </button>
@@ -108,7 +118,7 @@ export function AddonManagementTab() {
 
         {/* Stock Filter Pills & Add Button */}
         <div className="flex flex-wrap items-center gap-2">
-          <div className="flex items-center gap-1 bg-[#F5F5F5] p-1 rounded-lg border border-[#E5E5E5]/80">
+          <div className="flex items-center gap-1 bg-[#F5F5F5] p-1 rounded-lg border border-line/80">
             {[
               { id: 'all', label: `All (${totalCount})` },
               { id: 'instock', label: `Available (${inStockCount})` },
@@ -122,8 +132,8 @@ export function AddonManagementTab() {
                   onClick={() => setStockFilter(tab.id as any)}
                   className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-all cursor-pointer select-none ${
                     isSelected
-                      ? 'bg-white text-[#1F1F1F] shadow-2xs'
-                      : 'text-[#737373] hover:text-[#1F1F1F]'
+                      ? 'bg-white text-ink shadow-2xs'
+                      : 'text-muted hover:text-ink'
                   }`}
                 >
                   {tab.label}
@@ -132,29 +142,31 @@ export function AddonManagementTab() {
             })}
           </div>
 
-          <button
-            type="button"
-            onClick={() => setIsAddModalOpen(true)}
-            className="flex items-center justify-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-[#BA1A20] hover:bg-[#8B0000] text-white text-xs font-bold transition-colors shadow-2xs cursor-pointer ml-auto sm:ml-0"
-          >
-            <Plus className="w-3.5 h-3.5" />
-            <span>Add New Side / Add-on</span>
-          </button>
+          {isOwner && (
+            <button
+              type="button"
+              onClick={() => setIsAddModalOpen(true)}
+              className="flex items-center justify-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-brand hover:bg-brand-dark text-white text-xs font-bold transition-colors shadow-2xs cursor-pointer ml-auto sm:ml-0"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Add New Side / Add-on</span>
+            </button>
+          )}
         </div>
       </div>
 
       {/* Grid of Addon Cards */}
       {isLoading ? (
-        <div className="py-20 flex flex-col items-center justify-center text-[#737373] gap-2">
-          <Loader2 className="w-6 h-6 animate-spin text-[#BA1A20]" />
+        <div className="py-20 flex flex-col items-center justify-center text-muted gap-2">
+          <Loader2 className="w-6 h-6 animate-spin text-brand" />
           <span className="text-xs font-semibold">Loading sides &amp; add-ons...</span>
         </div>
       ) : filteredAddons.length === 0 ? (
-        <div className="bg-white rounded-xl border border-dashed border-[#E5E5E5] p-12 text-center text-[#737373] space-y-3">
+        <div className="bg-white rounded-xl border border-dashed border-line p-12 text-center text-muted space-y-3">
           <Info className="w-8 h-8 text-[#A3A3A3] mx-auto" />
           <div>
-            <p className="text-sm font-bold text-[#1F1F1F]">No add-ons match your filter</p>
-            <p className="text-xs text-[#737373] mt-0.5">
+            <p className="text-sm font-bold text-ink">No add-ons match your filter</p>
+            <p className="text-xs text-muted mt-0.5">
               Click &quot;Add New Side / Add-on&quot; above to create sides such as Raita, Salan, or Roti.
             </p>
           </div>
@@ -167,13 +179,13 @@ export function AddonManagementTab() {
             return (
               <div
                 key={addon.id}
-                className="bg-white rounded-xl border border-[#E5E5E5] hover:border-[#D4D4D4] p-3.5 flex flex-col justify-between shadow-2xs transition-all group"
+                className="bg-white rounded-xl border border-line hover:border-[#D4D4D4] p-3.5 flex flex-col justify-between shadow-2xs transition-all group"
               >
                 <div>
                   <div className="flex items-start gap-3 mb-2">
                     {/* Image Thumbnail */}
                     {addon.imageUrl ? (
-                      <div className="relative w-14 h-14 rounded-lg overflow-hidden bg-neutral-100 shrink-0 border border-[#E5E5E5]">
+                      <div className="relative w-14 h-14 rounded-lg overflow-hidden bg-neutral-100 shrink-0 border border-line">
                         <SafeImage
                           src={addon.imageUrl}
                           alt={addon.name}
@@ -183,21 +195,21 @@ export function AddonManagementTab() {
                         />
                       </div>
                     ) : (
-                      <div className="w-14 h-14 rounded-lg bg-[#FAFAFA] border border-[#E5E5E5] flex items-center justify-center text-xs font-bold text-neutral-400 shrink-0">
+                      <div className="w-14 h-14 rounded-lg bg-canvas border border-line flex items-center justify-center text-xs font-bold text-neutral-400 shrink-0">
                         +Add
                       </div>
                     )}
 
                     <div className="min-w-0 flex-1">
                       <div className="flex items-start justify-between gap-1">
-                        <h4 className="text-xs font-bold text-[#1F1F1F] leading-snug line-clamp-2">
+                        <h4 className="text-xs font-bold text-ink leading-snug line-clamp-2">
                           {addon.name}
                         </h4>
                         <span className="font-mono font-bold text-xs text-[#166534] shrink-0">
                           +₱{addon.price.toLocaleString()}
                         </span>
                       </div>
-                      <p className="text-[10px] text-[#737373] mt-1 line-clamp-1">
+                      <p className="text-xs text-muted mt-1 line-clamp-1">
                         Sides &amp; add-ons selection
                       </p>
                     </div>
@@ -207,11 +219,11 @@ export function AddonManagementTab() {
                 <div className="pt-2.5 mt-2 border-t border-[#F5F5F5] flex items-center justify-between gap-2">
                   {/* Stock Stepper & Status Badge */}
                   <div className="flex items-center gap-1.5">
-                    <div className="flex items-center border border-[#E5E5E5] rounded-lg bg-[#FAFAFA] p-0.5 shadow-2xs hover:border-[#A3A3A3] focus-within:border-[#1F1F1F] focus-within:bg-white transition-colors">
+                    <div className="flex items-center border border-line rounded-lg bg-canvas p-0.5 shadow-2xs hover:border-[#A3A3A3] focus-within:border-ink focus-within:bg-white transition-colors">
                       <button
                         type="button"
                         onClick={() => handleUpdateStockQty(addon, Math.max(0, (addon.stockQuantity ?? 50) - 1))}
-                        className="w-5 h-5 flex items-center justify-center text-[#737373] hover:text-[#1F1F1F] hover:bg-[#E5E5E5] rounded text-xs font-bold cursor-pointer"
+                        className="w-5 h-5 flex items-center justify-center text-muted hover:text-ink hover:bg-line rounded text-xs font-bold cursor-pointer"
                         title="Decrease stock (-1)"
                       >
                         -
@@ -225,13 +237,13 @@ export function AddonManagementTab() {
                         onKeyDown={(e) => {
                           if (e.key === 'Enter') e.currentTarget.blur();
                         }}
-                        className="w-10 text-center text-xs font-bold text-[#1F1F1F] bg-transparent focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        className="w-10 text-center text-xs font-bold text-ink bg-transparent focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         title="Directly edit stock quantity"
                       />
                       <button
                         type="button"
                         onClick={() => handleUpdateStockQty(addon, (addon.stockQuantity ?? 50) + 1)}
-                        className="w-5 h-5 flex items-center justify-center text-[#737373] hover:text-[#1F1F1F] hover:bg-[#E5E5E5] rounded text-xs font-bold cursor-pointer"
+                        className="w-5 h-5 flex items-center justify-center text-muted hover:text-ink hover:bg-line rounded text-xs font-bold cursor-pointer"
                         title="Increase stock (+1)"
                       >
                         +
@@ -241,7 +253,7 @@ export function AddonManagementTab() {
                     <button
                       type="button"
                       onClick={() => handleToggleStock(addon)}
-                      className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-bold transition-all cursor-pointer border ${
+                      className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-bold transition-all cursor-pointer border ${
                         isAvailable
                           ? 'bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100'
                           : 'bg-red-50 text-red-800 border-red-200 hover:bg-red-100'
@@ -252,6 +264,7 @@ export function AddonManagementTab() {
                     </button>
                   </div>
 
+                  {isOwner && (
                   <div className="flex items-center gap-1">
                     <button
                       type="button"
@@ -271,6 +284,7 @@ export function AddonManagementTab() {
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   </div>
+                  )}
                 </div>
               </div>
             );
@@ -294,6 +308,16 @@ export function AddonManagementTab() {
           onClose={() => setAddonToEdit(null)}
         />
       )}
+
+      <ConfirmDialog
+        open={!!confirmDelete}
+        title="Delete Add-on"
+        message={`Are you sure you want to delete "${confirmDelete?.name}"?`}
+        confirmLabel="Delete"
+        tone="danger"
+        onConfirm={executeDelete}
+        onCancel={() => setConfirmDelete(null)}
+      />
     </div>
   );
 }

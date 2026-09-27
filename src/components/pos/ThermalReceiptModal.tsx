@@ -58,7 +58,7 @@ function ThermalReceiptModalContent({
         {/* Modal Top Control Bar (Hidden when printing) */}
         <div className="flex items-center justify-between px-5 py-3.5 bg-[#F4F3F2] border-b border-[#E9E8E7]">
           <div className="flex items-center gap-2 text-xs font-bold text-[#2D2926]">
-            <Printer className="w-4 h-4 text-[#BA1A20]" />
+            <Printer className="w-4 h-4 text-brand" />
             <span>
               {order.paymentStatus === 'paid'
                 ? 'Official Sales Receipt (80mm)'
@@ -85,21 +85,21 @@ function ThermalReceiptModalContent({
               <p className="font-extrabold text-sm tracking-wider uppercase text-black">
                 HASAN&apos;S FLAVORS
               </p>
-              <p className="text-[10px] tracking-wide text-gray-700">AUTHENTIC HALAL CUISINE</p>
-              <p className="text-[9px] text-gray-500 mt-0.5">Zabihah Halal Certified • Fresh Daily</p>
-              <p className="text-[9px] text-gray-500">Tel: +63 (02) 8842-6100</p>
+              <p className="text-xs tracking-wide text-gray-700">AUTHENTIC HALAL CUISINE</p>
+              <p className="text-xs text-gray-500 mt-0.5">Zabihah Halal Certified • Fresh Daily</p>
+              <p className="text-xs text-gray-500">Tel: +63 (02) 8842-6100</p>
               <div className="mt-2 pt-1 border-t border-solid border-gray-300">
-                <p className="text-[11px] font-black tracking-wider text-black uppercase">
+                <p className="text-xs font-black tracking-wider text-black uppercase">
                   {order.paymentStatus === 'paid' ? 'OFFICIAL SALES RECEIPT' : 'GUEST BILL / TABLE CHECK'}
                 </p>
-                <p className={`text-[9px] font-bold ${order.paymentStatus === 'paid' ? 'text-green-700' : 'text-amber-700'}`}>
+                <p className={`text-xs font-bold ${order.paymentStatus === 'paid' ? 'text-green-700' : 'text-amber-700'}`}>
                   {order.paymentStatus === 'paid' ? '★ PAID IN FULL ★' : '⚠ OPEN BILL — PAYMENT PENDING ⚠'}
                 </p>
               </div>
             </div>
 
             {/* Order Metadata */}
-            <div className="py-2.5 border-b border-dashed border-gray-400 text-[10px] space-y-0.5">
+            <div className="py-2.5 border-b border-dashed border-gray-400 text-xs space-y-0.5">
               <div className="flex justify-between font-bold text-xs text-black">
                 <span>ORDER: {order.orderNumber}</span>
                 <span className="uppercase">
@@ -122,12 +122,12 @@ function ThermalReceiptModalContent({
                 <div className="text-gray-600">Phone: {order.customerPhone}</div>
               )}
               {order.specialNotes && (
-                <div className="text-gray-800 font-bold text-[9px] pt-1 border-t border-dotted border-gray-300">
+                <div className="text-gray-800 font-bold text-xs pt-1 border-t border-dotted border-gray-300">
                   SPECIAL INSTRUCTIONS: {order.specialNotes}
                 </div>
               )}
               {order.deliveryAddress && (
-                <div className="text-gray-600 text-[9px] leading-tight">
+                <div className="text-gray-600 text-xs leading-tight">
                   Addr: {order.deliveryAddress}
                 </div>
               )}
@@ -135,7 +135,7 @@ function ThermalReceiptModalContent({
 
             {/* Itemized Table */}
             <div className="py-3 border-b border-dashed border-gray-400">
-              <div className="flex justify-between text-[10px] font-bold text-gray-800 pb-1 mb-1 border-b border-gray-200">
+              <div className="flex justify-between text-xs font-bold text-gray-800 pb-1 mb-1 border-b border-gray-200">
                 <span className="w-8">QTY</span>
                 <span className="flex-1 px-1">ITEM DESCRIPTION</span>
                 <span className="w-14 text-right">AMOUNT</span>
@@ -143,7 +143,7 @@ function ThermalReceiptModalContent({
 
               <div className="space-y-2">
                 {order.items.map((item) => (
-                  <div key={item.cartItemId} className="text-[10px]">
+                  <div key={item.cartItemId} className="text-xs">
                     <div className="flex justify-between items-start">
                       <span className="w-8 font-bold text-black">{item.quantity}x</span>
                       <span className="flex-1 px-1 font-semibold text-gray-900 leading-tight">
@@ -155,7 +155,7 @@ function ThermalReceiptModalContent({
                     </div>
 
                     {/* Modifiers, Custom Variants & Portions Details */}
-                    <div className="pl-8 text-[9px] text-gray-500 space-y-0.5 mt-0.5">
+                    <div className="pl-8 text-xs text-gray-500 space-y-0.5 mt-0.5">
                       {item.selectedVariants && item.selectedVariants.length > 0 ? (
                         item.selectedVariants.map((v, idx) => (
                           <div key={idx} className="font-medium text-gray-800">
@@ -195,7 +195,7 @@ function ThermalReceiptModalContent({
             </div>
 
             {/* Financial Summary */}
-            <div className="py-2.5 border-b border-dashed border-gray-400 text-[10px] space-y-1">
+            <div className="py-2.5 border-b border-dashed border-gray-400 text-xs space-y-1">
               <div className="flex justify-between text-gray-700">
                 <span>Items Subtotal:</span>
                 <span>₱{order.subtotal.toLocaleString()}</span>
@@ -223,7 +223,7 @@ function ThermalReceiptModalContent({
             </div>
 
             {/* Payment Record */}
-            <div className="py-2 border-b border-dashed border-gray-400 text-[10px] space-y-0.5">
+            <div className="py-2 border-b border-dashed border-gray-400 text-xs space-y-0.5">
               <div className="flex justify-between">
                 <span>Order Status:</span>
                 <span className="uppercase font-bold text-black">{order.status}</span>
@@ -273,7 +273,7 @@ function ThermalReceiptModalContent({
               <div className="h-7 bg-gray-900 mx-auto w-3/4 rounded-xs opacity-85 flex items-center justify-center text-[8px] text-white tracking-[6px] font-mono">
                 *HF{order.orderNumber.replace('#', '')}*
               </div>
-              <p className="text-[9px] text-gray-600 font-medium">
+              <p className="text-xs text-gray-600 font-medium">
                 Thank you for dining with Hasan&apos;s Flavors!
               </p>
               <p className="text-[8px] text-gray-400">
@@ -285,13 +285,13 @@ function ThermalReceiptModalContent({
 
         {/* Footer Actions */}
         <div className="p-4 bg-white border-t border-[#E9E8E7] flex items-center justify-between gap-2.5">
-          <div className="flex items-center gap-1.5 text-[11px] text-[#8F6F6C]">
+          <div className="flex items-center gap-1.5 text-xs text-[#8F6F6C]">
             <span className="hidden sm:inline">Shortcut:</span>
-            <kbd className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-[#F4F3F2] border border-[#D4D4D4] font-mono font-bold text-[10px] text-[#2D2926] shadow-2xs">
+            <kbd className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-[#F4F3F2] border border-[#D4D4D4] font-mono font-bold text-xs text-[#2D2926] shadow-2xs">
               <span>Enter</span>
               <CornerDownLeft className="w-2.5 h-2.5" />
             </kbd>
-            <span className="text-[10px] text-[#8F6F6C]">to print</span>
+            <span className="text-xs text-[#8F6F6C]">to print</span>
           </div>
 
           <div className="flex items-center gap-2.5">
@@ -303,11 +303,11 @@ function ThermalReceiptModalContent({
             </button>
             <button
               onClick={handlePrint}
-              className="flex items-center gap-2 px-5 py-2 rounded-xl bg-[#BA1A20] hover:bg-[#8B0000] text-white text-xs font-bold transition-all shadow-sm group"
+              className="flex items-center gap-2 px-5 py-2 rounded-xl bg-brand hover:bg-brand-dark text-white text-xs font-bold transition-all shadow-sm group"
             >
               <Printer className="w-4 h-4" />
               <span>{order.paymentStatus === 'paid' ? 'Print Receipt' : 'Print Bill'}</span>
-              <kbd className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-white/20 border border-white/30 text-[10px] font-mono font-bold text-white shadow-2xs">
+              <kbd className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-white/20 border border-white/30 text-xs font-mono font-bold text-white shadow-2xs">
                 <span>↵</span>
               </kbd>
             </button>

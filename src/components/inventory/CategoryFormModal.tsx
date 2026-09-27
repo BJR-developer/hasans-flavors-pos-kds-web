@@ -147,21 +147,21 @@ function CategoryFormModalContent({
 
   return (
     <div className="fixed inset-0 z-[80] bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
-      <div className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-[#E5E5E5] my-6 animate-in fade-in zoom-in-95 duration-200">
+      <div className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-line my-6 animate-in fade-in zoom-in-95 duration-200">
         {/* Header */}
-        <div className="px-5 py-4 border-b border-[#E5E5E5] bg-[#FAFAFA] flex items-center justify-between">
+        <div className="px-5 py-4 border-b border-line bg-canvas flex items-center justify-between">
           <div>
-            <h3 className="text-base font-bold text-[#1F1F1F]">
+            <h3 className="text-base font-bold text-ink">
               {categoryToEdit ? 'Edit Category' : 'Create New Category'}
             </h3>
-            <p className="text-xs text-[#737373] mt-0.5">
+            <p className="text-xs text-muted mt-0.5">
               Available immediately in POS register, inventory filter, and customer app
             </p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-lg text-[#737373] hover:text-[#1F1F1F] hover:bg-white transition-colors cursor-pointer"
+            className="p-1.5 rounded-lg text-muted hover:text-ink hover:bg-white transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -177,7 +177,7 @@ function CategoryFormModalContent({
 
           {/* Category Name */}
           <div>
-            <label className="block text-xs font-bold text-[#1F1F1F] mb-1">
+            <label className="block text-xs font-bold text-ink mb-1">
               Category Name *
             </label>
             <input
@@ -186,18 +186,18 @@ function CategoryFormModalContent({
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Desserts & Sweets, Appetizers, Hot Beverages"
-              className="w-full px-3 py-2 text-xs rounded-lg border border-[#E5E5E5] bg-[#FAFAFA] text-[#1F1F1F] focus:bg-white focus:outline-none focus:border-[#1F1F1F]"
+              className="w-full px-3 py-2 text-xs rounded-lg border border-line bg-canvas text-ink focus:bg-white focus:outline-none focus:border-ink"
             />
           </div>
 
           {/* Category Cover Image Section */}
           <div>
-            <label className="block text-xs font-bold text-[#1F1F1F] mb-1.5">
+            <label className="block text-xs font-bold text-ink mb-1.5">
               Category Cover Photo
             </label>
 
             {/* Image Preview Box */}
-            <div className="relative w-full h-32 rounded-xl overflow-hidden bg-neutral-100 border border-[#E5E5E5] mb-2.5">
+            <div className="relative w-full h-32 rounded-xl overflow-hidden bg-neutral-100 border border-line mb-2.5">
               <SafeImage
                 src={imageUrl}
                 alt="Category Cover Preview"
@@ -208,7 +208,7 @@ function CategoryFormModalContent({
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
               <div className="absolute bottom-2.5 left-3 right-3 flex items-center justify-between text-white">
                 <span className="text-xs font-bold truncate">{name || 'Category Name'}</span>
-                <span className="text-[10px] bg-black/60 px-2 py-0.5 rounded-full font-medium">Cover Preview</span>
+                <span className="text-xs bg-black/60 px-2 py-0.5 rounded-full font-medium">Cover Preview</span>
               </div>
               {isUploading && (
                 <div className="absolute inset-0 bg-black/60 backdrop-blur-xs flex flex-col items-center justify-center text-white gap-1.5">
@@ -232,18 +232,18 @@ function CategoryFormModalContent({
                 type="button"
                 disabled={isUploading}
                 onClick={() => fileInputRef.current?.click()}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#E5E5E5] bg-white hover:bg-[#FAFAFA] text-xs font-semibold text-[#1F1F1F] transition-colors shadow-2xs cursor-pointer disabled:opacity-50"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-line bg-white hover:bg-canvas text-xs font-semibold text-ink transition-colors shadow-2xs cursor-pointer disabled:opacity-50"
               >
-                <UploadCloud className="w-3.5 h-3.5 text-[#BA1A20]" />
+                <UploadCloud className="w-3.5 h-3.5 text-brand" />
                 <span>Upload Custom Image</span>
               </button>
 
-              <span className="text-[11px] text-[#737373]">or choose a preset below</span>
+              <span className="text-xs text-muted">or choose a preset below</span>
             </div>
 
             {/* Preset Image Thumbnails */}
             <div className="space-y-1">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-[#737373]">
+              <span className="text-xs font-bold uppercase tracking-wider text-muted">
                 Popular Presets:
               </span>
               <div className="grid grid-cols-4 gap-1.5">
@@ -256,8 +256,8 @@ function CategoryFormModalContent({
                       onClick={() => setImageUrl(preset.url)}
                       className={`group relative rounded-lg overflow-hidden border-2 aspect-video transition-all cursor-pointer ${
                         isSelected
-                          ? 'border-[#BA1A20] ring-2 ring-[#BA1A20]/20'
-                          : 'border-[#E5E5E5] hover:border-neutral-400'
+                          ? 'border-brand ring-2 ring-brand/20'
+                          : 'border-line hover:border-neutral-400'
                       }`}
                       title={preset.label}
                     >
@@ -269,12 +269,12 @@ function CategoryFormModalContent({
                         sizes="100px"
                       />
                       <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 flex items-end p-1 transition-colors">
-                        <span className="text-[9px] font-bold text-white truncate leading-none drop-shadow-xs">
+                        <span className="text-xs font-bold text-white truncate leading-none drop-shadow-xs">
                           {preset.label}
                         </span>
                       </div>
                       {isSelected && (
-                        <div className="absolute top-1 right-1 bg-[#BA1A20] text-white p-0.5 rounded-full shadow-xs">
+                        <div className="absolute top-1 right-1 bg-brand text-white p-0.5 rounded-full shadow-xs">
                           <CheckCircle2 className="w-2.5 h-2.5" />
                         </div>
                       )}
@@ -286,18 +286,18 @@ function CategoryFormModalContent({
           </div>
 
           {/* Action Buttons */}
-          <div className="pt-3 border-t border-[#E5E5E5] flex items-center justify-end gap-2">
+          <div className="pt-3 border-t border-line flex items-center justify-end gap-2">
             <button
               type="button"
               onClick={onClose}
-              className="px-3.5 py-1.5 text-xs font-semibold text-[#525252] hover:bg-[#F5F5F5] rounded-lg transition-colors cursor-pointer"
+              className="px-3.5 py-1.5 text-xs font-semibold text-ink-soft hover:bg-[#F5F5F5] rounded-lg transition-colors cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSaving || isUploading || !name.trim()}
-              className="px-4 py-1.5 text-xs font-bold text-white bg-[#BA1A20] hover:bg-[#8B0000] rounded-lg transition-colors shadow-xs flex items-center gap-1.5 disabled:opacity-50 cursor-pointer"
+              className="px-4 py-1.5 text-xs font-bold text-white bg-brand hover:bg-brand-dark rounded-lg transition-colors shadow-xs flex items-center gap-1.5 disabled:opacity-50 cursor-pointer"
             >
               {isSaving ? (
                 <>

@@ -112,6 +112,17 @@ export async function resetPasswordDirect(
     }
   }
 
+  const { data: sessionData } = await supabase.auth.getSession();
+  const currentEmail = sessionData.session?.user.email?.toLowerCase();
+  if (currentEmail && currentEmail === email.toLowerCase()) {
+    const { error: selfError } = await supabase.auth.updateUser({ password: newPassword });
+    if (selfError) {
+      console.error('Error updating own password:', selfError);
+      return { success: false, message: selfError.message };
+    }
+    return { success: true, message: 'Your password has been updated.' };
+  }
+
   const { data, error } = await supabase.rpc('admin_reset_user_password', {
     p_email: email,
     p_new_password: newPassword,
@@ -126,6 +137,26 @@ export async function resetPasswordDirect(
     success: true,
     message: data?.message || 'Password successfully updated.',
   };
+}
+
+/**
+ * Update a staff member's username via the owner-only RPC.
+ */
+export async function updateStaffUsername(
+  userId: string,
+  username: string
+): Promise<{ success: boolean; message?: string; username?: string }> {
+  const { data, error } = await supabase.rpc('admin_update_staff_username', {
+    p_user_id: userId,
+    p_username: username,
+  });
+
+  if (error) {
+    console.error('Error updating staff username:', error);
+    return { success: false, message: error.message };
+  }
+
+  return { success: true, username: (data as { username?: string })?.username };
 }
 
 /**

@@ -43,6 +43,7 @@ import {
 import { ProductFormModal } from './ProductFormModal';
 import { SafeImage } from '@/components/common/SafeImage';
 import { SelectDropdown, DropdownOption } from '@/components/common/SelectDropdown';
+import { useAuthStore } from '@/lib/auth';
 
 const STORAGE_KEY = 'hasans_inventory_prefs_v1';
 
@@ -121,12 +122,12 @@ function InlineDishStockInput({ dish, currentQty }: { dish: Dish; currentQty: nu
 
   return (
     <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
-      <div className="flex items-center border border-[#E5E5E5] rounded-lg bg-[#FAFAFA] p-0.5 shadow-2xs hover:border-[#A3A3A3] focus-within:border-[#1F1F1F] focus-within:bg-white transition-colors">
+      <div className="flex items-center border border-line rounded-lg bg-canvas p-0.5 shadow-2xs hover:border-[#A3A3A3] focus-within:border-ink focus-within:bg-white transition-colors">
         <button
           type="button"
           onClick={() => commitStock(Math.max(0, currentQty - 1))}
           disabled={isSaving || currentQty <= 0}
-          className="w-5 h-5 flex items-center justify-center text-[#737373] hover:text-[#1F1F1F] hover:bg-[#E5E5E5] rounded disabled:opacity-30 cursor-pointer text-xs font-bold"
+          className="w-5 h-5 flex items-center justify-center text-muted hover:text-ink hover:bg-line rounded disabled:opacity-30 cursor-pointer text-xs font-bold"
           title="Decrease stock (-1)"
         >
           -
@@ -138,14 +139,14 @@ function InlineDishStockInput({ dish, currentQty }: { dish: Dish; currentQty: nu
           onChange={(e) => setVal(e.target.value)}
           onBlur={handleBlur}
           onKeyDown={handleKeyDown}
-          className="w-11 text-center text-xs font-bold text-[#1F1F1F] bg-transparent focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+          className="w-11 text-center text-xs font-bold text-ink bg-transparent focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
           title="Directly edit stock quantity (press Enter or click outside to save)"
         />
         <button
           type="button"
           onClick={() => commitStock(currentQty + 1)}
           disabled={isSaving}
-          className="w-5 h-5 flex items-center justify-center text-[#737373] hover:text-[#1F1F1F] hover:bg-[#E5E5E5] rounded disabled:opacity-30 cursor-pointer text-xs font-bold"
+          className="w-5 h-5 flex items-center justify-center text-muted hover:text-ink hover:bg-line rounded disabled:opacity-30 cursor-pointer text-xs font-bold"
           title="Increase stock (+1)"
         >
           +
@@ -153,10 +154,10 @@ function InlineDishStockInput({ dish, currentQty }: { dish: Dish; currentQty: nu
       </div>
 
       <span
-        className={`inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded shrink-0 ${
+        className={`inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded shrink-0 ${
           isAvailable
-            ? 'text-[#2E7D32] bg-[#E8F5E9]'
-            : 'text-[#BA1A20] bg-[#FFF2F0]'
+            ? 'text-money bg-[#E8F5E9]'
+            : 'text-brand bg-brand-soft'
         }`}
       >
         {isAvailable ? (
@@ -176,6 +177,8 @@ function InlineDishStockInput({ dish, currentQty }: { dish: Dish; currentQty: nu
 }
 
 export function InventoryTable() {
+  const { user } = useAuthStore();
+  const isOwner = user?.role === 'owner';
   const { data: dishes = [] } = useDishes();
   const { data: categories = [] } = useCategories();
   const toggleStockMutation = useToggleDishStock();
@@ -419,7 +422,7 @@ export function InventoryTable() {
                 }
               }}
               onChange={table.getToggleAllPageRowsSelectedHandler()}
-              className="w-4 h-4 rounded border-[#D4D4D4] text-[#BA1A20] focus:ring-[#BA1A20] accent-[#BA1A20] cursor-pointer block m-0 p-0"
+              className="w-4 h-4 rounded border-[#D4D4D4] text-brand focus:ring-brand accent-brand cursor-pointer block m-0 p-0"
               title="Select all on this page"
             />
           </div>
@@ -431,7 +434,7 @@ export function InventoryTable() {
               checked={row.getIsSelected()}
               disabled={!row.getCanSelect()}
               onChange={row.getToggleSelectedHandler()}
-              className="w-4 h-4 rounded border-[#D4D4D4] text-[#BA1A20] focus:ring-[#BA1A20] accent-[#BA1A20] cursor-pointer block m-0 p-0"
+              className="w-4 h-4 rounded border-[#D4D4D4] text-brand focus:ring-brand accent-brand cursor-pointer block m-0 p-0"
               title={`Select ${row.original.name}`}
             />
           </div>
@@ -444,27 +447,27 @@ export function InventoryTable() {
           const d = row.original;
           return (
             <div className="flex items-center gap-2.5">
-              <div className="relative w-9 h-9 rounded-lg overflow-hidden bg-[#F5F5F5] shrink-0 border border-[#E5E5E5]">
+              <div className="w-9 h-9 rounded-lg overflow-hidden bg-[#F5F5F5] shrink-0 border border-line flex items-center justify-center">
                 <SafeImage
                   src={d.imageUrl}
                   alt={d.name}
-                  fill
-                  className="object-cover"
-                  sizes="36px"
+                  width={36}
+                  height={36}
+                  className="object-cover w-9 h-9"
                 />
               </div>
               <div className="min-w-0">
                 <div className="flex items-center gap-1.5">
-                  <span className="font-semibold text-xs text-[#1F1F1F] truncate block max-w-xs">
+                  <span className="font-semibold text-xs text-ink truncate block max-w-xs">
                     {d.name}
                   </span>
                   {d.isChefSpecial && (
-                    <span className="shrink-0 inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded text-[9px] font-bold bg-[#FEF3C7] text-[#B45309] border border-[#FDE68A]">
+                    <span className="shrink-0 inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded text-xs font-bold bg-[#FEF3C7] text-[#B45309] border border-[#FDE68A]">
                       <Sparkles className="w-2.5 h-2.5" /> Special
                     </span>
                   )}
                 </div>
-                <span className="text-[10px] text-[#737373] line-clamp-1 max-w-xs">
+                <span className="text-xs text-muted line-clamp-1 max-w-xs">
                   {d.description}
                 </span>
               </div>
@@ -476,7 +479,7 @@ export function InventoryTable() {
         accessorKey: 'category',
         header: 'Category',
         cell: ({ row }) => (
-          <span className="text-xs text-[#525252]">
+          <span className="text-xs text-ink-soft">
             {row.original.category}
           </span>
         ),
@@ -485,7 +488,7 @@ export function InventoryTable() {
         accessorKey: 'price',
         header: 'Price',
         cell: ({ row }) => (
-          <span className="text-xs font-bold text-[#1F1F1F]">
+          <span className="text-xs font-bold text-ink">
             ₱{row.original.price.toLocaleString()}
           </span>
         ),
@@ -524,7 +527,7 @@ export function InventoryTable() {
           const val = row.original.updatedAt || row.original.createdAt;
           return (
             <span
-              className="text-xs text-[#737373] whitespace-nowrap block"
+              className="text-xs text-muted whitespace-nowrap block"
               title={val ? new Date(val).toLocaleString() : undefined}
             >
               {formatLastUpdated(val)}
@@ -542,18 +545,20 @@ export function InventoryTable() {
 
           return (
             <div className="flex items-center justify-end gap-2 pr-1">
-              {/* Edit Product */}
-              <button
-                type="button"
-                onClick={() => {
-                  setDishToEdit(dish);
-                  setIsFormModalOpen(true);
-                }}
-                className="p-1 rounded text-[#737373] hover:text-[#1F1F1F] hover:bg-[#F5F5F5] transition-colors cursor-pointer"
-                title="Edit Product"
-              >
-                <Edit2 className="w-3.5 h-3.5" />
-              </button>
+              {/* Edit Product (owner only) */}
+              {isOwner && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDishToEdit(dish);
+                    setIsFormModalOpen(true);
+                  }}
+                  className="p-1 rounded text-muted hover:text-ink hover:bg-[#F5F5F5] transition-colors cursor-pointer"
+                  title="Edit Product"
+                >
+                  <Edit2 className="w-3.5 h-3.5" />
+                </button>
+              )}
 
               {/* Toggle Availability Button */}
               <button
@@ -561,8 +566,8 @@ export function InventoryTable() {
                 onClick={() => toggleStockMutation.mutate(dish.id)}
                 className={`px-2.5 py-1 rounded text-xs font-semibold transition-colors cursor-pointer ${
                   isAvailable
-                    ? 'border border-[#E5E5E5] text-[#737373] hover:text-[#BA1A20] hover:bg-[#FFF2F0]'
-                    : 'bg-[#1F1F1F] text-white hover:bg-[#383838]'
+                    ? 'border border-line text-muted hover:text-brand hover:bg-brand-soft'
+                    : 'bg-ink text-white hover:bg-[#383838]'
                 }`}
               >
                 {isAvailable ? 'Mark Out of Stock' : 'Set Available'}
@@ -572,7 +577,7 @@ export function InventoryTable() {
         },
       },
     ],
-    [toggleStockMutation]
+    [toggleStockMutation, isOwner, setDishToEdit, setIsFormModalOpen]
   );
 
   const table = useReactTable({
@@ -584,7 +589,7 @@ export function InventoryTable() {
       pagination,
       rowSelection,
     },
-    enableRowSelection: true,
+    enableRowSelection: isOwner,
     getRowId: (row) => row.id,
     onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
@@ -638,11 +643,11 @@ export function InventoryTable() {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-lg font-bold text-[#1F1F1F]">
+            <h1 className="text-lg font-bold text-ink">
               Menu Products &amp; Stock Availability
             </h1>
           </div>
-          <p className="text-xs text-[#737373] mt-0.5 flex items-center gap-1">
+          <p className="text-xs text-muted mt-0.5 flex items-center gap-1">
             <Info className="w-3.5 h-3.5 text-[#A3A3A3]" />
             <span>
               Manage dishes, stock availability, and bulk delete operations across your restaurant system.
@@ -650,24 +655,26 @@ export function InventoryTable() {
           </p>
         </div>
 
-        <button
-          type="button"
-          onClick={() => {
-            setDishToEdit(null);
-            setIsFormModalOpen(true);
-          }}
-          className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-[#BA1A20] hover:bg-[#8B0000] text-white text-xs font-bold transition-colors shadow-xs cursor-pointer"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Add New Product</span>
-        </button>
+        {isOwner && (
+          <button
+            type="button"
+            onClick={() => {
+              setDishToEdit(null);
+              setIsFormModalOpen(true);
+            }}
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-brand hover:bg-brand-dark text-white text-xs font-bold transition-colors shadow-xs cursor-pointer"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Add New Product</span>
+          </button>
+        )}
       </div>
 
       {/* Floating / Sticky Bulk Action Bar when items are marked */}
       {selectedIds.length > 0 && (
-        <div className="bg-[#1F1F1F] text-white px-4 py-2.5 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-lg animate-in slide-in-from-top-2 duration-200">
+        <div className="bg-ink text-white px-4 py-2.5 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-lg animate-in slide-in-from-top-2 duration-200">
           <div className="flex items-center gap-2">
-            <span className="w-6 h-6 rounded-full bg-[#BA1A20] text-white text-xs font-bold flex items-center justify-center shrink-0">
+            <span className="w-6 h-6 rounded-full bg-brand text-white text-xs font-bold flex items-center justify-center shrink-0">
               {selectedIds.length}
             </span>
             <span className="text-xs font-semibold whitespace-nowrap">
@@ -681,7 +688,7 @@ export function InventoryTable() {
               type="button"
               disabled={bulkUpdateStockMutation.isPending || bulkDeleteMutation.isPending}
               onClick={() => handleBulkSetStock(true)}
-              className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-[#2E7D32] hover:bg-[#1B5E20] text-white flex items-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50"
+              className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-money hover:bg-[#1B5E20] text-white flex items-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50"
               title="Mark all selected items as Available (In Stock)"
             >
               {bulkUpdateStockMutation.isPending ? (
@@ -718,14 +725,16 @@ export function InventoryTable() {
               Deselect All
             </button>
 
-            <button
-              type="button"
-              onClick={() => setIsBulkDeleteModalOpen(true)}
-              className="text-xs font-bold px-3.5 py-1.5 rounded-lg bg-[#BA1A20] hover:bg-[#991B1B] text-white flex items-center gap-1.5 transition-colors shadow-xs cursor-pointer"
-            >
-              <Trash2 className="w-3.5 h-3.5" />
-              <span>Delete ({selectedIds.length})</span>
-            </button>
+            {isOwner && (
+              <button
+                type="button"
+                onClick={() => setIsBulkDeleteModalOpen(true)}
+                className="text-xs font-bold px-3.5 py-1.5 rounded-lg bg-brand hover:bg-[#991B1B] text-white flex items-center gap-1.5 transition-colors shadow-xs cursor-pointer"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>Delete ({selectedIds.length})</span>
+              </button>
+            )}
           </div>
         </div>
       )}
@@ -735,28 +744,28 @@ export function InventoryTable() {
         {/* Row 1: Segmented Status Filter Tabs + Clear Action */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
           {/* Status Tabs - Tactile Selection Buttons */}
-          <div className="flex flex-wrap items-center gap-1.5 p-1 bg-[#F5F5F5] rounded-xl border border-[#E5E5E5]/80">
+          <div className="flex flex-wrap items-center gap-1.5 p-1 bg-[#F5F5F5] rounded-xl border border-line/80">
             {[
               {
                 id: 'all',
                 label: 'All Items',
                 count: dishes.length,
-                badgeActive: 'bg-[#1F1F1F] text-white',
-                badgeInactive: 'bg-[#E5E5E5] text-[#525252]',
+                badgeActive: 'bg-ink text-white',
+                badgeInactive: 'bg-line text-ink-soft',
               },
               {
                 id: 'instock',
                 label: 'Available',
                 count: dishes.filter((d) => d.inStock).length,
                 badgeActive: 'bg-[#166534] text-white',
-                badgeInactive: 'bg-[#E8F5E9] text-[#2E7D32]',
+                badgeInactive: 'bg-[#E8F5E9] text-money',
               },
               {
                 id: 'outofstock',
                 label: 'Out of Stock',
                 count: dishes.filter((d) => !d.inStock).length,
                 badgeActive: 'bg-[#991B1B] text-white',
-                badgeInactive: 'bg-[#FFF2F0] text-[#BA1A20]',
+                badgeInactive: 'bg-brand-soft text-brand',
               },
               {
                 id: 'special',
@@ -777,13 +786,13 @@ export function InventoryTable() {
                   }}
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer select-none ${
                     isSelected
-                      ? 'bg-white text-[#1F1F1F] shadow-2xs border border-[#E5E5E5]'
-                      : 'text-[#737373] hover:text-[#1F1F1F] hover:bg-white/60'
+                      ? 'bg-white text-ink shadow-2xs border border-line'
+                      : 'text-muted hover:text-ink hover:bg-white/60'
                   }`}
                 >
                   <span>{tab.label}</span>
                   <span
-                    className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
+                    className={`px-1.5 py-0.2 rounded-full text-xs font-bold ${
                       isSelected ? tab.badgeActive : tab.badgeInactive
                     }`}
                   >
@@ -796,14 +805,14 @@ export function InventoryTable() {
 
           {/* Results Count & Reset Filters */}
           <div className="flex items-center gap-2 self-end sm:self-center">
-            <span className="text-[11px] text-[#737373] font-medium">
-              Showing <strong className="text-[#1F1F1F]">{table.getFilteredRowModel().rows.length}</strong> of {dishes.length}
+            <span className="text-xs text-muted font-medium">
+              Showing <strong className="text-ink">{table.getFilteredRowModel().rows.length}</strong> of {dishes.length}
             </span>
             {isFiltered && (
               <button
                 type="button"
                 onClick={resetFilters}
-                className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#BA1A20] hover:text-[#8B0000] px-2 py-1 rounded-md bg-[#FFF2F0] hover:bg-[#FFE8E5] transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1 text-xs font-semibold text-brand hover:text-brand-dark px-2 py-1 rounded-md bg-brand-soft hover:bg-[#FFE8E5] transition-colors cursor-pointer"
                 title="Reset all filters"
               >
                 <RotateCcw className="w-3 h-3" />
@@ -838,8 +847,8 @@ export function InventoryTable() {
 
             {/* Custom Price Range Input Fields */}
             {priceFilter === 'custom' && (
-              <div className="flex items-center gap-1.5 bg-white border border-[#E5E5E5] rounded-lg px-2.5 py-1 text-xs shadow-2xs animate-in fade-in zoom-in-95 duration-150">
-                <span className="text-[11px] font-semibold text-[#737373]">₱</span>
+              <div className="flex items-center gap-1.5 bg-white border border-line rounded-lg px-2.5 py-1 text-xs shadow-2xs animate-in fade-in zoom-in-95 duration-150">
+                <span className="text-xs font-semibold text-muted">₱</span>
                 <input
                   type="number"
                   min="0"
@@ -849,10 +858,10 @@ export function InventoryTable() {
                     setCustomMin(e.target.value);
                     table.setPageIndex(0);
                   }}
-                  className="w-14 text-xs font-medium text-[#1F1F1F] bg-transparent focus:outline-none placeholder-[#A3A3A3]"
+                  className="w-14 text-xs font-medium text-ink bg-transparent focus:outline-none placeholder-[#A3A3A3]"
                 />
                 <span className="text-[#A3A3A3] text-xs font-bold">—</span>
-                <span className="text-[11px] font-semibold text-[#737373]">₱</span>
+                <span className="text-xs font-semibold text-muted">₱</span>
                 <input
                   type="number"
                   min="0"
@@ -862,7 +871,7 @@ export function InventoryTable() {
                     setCustomMax(e.target.value);
                     table.setPageIndex(0);
                   }}
-                  className="w-14 text-xs font-medium text-[#1F1F1F] bg-transparent focus:outline-none placeholder-[#A3A3A3]"
+                  className="w-14 text-xs font-medium text-ink bg-transparent focus:outline-none placeholder-[#A3A3A3]"
                 />
                 {(customMin || customMax) && (
                   <button
@@ -872,7 +881,7 @@ export function InventoryTable() {
                       setCustomMax('');
                       table.setPageIndex(0);
                     }}
-                    className="text-[#A3A3A3] hover:text-[#1F1F1F] p-0.5 cursor-pointer ml-0.5"
+                    className="text-[#A3A3A3] hover:text-ink p-0.5 cursor-pointer ml-0.5"
                     title="Clear custom range"
                   >
                     <X className="w-3 h-3" />
@@ -899,17 +908,17 @@ export function InventoryTable() {
               placeholder="Search dish, category... (press '/' to focus)"
               value={globalFilter ?? ''}
               onChange={(e) => setGlobalFilter(e.target.value)}
-              className="w-full pl-8 pr-8 py-1.5 text-xs rounded-lg border border-[#E5E5E5] bg-white text-[#1F1F1F] placeholder-[#A3A3A3] hover:border-[#D4D4D4] focus:outline-none focus:border-[#1F1F1F] transition-colors"
+              className="w-full pl-8 pr-8 py-1.5 text-xs rounded-lg border border-line bg-white text-ink placeholder-[#A3A3A3] hover:border-[#D4D4D4] focus:outline-none focus:border-ink transition-colors"
             />
             {globalFilter ? (
               <button
                 onClick={() => setGlobalFilter('')}
-                className="absolute right-2.5 top-2 text-[#A3A3A3] hover:text-[#1F1F1F] cursor-pointer"
+                className="absolute right-2.5 top-2 text-[#A3A3A3] hover:text-ink cursor-pointer"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
             ) : (
-              <kbd className="hidden sm:inline-flex items-center justify-center absolute right-2.5 top-2 h-4 w-4 text-[10px] font-mono font-bold text-[#737373] bg-[#F5F5F5] border border-[#E5E5E5] rounded pointer-events-none select-none">
+              <kbd className="hidden sm:inline-flex items-center justify-center absolute right-2.5 top-2 h-4 w-4 text-xs font-mono font-bold text-muted bg-[#F5F5F5] border border-line rounded pointer-events-none select-none">
                 /
               </kbd>
             )}
@@ -918,12 +927,12 @@ export function InventoryTable() {
       </div>
 
       {/* TanStack Table with Left Checkbox & Clickable Column Sorting */}
-      <div className="bg-white rounded-xl border border-[#E5E5E5] overflow-hidden shadow-2xs">
+      <div className="bg-white rounded-xl border border-line overflow-hidden shadow-2xs">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse min-w-[850px]">
             <thead>
               {table.getHeaderGroups().map((headerGroup) => (
-                <tr key={headerGroup.id} className="bg-[#FAFAFA] border-b border-[#E5E5E5]">
+                <tr key={headerGroup.id} className="bg-canvas border-b border-line">
                   {headerGroup.headers.map((header) => {
                     const canSort = header.column.getCanSort();
                     const isSorted = header.column.getIsSorted();
@@ -934,7 +943,7 @@ export function InventoryTable() {
                       <th
                         key={header.id}
                         onClick={canSort ? header.column.getToggleSortingHandler() : undefined}
-                        className={`py-2.5 text-[11px] font-bold uppercase tracking-wider select-none ${
+                        className={`py-2.5 text-xs font-bold uppercase tracking-wider select-none ${
                           isSelect
                             ? 'w-12 px-3 text-center align-middle'
                             : isActions
@@ -942,15 +951,15 @@ export function InventoryTable() {
                             : 'px-3'
                         } ${
                           canSort
-                            ? 'cursor-pointer hover:bg-[#F0F0F0] text-[#737373] hover:text-[#1F1F1F] transition-colors'
-                            : 'text-[#737373]'
+                            ? 'cursor-pointer hover:bg-[#F0F0F0] text-muted hover:text-ink transition-colors'
+                            : 'text-muted'
                         }`}
                       >
                         {isSelect ? (
                           flexRender(header.column.columnDef.header, header.getContext())
                         ) : (
                           <div className={`flex items-center gap-1.5 group ${isActions ? 'justify-end pr-1' : ''}`}>
-                            <span className={isSorted ? 'text-[#1F1F1F] font-extrabold' : ''}>
+                            <span className={isSorted ? 'text-ink font-extrabold' : ''}>
                               {flexRender(header.column.columnDef.header, header.getContext())}
                             </span>
 
@@ -958,9 +967,9 @@ export function InventoryTable() {
                             {canSort && (
                               <span className="shrink-0">
                                 {isSorted === 'asc' ? (
-                                  <ArrowUp className="w-3.5 h-3.5 text-[#BA1A20]" />
+                                  <ArrowUp className="w-3.5 h-3.5 text-brand" />
                                 ) : isSorted === 'desc' ? (
-                                  <ArrowDown className="w-3.5 h-3.5 text-[#BA1A20]" />
+                                  <ArrowDown className="w-3.5 h-3.5 text-brand" />
                                 ) : (
                                   <ArrowUpDown className="w-3 h-3 text-[#B0B0B0] opacity-0 group-hover:opacity-100 transition-opacity" />
                                 )}
@@ -978,15 +987,15 @@ export function InventoryTable() {
             <tbody className="divide-y divide-[#F5F5F5]">
               {table.getRowModel().rows.length === 0 ? (
                 <tr>
-                  <td colSpan={columns.length} className="px-4 py-12 text-center text-xs text-[#737373]">
+                  <td colSpan={columns.length} className="px-4 py-12 text-center text-xs text-muted">
                     <div className="flex flex-col items-center justify-center space-y-2">
-                      <p className="text-sm font-semibold text-[#1F1F1F]">No matching dishes found</p>
+                      <p className="text-sm font-semibold text-ink">No matching dishes found</p>
                       <p className="text-xs text-[#A3A3A3]">Try adjusting your search query, price, or category filter.</p>
                       {isFiltered && (
                         <button
                           type="button"
                           onClick={resetFilters}
-                          className="mt-2 text-xs font-semibold text-[#BA1A20] hover:underline cursor-pointer"
+                          className="mt-2 text-xs font-semibold text-brand hover:underline cursor-pointer"
                         >
                           Clear all filters
                         </button>
@@ -1001,7 +1010,7 @@ export function InventoryTable() {
                     <tr
                       key={row.id}
                       className={`transition-colors ${
-                        isSelected ? 'bg-[#FFF2F0]/60 hover:bg-[#FFF2F0]' : 'hover:bg-[#FAFAFA]'
+                        isSelected ? 'bg-brand-soft/60 hover:bg-brand-soft' : 'hover:bg-canvas'
                       }`}
                     >
                       {row.getVisibleCells().map((cell) => {
@@ -1024,14 +1033,14 @@ export function InventoryTable() {
         </div>
 
         {/* Pagination Footer with Page Size Options (12, 25, 50, 100, 250, 500) */}
-        <div className="px-4 py-3 bg-[#FAFAFA] border-t border-[#E5E5E5] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-[#737373]">
+        <div className="px-4 py-3 bg-canvas border-t border-line flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-muted">
           {/* Left: Total Dishes Count & Selection Indicator */}
           <div className="flex items-center gap-3">
             <span>
-              Total: <strong className="text-[#1F1F1F]">{table.getFilteredRowModel().rows.length}</strong> items
+              Total: <strong className="text-ink">{table.getFilteredRowModel().rows.length}</strong> items
             </span>
             {selectedIds.length > 0 && (
-              <span className="text-[#BA1A20] font-semibold text-[11px] bg-[#FFF2F0] px-2 py-0.5 rounded border border-[#FFDAD6]">
+              <span className="text-brand font-semibold text-xs bg-brand-soft px-2 py-0.5 rounded border border-[#FFDAD6]">
                 {selectedIds.length} marked
               </span>
             )}
@@ -1041,7 +1050,7 @@ export function InventoryTable() {
           <div className="flex flex-wrap items-center gap-3">
             {/* Page Size Selector */}
             <div className="flex items-center gap-1.5">
-              <span className="text-[11px] text-[#737373] whitespace-nowrap">Per table:</span>
+              <span className="text-xs text-muted whitespace-nowrap">Per table:</span>
               <SelectDropdown
                 value={table.getState().pagination.pageSize}
                 options={pageSizeOptions}
@@ -1058,18 +1067,18 @@ export function InventoryTable() {
               <button
                 onClick={() => table.previousPage()}
                 disabled={!table.getCanPreviousPage()}
-                className="p-1.5 rounded-md border border-[#E5E5E5] bg-white text-[#525252] disabled:opacity-30 hover:bg-[#F5F5F5] cursor-pointer transition-colors"
+                className="p-1.5 rounded-md border border-line bg-white text-ink-soft disabled:opacity-30 hover:bg-[#F5F5F5] cursor-pointer transition-colors"
                 title="Previous page"
               >
                 <ChevronLeft className="w-3.5 h-3.5" />
               </button>
-              <span className="px-2 text-[11px] font-semibold text-[#1F1F1F]">
+              <span className="px-2 text-xs font-semibold text-ink">
                 {table.getState().pagination.pageIndex + 1} / {table.getPageCount() || 1}
               </span>
               <button
                 onClick={() => table.nextPage()}
                 disabled={!table.getCanNextPage()}
-                className="p-1.5 rounded-md border border-[#E5E5E5] bg-white text-[#525252] disabled:opacity-30 hover:bg-[#F5F5F5] cursor-pointer transition-colors"
+                className="p-1.5 rounded-md border border-line bg-white text-ink-soft disabled:opacity-30 hover:bg-[#F5F5F5] cursor-pointer transition-colors"
                 title="Next page"
               >
                 <ChevronRight className="w-3.5 h-3.5" />
@@ -1093,36 +1102,36 @@ export function InventoryTable() {
       {/* Bulk Delete Confirmation Modal */}
       {isBulkDeleteModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-150">
-          <div className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-[#E5E5E5] p-6 space-y-4 animate-in zoom-in-95 duration-200">
+          <div className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-line p-6 space-y-4 animate-in zoom-in-95 duration-200">
             {/* Warning Icon & Header */}
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-full bg-[#FFF2F0] text-[#BA1A20] flex items-center justify-center shrink-0">
+              <div className="w-10 h-10 rounded-full bg-brand-soft text-brand flex items-center justify-center shrink-0">
                 <AlertTriangle className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-[#1F1F1F]">
+                <h3 className="text-base font-bold text-ink">
                   Delete {selectedIds.length} Product{selectedIds.length > 1 ? 's' : ''}?
                 </h3>
-                <p className="text-xs text-[#737373] mt-1 leading-relaxed">
+                <p className="text-xs text-muted mt-1 leading-relaxed">
                   This will permanently delete the selected items from the database, menus, POS register, and customer ordering. This action cannot be undone.
                 </p>
               </div>
             </div>
 
             {/* List of items to be deleted (max preview 8) */}
-            <div className="bg-[#FAFAFA] border border-[#E5E5E5] rounded-xl p-3 max-h-40 overflow-y-auto space-y-1.5">
-              <span className="text-[10px] uppercase font-bold text-[#737373] block tracking-wider">
+            <div className="bg-canvas border border-line rounded-xl p-3 max-h-40 overflow-y-auto space-y-1.5">
+              <span className="text-xs uppercase font-bold text-muted block tracking-wider">
                 Marked for Deletion:
               </span>
-              <ul className="divide-y divide-[#E5E5E5]/60 text-xs">
+              <ul className="divide-y divide-line/60 text-xs">
                 {selectedDishes.slice(0, 8).map((d) => (
-                  <li key={d.id} className="py-1 flex items-center justify-between text-[#1F1F1F]">
+                  <li key={d.id} className="py-1 flex items-center justify-between text-ink">
                     <span className="font-medium truncate max-w-[240px]">{d.name}</span>
-                    <span className="text-[11px] text-[#737373] font-mono">₱{d.price}</span>
+                    <span className="text-xs text-muted font-mono">₱{d.price}</span>
                   </li>
                 ))}
                 {selectedDishes.length > 8 && (
-                  <li className="pt-1.5 text-[11px] text-[#737373] italic">
+                  <li className="pt-1.5 text-xs text-muted italic">
                     ...and {selectedDishes.length - 8} more item{selectedDishes.length - 8 > 1 ? 's' : ''}
                   </li>
                 )}
@@ -1135,7 +1144,7 @@ export function InventoryTable() {
                 type="button"
                 disabled={bulkDeleteMutation.isPending}
                 onClick={() => setIsBulkDeleteModalOpen(false)}
-                className="px-4 py-2 text-xs font-semibold text-[#525252] hover:bg-[#F5F5F5] rounded-lg transition-colors cursor-pointer disabled:opacity-50"
+                className="px-4 py-2 text-xs font-semibold text-ink-soft hover:bg-[#F5F5F5] rounded-lg transition-colors cursor-pointer disabled:opacity-50"
               >
                 Cancel
               </button>
@@ -1143,7 +1152,7 @@ export function InventoryTable() {
                 type="button"
                 disabled={bulkDeleteMutation.isPending}
                 onClick={handleExecuteBulkDelete}
-                className="px-4 py-2 text-xs font-bold text-white bg-[#BA1A20] hover:bg-[#8B0000] rounded-lg transition-colors shadow-xs flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                className="px-4 py-2 text-xs font-bold text-white bg-brand hover:bg-brand-dark rounded-lg transition-colors shadow-xs flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
               >
                 {bulkDeleteMutation.isPending ? (
                   <>

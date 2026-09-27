@@ -34,8 +34,8 @@ export function PosCartItemList({
     return (
       <div className="flex-1 overflow-y-auto p-4 space-y-2.5 min-h-0 flex flex-col items-center justify-center text-center text-[#A3A3A3]">
         <Utensils className="w-7 h-7 stroke-1 text-[#D4D4D4] mb-2" />
-        <p className="text-xs font-semibold text-[#525252]">No items in ticket</p>
-        <p className="text-[11px] text-[#A3A3A3] mt-0.5">
+        <p className="text-xs font-semibold text-ink-soft">No items in ticket</p>
+        <p className="text-xs text-[#A3A3A3] mt-0.5">
           Tap any dish from the menu to add.
         </p>
       </div>
@@ -47,20 +47,20 @@ export function PosCartItemList({
       {items.map((item) => (
         <div
           key={item.cartItemId}
-          className="p-2.5 bg-[#FAFAFA] rounded-lg border border-[#E5E5E5] flex items-center justify-between gap-2"
+          className="p-2.5 bg-canvas rounded-lg border border-line flex items-center justify-between gap-2"
         >
           {/* Item Info */}
           <div className="min-w-0 flex-1">
             <div className="flex items-baseline justify-between gap-1">
-              <h5 className="text-xs font-bold text-[#1F1F1F] truncate">
+              <h5 className="text-xs font-bold text-ink truncate">
                 {item.dish.name}
               </h5>
-              <span className="text-xs font-mono font-bold text-[#1F1F1F] shrink-0">
+              <span className="text-xs font-mono font-bold text-ink shrink-0">
                 ₱{item.totalPrice.toLocaleString()}
               </span>
             </div>
 
-            <div className="flex flex-wrap items-center gap-1 text-[10px] text-[#737373] mt-0.5">
+            <div className="flex flex-wrap items-center gap-1 text-xs text-muted mt-0.5">
               <span>₱{item.unitPrice.toLocaleString()}</span>
               {item.selectedVariants && item.selectedVariants.length > 0 ? (
                 item.selectedVariants.map((v, idx) => (
@@ -100,21 +100,21 @@ export function PosCartItemList({
 
           {/* Live Stepper & Remove */}
           <div className="flex items-center gap-1 shrink-0 ml-2">
-            <div className="flex items-center bg-white border border-[#E5E5E5] rounded-md">
+            <div className="flex items-center bg-white border border-line rounded-md">
               <button
                 type="button"
                 onClick={() => onUpdateQty(item.cartItemId, -1)}
-                className="px-2 py-1 text-xs text-[#525252] hover:bg-[#F5F5F5] rounded-l-md"
+                className="px-2 py-1 text-xs text-ink-soft hover:bg-[#F5F5F5] rounded-l-md"
               >
                 <Minus className="w-2.5 h-2.5" />
               </button>
-              <span className="w-5 text-center text-xs font-bold text-[#1F1F1F]">
+              <span className="w-5 text-center text-xs font-bold text-ink">
                 {item.quantity}
               </span>
               <button
                 type="button"
                 onClick={() => onUpdateQty(item.cartItemId, 1)}
-                className="px-2 py-1 text-xs text-[#525252] hover:bg-[#F5F5F5] rounded-r-md"
+                className="px-2 py-1 text-xs text-ink-soft hover:bg-[#F5F5F5] rounded-r-md"
               >
                 <Plus className="w-2.5 h-2.5" />
               </button>
@@ -123,7 +123,7 @@ export function PosCartItemList({
             <button
               type="button"
               onClick={() => onRemoveItem(item.cartItemId)}
-              className="p-1 text-[#A3A3A3] hover:text-[#BA1A20] transition-colors"
+              className="p-1 text-[#A3A3A3] hover:text-brand transition-colors"
             >
               <Trash2 className="w-3.5 h-3.5" />
             </button>

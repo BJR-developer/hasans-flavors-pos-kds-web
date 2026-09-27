@@ -6,6 +6,7 @@ import {
   createStaffAccount,
   resetPasswordDirect,
   updateStaffProfile,
+  updateStaffUsername,
   deleteStaffAccount,
 } from '@/lib/staffApi';
 import { StaffUser } from '@/types';
@@ -67,6 +68,18 @@ export function useUpdateStaffProfile() {
         fullName: params.fullName,
         phone: params.phone,
       }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: STAFF_QUERY_KEYS.staffUsers });
+    },
+  });
+}
+
+export function useUpdateStaffUsername() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (params: { userId: string; username: string }) =>
+      updateStaffUsername(params.userId, params.username),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: STAFF_QUERY_KEYS.staffUsers });
     },

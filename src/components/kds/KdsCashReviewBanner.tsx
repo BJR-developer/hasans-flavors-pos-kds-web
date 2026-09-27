@@ -35,21 +35,21 @@ export function KdsCashReviewBanner({
           </div>
           <div>
             <div className="flex items-center gap-1.5 flex-wrap">
-              <span className="text-[11px] font-black uppercase tracking-wider text-amber-900">
+              <span className="text-xs font-black uppercase tracking-wider text-amber-900">
                 {isDelivery ? 'Cash on Delivery Review' : 'Cash Order Review'}
               </span>
-              <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-amber-200 text-amber-900">
+              <span className="text-xs font-bold px-1.5 py-0.2 rounded bg-amber-200 text-amber-900">
                 Pending Staff Approval
               </span>
             </div>
-            <p className="text-[11px] text-amber-800 font-medium leading-tight mt-0.5">
+            <p className="text-xs text-amber-800 font-medium leading-tight mt-0.5">
               Customer placed via mobile app. Verify before kitchen starts cooking.
             </p>
           </div>
         </div>
 
         <div className="text-right shrink-0">
-          <div className="flex items-center gap-1 text-[11px] font-black text-amber-950 justify-end">
+          <div className="flex items-center gap-1 text-xs font-black text-amber-950 justify-end">
             <Banknote className="w-3.5 h-3.5 text-amber-700" />
             <span>Collect ₱{Number(order.total || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
           </div>
@@ -57,7 +57,7 @@ export function KdsCashReviewBanner({
             <a
               href={`tel:${order.customerPhone}`}
               onClick={(e) => e.stopPropagation()}
-              className="inline-flex items-center gap-1 text-[10px] text-amber-800 hover:text-amber-950 font-bold underline decoration-dotted mt-0.5"
+              className="inline-flex items-center gap-1 text-xs text-amber-800 hover:text-amber-950 font-bold underline decoration-dotted mt-0.5"
             >
               <Phone className="w-2.5 h-2.5" />
               <span>{order.customerPhone}</span>

@@ -64,7 +64,7 @@ export function AccountSettingsTab() {
                 {user.name}
               </h2>
               <span
-                className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider ${
+                className={`text-xs font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider ${
                   user.role === 'owner'
                     ? 'bg-amber-100 text-amber-800 border border-amber-200'
                     : user.role === 'cashier'
@@ -74,7 +74,7 @@ export function AccountSettingsTab() {
               >
                 {user.role}
               </span>
-              <span className="flex items-center gap-1 text-[11px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full font-medium border border-emerald-200">
+              <span className="flex items-center gap-1 text-xs text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full font-medium border border-emerald-200">
                 <CheckCircle2 className="w-3 h-3 text-emerald-600" />
                 Active Session
               </span>
@@ -89,7 +89,7 @@ export function AccountSettingsTab() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-6">
           {/* Full Name */}
           <div className="p-3.5 rounded-xl bg-neutral-50 border border-neutral-200/80 space-y-1">
-            <div className="flex items-center gap-1.5 text-neutral-500 text-[11px] font-semibold">
+            <div className="flex items-center gap-1.5 text-neutral-500 text-xs font-semibold">
               <User className="w-3.5 h-3.5 text-neutral-600" />
               <span>Full Name</span>
             </div>
@@ -100,7 +100,7 @@ export function AccountSettingsTab() {
 
           {/* Email Address */}
           <div className="p-3.5 rounded-xl bg-neutral-50 border border-neutral-200/80 space-y-1">
-            <div className="flex items-center gap-1.5 text-neutral-500 text-[11px] font-semibold">
+            <div className="flex items-center gap-1.5 text-neutral-500 text-xs font-semibold">
               <Mail className="w-3.5 h-3.5 text-neutral-600" />
               <span>Email Address</span>
             </div>
@@ -111,7 +111,7 @@ export function AccountSettingsTab() {
 
           {/* Role & Permissions */}
           <div className="p-3.5 rounded-xl bg-neutral-50 border border-neutral-200/80 space-y-1">
-            <div className="flex items-center gap-1.5 text-neutral-500 text-[11px] font-semibold">
+            <div className="flex items-center gap-1.5 text-neutral-500 text-xs font-semibold">
               <ShieldCheck className="w-3.5 h-3.5 text-neutral-600" />
               <span>Portal Role</span>
             </div>
@@ -122,7 +122,7 @@ export function AccountSettingsTab() {
 
           {/* Contact Phone */}
           <div className="p-3.5 rounded-xl bg-neutral-50 border border-neutral-200/80 space-y-1">
-            <div className="flex items-center gap-1.5 text-neutral-500 text-[11px] font-semibold">
+            <div className="flex items-center gap-1.5 text-neutral-500 text-xs font-semibold">
               <Phone className="w-3.5 h-3.5 text-neutral-600" />
               <span>Contact Number</span>
             </div>
