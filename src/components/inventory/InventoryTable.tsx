@@ -44,6 +44,7 @@ import { ProductFormModal } from './ProductFormModal';
 import { SafeImage } from '@/components/common/SafeImage';
 import { SelectDropdown, DropdownOption } from '@/components/common/SelectDropdown';
 import { useAuthStore } from '@/lib/auth';
+import { usePosSettings } from '@/hooks/usePosSettings';
 
 const STORAGE_KEY = 'hasans_inventory_prefs_v1';
 
@@ -179,6 +180,8 @@ function InlineDishStockInput({ dish, currentQty }: { dish: Dish; currentQty: nu
 export function InventoryTable() {
   const { user } = useAuthStore();
   const isOwner = user?.role === 'owner';
+  const { cashiersCanCreateProducts } = usePosSettings();
+  const canCreateProduct = isOwner || (user?.role === 'cashier' && cashiersCanCreateProducts);
   const { data: dishes = [] } = useDishes();
   const { data: categories = [] } = useCategories();
   const toggleStockMutation = useToggleDishStock();
@@ -655,7 +658,7 @@ export function InventoryTable() {
           </p>
         </div>
 
-        {isOwner && (
+        {canCreateProduct && (
           <button
             type="button"
             onClick={() => {

@@ -6,6 +6,7 @@ import { PaymentMethod, PosSettings, VatApplicability } from '@/types';
 // Extended type – only used internally, not exported to src/types/index.ts
 export interface PosSettingsExtended extends PosSettings {
   cashiersCanEditPos: boolean;
+  cashiersCanCreateProducts: boolean;
 }
 
 export interface PosSettingsStore extends PosSettingsExtended {
@@ -22,6 +23,7 @@ export interface PosSettingsStore extends PosSettingsExtended {
   setEnabledPaymentMethods: (methods: PaymentMethod[]) => void;
   setDefaultPaymentTiming: (timing: 'pay_now' | 'pay_later') => void;
   setCashiersCanEditPos: (enabled: boolean) => void;
+  setCashiersCanCreateProducts: (enabled: boolean) => void;
   resetSettings: () => void;
   calculateTax: (subtotal: number, paymentMethod?: PaymentMethod | null) => number;
 }
@@ -34,6 +36,7 @@ export const DEFAULT_POS_SETTINGS: PosSettingsExtended = {
   enabledPaymentMethods: ['cash', 'card', 'gcash', 'inr_qr'],
   defaultPaymentTiming: 'pay_later',
   cashiersCanEditPos: true,
+  cashiersCanCreateProducts: true,
 };
 
 const POS_QUERY_KEY = ['app_settings', 'pos'] as const;
@@ -60,6 +63,7 @@ async function fetchPosSettings(): Promise<PosSettingsExtended> {
       : DEFAULT_POS_SETTINGS.enabledPaymentMethods,
     defaultPaymentTiming: (v.defaultPaymentTiming as 'pay_now' | 'pay_later') || DEFAULT_POS_SETTINGS.defaultPaymentTiming,
     cashiersCanEditPos: typeof v.cashiersCanEditPos === 'boolean' ? v.cashiersCanEditPos : true,
+    cashiersCanCreateProducts: typeof v.cashiersCanCreateProducts === 'boolean' ? v.cashiersCanCreateProducts : true,
   };
 }
 
@@ -151,7 +155,14 @@ export function usePosSettings(): PosSettingsStore {
     setEnabledPaymentMethods: (enabledPaymentMethods) => patch({ enabledPaymentMethods }),
     setDefaultPaymentTiming: (defaultPaymentTiming) => patch({ defaultPaymentTiming }),
     setCashiersCanEditPos: (cashiersCanEditPos) => patch({ cashiersCanEditPos }),
-    resetSettings: () => mutation.mutate(DEFAULT_POS_SETTINGS),
+    setCashiersCanCreateProducts: (cashiersCanCreateProducts) => patch({ cashiersCanCreateProducts }),
+    // Reset POS options only; keep owner-controlled cashier permissions as they are
+    resetSettings: () =>
+      mutation.mutate({
+        ...DEFAULT_POS_SETTINGS,
+        cashiersCanEditPos: current.cashiersCanEditPos,
+        cashiersCanCreateProducts: current.cashiersCanCreateProducts,
+      }),
     calculateTax,
   };
 }

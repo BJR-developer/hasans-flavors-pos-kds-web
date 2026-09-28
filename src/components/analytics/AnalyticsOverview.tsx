@@ -2,7 +2,7 @@
 
 import React, { useMemo, useState } from 'react';
 import Link from 'next/link';
-import { Wallet, Receipt, TrendingUp, AlertTriangle, ClipboardCheck, ArrowRight, Package, Clock, Utensils } from 'lucide-react';
+import { Wallet, Receipt, TrendingUp, AlertTriangle, ClipboardCheck, ArrowRight, Package, Clock, Utensils, Banknote } from 'lucide-react';
 import { useOrders, useDishes, useTableSessions } from '@/hooks/useRestaurantData';
 import { useShifts } from '@/hooks/useShiftData';
 import { useStaffUsers } from '@/hooks/useStaffData';
@@ -75,6 +75,25 @@ export function AnalyticsOverview() {
   );
   const shortTotal = rangeShifts.reduce((s, r) => s + Math.min(0, r.money.variance ?? 0), 0);
 
+  // Drawer cash per shift in range: counted amount once closed, float + cash taken while open
+  const drawers = useMemo(() => {
+    const drawerOf = (m: (typeof rangeShifts)[number]['money']) => m.countedCash ?? m.expectedCash;
+    return {
+      total: rangeShifts.reduce((sum, r) => sum + drawerOf(r.money), 0),
+      float: rangeShifts.reduce((sum, r) => sum + r.money.openingCash, 0),
+      cash: rangeShifts.reduce((sum, r) => sum + r.money.cashCollected, 0),
+      openCount: rangeShifts.filter((r) => r.shift.status === 'open').length,
+    };
+  }, [rangeShifts]);
+
+  const shiftNotes = useMemo(
+    () =>
+      rangeShifts
+        .filter((r) => r.shift.notes)
+        .sort((a, b) => new Date(b.shift.endTime || b.shift.startTime).getTime() - new Date(a.shift.endTime || a.shift.startTime).getTime()),
+    [rangeShifts]
+  );
+
   // Alerts
   const alerts = useMemo(() => {
     const list: { tone: 'red' | 'amber'; text: string; href: string }[] = [];
@@ -128,11 +147,23 @@ export function AnalyticsOverview() {
         const own = rangeShifts.filter((r) => r.shift.cashierId === c.id);
         const collected = summarizePayments(rangePayments.filter((p) => p.cashierId === c.id)).collected;
         const openShift = shifts.find((s) => s.cashierId === c.id && s.status === 'open');
+        const openMoney = openShift ? shiftMoney(openShift, allPayments) : undefined;
+        const closed = own.filter((r) => r.money.countedCash !== undefined);
+        const drawer = openMoney
+          ? { amount: openMoney.expectedCash, float: openMoney.openingCash, cash: openMoney.cashCollected, live: true }
+          : closed.length
+            ? {
+                amount: closed.reduce((sum, r) => sum + (r.money.countedCash || 0), 0),
+                float: closed.reduce((sum, r) => sum + r.money.openingCash, 0),
+                cash: closed.reduce((sum, r) => sum + r.money.cashCollected, 0),
+                live: false,
+              }
+            : undefined;
         const variance = own.reduce((s, r) => s + (r.money.variance ?? 0), 0);
         const hasClosed = own.some((r) => r.money.variance !== undefined);
-        return { cashier: c, shifts: own.length, collected, openShift, variance: hasClosed ? variance : undefined };
+        return { cashier: c, shifts: own.length, collected, openShift, drawer, variance: hasClosed ? variance : undefined };
       });
-  }, [staff, rangeShifts, rangePayments, shifts]);
+  }, [staff, rangeShifts, rangePayments, shifts, allPayments]);
 
   // Best sellers
   const bestSellers = useMemo(() => {
@@ -189,13 +220,23 @@ export function AnalyticsOverview() {
         onCustomTo={setCustomTo}
       />
 
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
         <StatTile tone="dark" label="Money collected" value={formatPeso(summary.collected)} hint={`Cash ${formatPeso(summary.byMethod.cash.amount)}`} icon={Wallet} />
         <StatTile label="Orders" value={rangeOrders.length} hint={`${summary.orderCount} paid`} icon={Receipt} />
         <StatTile
           label="Average paid order"
           value={formatPeso(summary.orderCount ? summary.collected / summary.orderCount : 0)}
           icon={TrendingUp}
+        />
+        <StatTile
+          label="Drawer cash"
+          value={formatPeso(drawers.total)}
+          hint={
+            rangeShifts.length
+              ? `Float ${formatPeso(drawers.float)} + cash ${formatPeso(drawers.cash)}${drawers.openCount ? ` · ${drawers.openCount} open` : ''}`
+              : 'No shifts'
+          }
+          icon={Banknote}
         />
         <StatTile tone={open.count ? 'amber' : 'default'} label="Not paid yet" value={formatPeso(open.amount)} hint={`${open.count} open orders`} icon={AlertTriangle} />
         <StatTile
@@ -275,8 +316,17 @@ export function AnalyticsOverview() {
                     <td className="px-3 py-3 text-right">{r.shifts}</td>
                     <td className="px-3 py-3 text-right font-mono font-bold">{formatPeso(r.collected)}</td>
                     <td className="px-5 py-3 text-right whitespace-nowrap">
-                      {r.variance === undefined ? (
-                        <span className="text-muted">—</span>
+                      {r.drawer && (
+                        <div className="leading-tight mb-0.5">
+                          <span className="font-mono font-bold text-ink">{formatPeso(r.drawer.amount)}</span>
+                          <span className="text-muted">{r.drawer.live ? ' in drawer' : ' counted'}</span>
+                          <div className="text-xs text-muted">
+                            Float {formatPeso(r.drawer.float)} + cash {formatPeso(r.drawer.cash)}
+                          </div>
+                        </div>
+                      )}
+                      {r.variance === undefined || r.drawer?.live ? (
+                        r.drawer ? null : <span className="text-muted">—</span>
                       ) : Math.abs(r.variance) < 0.01 ? (
                         <span className="font-bold text-emerald-700">Balanced</span>
                       ) : (
@@ -289,6 +339,23 @@ export function AnalyticsOverview() {
                 ))}
               </tbody>
             </table>
+          )}
+          {shiftNotes.length > 0 && (
+            <div className="px-5 py-4 border-t border-line space-y-2">
+              <p className="text-xs font-bold uppercase tracking-wide text-muted">Shift notes</p>
+              {shiftNotes.map((r) => (
+                <div key={r.shift.id} className="text-sm">
+                  <span className="font-bold text-ink">{r.shift.cashierName}</span>
+                  <span className="text-muted">
+                    {' · '}
+                    {r.shift.status === 'closed' && r.shift.endTime
+                      ? `closed ${new Date(r.shift.endTime).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}`
+                      : 'open'}
+                  </span>
+                  <p className="text-ink-soft mt-0.5">&ldquo;{r.shift.notes}&rdquo;</p>
+                </div>
+              ))}
+            </div>
           )}
         </Card>
 

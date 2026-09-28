@@ -39,6 +39,7 @@ export function PosSettingsTab() {
     enabledPaymentMethods,
     defaultPaymentTiming,
     cashiersCanEditPos,
+    cashiersCanCreateProducts,
     setVatEnabled,
     setVatRate,
     setVatApplicability,
@@ -46,6 +47,7 @@ export function PosSettingsTab() {
     togglePaymentMethod,
     setDefaultPaymentTiming,
     setCashiersCanEditPos,
+    setCashiersCanCreateProducts,
     resetSettings,
   } = usePosSettings();
 
@@ -331,33 +333,47 @@ export function PosSettingsTab() {
             </div>
             <div>
               <h3 className="text-sm font-extrabold text-neutral-900">Cashier POS Permissions</h3>
-              <p className="text-xs text-neutral-500">Control whether cashiers can edit these settings</p>
+              <p className="text-xs text-neutral-500">Control what cashier accounts are allowed to do</p>
             </div>
           </div>
 
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs font-bold text-neutral-800">Cashiers can change POS settings</p>
-              <p className="text-xs text-neutral-500 mt-0.5">
-                When disabled, cashiers see settings as read-only
-              </p>
-            </div>
-            <button
-              type="button"
-              role="switch"
-              aria-checked={cashiersCanEditPos}
-              onClick={() => setCashiersCanEditPos(!cashiersCanEditPos)}
-              className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                cashiersCanEditPos ? 'bg-money' : 'bg-neutral-200'
-              }`}
-            >
-              <span
-                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
-                  cashiersCanEditPos ? 'translate-x-5' : 'translate-x-0'
+          {[
+            {
+              label: 'Cashiers can change POS settings',
+              hint: 'When disabled, cashiers see settings as read-only',
+              on: cashiersCanEditPos,
+              toggle: () => setCashiersCanEditPos(!cashiersCanEditPos),
+            },
+            {
+              label: 'Cashiers can create products',
+              hint: 'Shows "Add New Product" in Menu & Stock for cashiers',
+              on: cashiersCanCreateProducts,
+              toggle: () => setCashiersCanCreateProducts(!cashiersCanCreateProducts),
+            },
+          ].map((row) => (
+            <div key={row.label} className="flex items-center justify-between">
+              <div>
+                <p className="text-xs font-bold text-neutral-800">{row.label}</p>
+                <p className="text-xs text-neutral-500 mt-0.5">{row.hint}</p>
+              </div>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={row.on}
+                aria-label={row.label}
+                onClick={row.toggle}
+                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                  row.on ? 'bg-money' : 'bg-neutral-200'
                 }`}
-              />
-            </button>
-          </div>
+              >
+                <span
+                  className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
+                    row.on ? 'translate-x-5' : 'translate-x-0'
+                  }`}
+                />
+              </button>
+            </div>
+          ))}
         </div>
       )}
 
